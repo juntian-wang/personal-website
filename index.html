@@ -231,12 +231,15 @@
       background: #000;
       overflow-x: hidden;
     }
+    .portfolio-top-img-wrap {
+      width: 100vw;
+      overflow: hidden;
+      height: 38vw;
+    }
     .portfolio-top-img {
       display: block;
-      width: 100vw;
-      height: 32vw;
-      object-fit: cover;
-      object-position: center bottom;
+      width: 100%;
+      height: auto;
     }
     .portfolio-inner {
       position: relative;
@@ -368,7 +371,6 @@
       position: relative;
       width: 100%;
       height: 100vh;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -376,11 +378,18 @@
     }
     .thanks-scene {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: 0;
     }
     .thanks-scene [data-us-project] {
-      width: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+    .thanks-scene canvas {
+      width: 100vw !important;
       height: 100vh !important;
     }
     .thanks-placeholder {
@@ -491,7 +500,9 @@
 
   <!-- ===== Portfolio ===== -->
   <section class="portfolio">
-    <img class="portfolio-top-img" src="pic/背景图-偷看.webp" alt="" />
+    <div class="portfolio-top-img-wrap">
+      <img class="portfolio-top-img" src="pic/背景图-偷看.webp" alt="" />
+    </div>
     <div class="portfolio-inner">
       <div class="portfolio-gallery" id="portfolioGallery" role="region" aria-roledescription="carousel" aria-label="精选作品画廊">
         <button class="pg-nav pg-prev" id="pgPrev" aria-label="上一个作品">&#8249;</button>
@@ -503,11 +514,18 @@
               <p>短篇动画 · 2026</p>
             </div>
           </a>
-          <a class="portfolio-item" href="https://jonlab.cn/maplibre_3d_history.html" target="_blank" rel="noopener">
+          <a class="portfolio-item" href="http://history.jonlab.cn/maplibre_3d_history.html" target="_blank" rel="noopener">
             <img src="pic/作品封面/中国古代疆域.webp" alt="中国古代疆域" loading="lazy" />
             <div class="info">
               <h3>中国古代疆域</h3>
               <p>3D 地图可视化 · 2026</p>
+            </div>
+          </a>
+          <a class="portfolio-item" href="https://history.jonlab.cn/maplibre_3d_history.html?mode=poem" target="_blank" rel="noopener">
+            <img src="pic/作品封面/中国古代诗词地图.webp" alt="中国古代诗词地图" loading="lazy" />
+            <div class="info">
+              <h3>中国古代诗词地图</h3>
+              <p>诗词地图 · 2026</p>
             </div>
           </a>
           <div class="portfolio-item">
@@ -524,6 +542,20 @@
               <p>角色设计 · 2026</p>
             </div>
           </div>
+          <div class="portfolio-item">
+            <img src="pic/作品封面/卫星.webp" alt="军事卫星设计图" loading="lazy" />
+            <div class="info">
+              <h3>军事卫星设计图</h3>
+              <p>卫星设计 · 2026</p>
+            </div>
+          </div>
+          <div class="portfolio-item">
+            <img src="pic/作品封面/飞船.webp" alt="星际飞船设计图" loading="lazy" />
+            <div class="info">
+              <h3>星际飞船设计图</h3>
+              <p>飞船设计 · 2026</p>
+            </div>
+          </div>
         </div>
         <button class="pg-nav pg-next" id="pgNext" aria-label="下一个作品">&#8250;</button>
       </div>
@@ -534,7 +566,7 @@
   <section class="thanks" id="thanksSection">
     <div class="thanks-scene">
       <div
-        data-us-project="D9oxW7Kg2t9vuTZh39jk"
+        data-us-project="b4yDz9Fg5aupJU3GGOTp"
         style="width: 100%; height: 100vh;"
       ></div>
     </div>
