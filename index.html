@@ -685,9 +685,12 @@
               loaded++;
               images[idx] = img;
               if (loadingTxt) {
-                loadingTxt.textContent = '加载中 ' + loaded + '/' + TOTAL_FRAMES;
+                loadingTxt.textContent = (loaded < TOTAL_FRAMES)
+                  ? '加载中 ' + loaded + '/' + TOTAL_FRAMES
+                  : '✓ 已就绪';
               }
-              if (loaded === TOTAL_FRAMES) {
+              // Progressive: enable scrolling as soon as frame 0 is available
+              if (!isReady && images[0]) {
                 isReady = true;
                 loading.classList.add('is-hidden');
                 drawFrame(0);
