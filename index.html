@@ -431,14 +431,16 @@
     <!-- Sticky container: stays fixed during scroll, section height creates the scroll room -->
     <div class="scroll-video-sticky" id="scrollVideoSticky">
       <!-- Video plays directly in the viewport, scrubbed by scroll position -->
-      <video id="scrollVidEl" muted playsinline preload="auto"
-        src="pic/视频/intro-scroll-kf.mp4"
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none">
-      </video>
+      <canvas id="scrollCanvas"
+        style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+      </canvas>
 
       <!-- Loading overlay -->
       <div class="scroll-video-loading" id="scrollVideoLoading">
-        <div class="spinner"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1rem">
+          <div class="spinner"></div>
+          <div id="loadingProgress" style="font-size:0.85rem;color:#666">加载中 0/361</div>
+        </div>
       </div>
 
       <!-- ===== Text overlays ===== -->
@@ -645,57 +647,120 @@
   </script>
 
   <script>
-    // ===== Scroll-Driven Video Playback (Page 2) =====
-    // Uses direct <video> element scrubbing — no Canvas overhead, hardware accelerated.
+    // ===== Scroll-Driven Canvas Image Sequence (Page 2) =====
+    // Preloads all 361 frames as WebP images, draws to canvas based on scroll.
+    // No network requests after preload = instant frame switching.
     (function(){
-      var section   = document.getElementById('scrollVideo');
-      var video     = document.getElementById('scrollVidEl');
-      var loading   = document.getElementById('scrollVideoLoading');
-      var progBar   = document.getElementById('scrollVideoProgressBar');
+      var TOTAL_FRAMES = 361;
+      var FRAME_W      = 1920;
+      var FRAME_H      = 1080;
+      var FRAME_DIR    = 'pic/frames/';
+      var DURATION     = 15; // seconds
 
-      var DURATION = 0;                    // auto-detected from video metadata
-      var isReady = false;                 // video metadata loaded
+      var section     = document.getElementById('scrollVideo');
+      var canvas      = document.getElementById('scrollCanvas');
+      var ctx         = canvas.getContext('2d');
+      var loading     = document.getElementById('scrollVideoLoading');
+      var loadingTxt  = document.getElementById('loadingProgress');
+      var progBar     = document.getElementById('scrollVideoProgressBar');
 
-      // Set section scroll height (500vh = 400vh sticky room, 2x slower scroll)
-      function resize() {
-        section.style.height = (window.innerHeight * 5) + 'px';
+      // Retina support
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width  = FRAME_W * dpr;
+      canvas.height = FRAME_H * dpr;
+      ctx.scale(dpr, dpr);
+
+      // ===== Preload all 361 frames =====
+      var images   = [];
+      var loaded   = 0;
+      var isReady  = false;
+
+      function preloadAll() {
+        for (var i = 0; i < TOTAL_FRAMES; i++) {
+          (function(idx){
+            var img = new Image();
+            var num = String(idx + 1).padStart(4, '0');
+            img.src = FRAME_DIR + 'frame-' + num + '.webp';
+            img.onload = img.onerror = function(){
+              loaded++;
+              images[idx] = img;
+              if (loadingTxt) {
+                loadingTxt.textContent = '加载中 ' + loaded + '/' + TOTAL_FRAMES;
+              }
+              if (loaded === TOTAL_FRAMES) {
+                isReady = true;
+                loading.classList.add('is-hidden');
+                drawFrame(0);
+                updateTextOverlays(0);
+              }
+            };
+            images[idx] = null;
+          })(i);
+        }
       }
 
-      // Update video time based on scroll position
+      // ===== Draw frame with object-fit:cover =====
+      var currentFrame = -1;
+
+      function drawFrame(frameIdx) {
+        if (frameIdx === currentFrame) return;
+        currentFrame = frameIdx;
+        var img = images[frameIdx];
+        if (!img) return;
+
+        ctx.clearRect(0, 0, FRAME_W, FRAME_H);
+
+        // Cover-fit: source image (1920x1080) → canvas client area
+        var cw = canvas.clientWidth || window.innerWidth;
+        var ch = canvas.clientHeight || window.innerHeight;
+        var ca = cw / ch;
+        var ia = FRAME_W / FRAME_H;
+        var sx, sy, sw, sh;
+        if (ca > ia) {
+          sw = FRAME_H * ca;
+          sh = FRAME_H;
+          sx = (FRAME_W - sw) / 2;
+          sy = 0;
+        } else {
+          sw = FRAME_W;
+          sh = FRAME_W / ca;
+          sx = 0;
+          sy = (FRAME_H - sh) / 2;
+        }
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, FRAME_W, FRAME_H);
+      }
+
+      // ===== Scroll-driven frame selection =====
       var scrollTicking = false;
+
       function onScroll() {
         if (scrollTicking || !isReady) return;
         scrollTicking = true;
-
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function(){
           var rect = section.getBoundingClientRect();
           var vh = window.innerHeight;
           var travel = section.offsetHeight - vh;
           if (travel <= 0) { scrollTicking = false; return; }
-
-          // progress: 0 (section top at viewport top) → 1 (about to unstick)
           var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-          // Scrub video directly — browser renders the frame natively
-          video.currentTime = p * DURATION;
+          var frameIdx = Math.round(p * (TOTAL_FRAMES - 1));
+          drawFrame(frameIdx);
 
-          // Update progress bar
           progBar.style.width = (p * 100) + '%';
 
-          // Sync text overlays with video time
-          updateTextOverlays();
+          var t = (frameIdx / TOTAL_FRAMES) * DURATION;
+          updateTextOverlays(t);
 
           scrollTicking = false;
         });
       }
 
-      // Update text overlay visibility based on video.currentTime
-      var textOverlays = null; // lazy init
-      function updateTextOverlays() {
+      // ===== Text overlays (receives time param, no longer reads video.currentTime) =====
+      var textOverlays = null;
+      function updateTextOverlays(t) {
         if (textOverlays === null) {
           textOverlays = document.querySelectorAll('.scroll-text-overlay');
         }
-        var t = video.currentTime;
         for (var i = 0; i < textOverlays.length; i++) {
           var el = textOverlays[i];
           var start = parseFloat(el.dataset.start);
@@ -704,49 +769,25 @@
           var opacity = 0;
           if (t >= start && t <= end) {
             opacity = 1;
-            // Fade in at start
-            if (t - start < fade) {
-              opacity = (t - start) / fade;
-            }
-            // Fade out at end
-            if (end - t < fade) {
-              opacity = (end - t) / fade;
-            }
+            if (t - start < fade) opacity = (t - start) / fade;
+            if (end - t < fade) opacity = (end - t) / fade;
           }
           el.style.opacity = opacity;
         }
       }
 
-      // Init
-      function init() {
-        DURATION = video.duration;
-        resize();
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', resize);
-
-        // Mark the video as ready for scrolling.
-        function markReady() {
-          if (isReady) return;
-          isReady = true;
-          loading.classList.add('is-hidden');
-          updateTextOverlays();  // show initial text state
-        }
-
-        // If the video already has enough data (e.g. cached), canplay may have
-        // fired before we registered the listener — handle that synchronously.
-        if (video.readyState >= 3) {
-          markReady();
-        } else {
-          video.addEventListener('canplay', markReady, { once: true });
-        }
+      // ===== Init =====
+      function resize() {
+        section.style.height = (window.innerHeight * 5) + 'px';
       }
 
-      // Start when video metadata is ready
-      if (video.readyState >= 1) {
-        init();
-      } else {
-        video.addEventListener('loadedmetadata', init, { once: true });
-      }
+      resize();
+      preloadAll();
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', resize);
+
+      updateTextOverlays(0);
     })();
   </script>
 
