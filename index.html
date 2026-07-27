@@ -402,9 +402,253 @@
       justify-content: center;
       transition: opacity 0.6s ease;
     }
+
+    /* ===== Loading Screen (user's cyberpunk style) ===== */
+    :root {
+      --loader-primary: #00f3ff;
+      --loader-bg: #050505;
+    }
+    #loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    #loader-wrapper.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Background grid */
+    #loader-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,243,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,243,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Core loading ring */
+    .loader-ring {
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+    .loader-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .circle-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.1);
+      stroke-width: 4;
+    }
+    .circle-progress {
+      fill: none;
+      stroke: var(--loader-primary);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      filter: drop-shadow(0 0 8px var(--loader-primary));
+      transition: stroke-dashoffset 0.1s linear;
+    }
+
+    /* Decorative spinning rings */
+    .spinner-inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120px;
+      height: 120px;
+      margin-top: -60px;
+      margin-left: -60px;
+      border: 2px dashed rgba(255,255,255,0.3);
+      border-radius: 50%;
+      animation: loaderSpin 4s linear infinite;
+    }
+    .spinner-outer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 180px;
+      height: 180px;
+      margin-top: -90px;
+      margin-left: -90px;
+      border: 1px solid rgba(0,243,255,0.1);
+      border-radius: 50%;
+      animation: loaderSpinReverse 10s linear infinite;
+    }
+    .core-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background: var(--loader-primary);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      box-shadow: 0 0 15px var(--loader-primary), 0 0 30px var(--loader-primary);
+      animation: loaderPulse 1s ease-in-out infinite;
+    }
+
+    /* Text */
+    .loading-text {
+      margin-top: 40px;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+    }
+    .loader-percentage {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 10px var(--loader-primary);
+    }
+    .loader-status {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    @keyframes loaderSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes loaderSpinReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes loaderPulse {
+      0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+      50% { transform: translate(-50%,-50%) scale(1.5); opacity: 0.5; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spinner-inner, .spinner-outer { animation: none; }
+      .core-dot { animation: none; }
+    }
   </style>
+
+  <!-- Three.js importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
+
+  <!-- ===== Loading Screen (cyberpunk style) ===== -->
+  <div id="loader-wrapper">
+    <div id="loader-grid"></div>
+    <!-- Outer spinning ring -->
+    <div class="spinner-outer"></div>
+
+    <!-- Core ring -->
+    <div class="loader-ring">
+      <div class="spinner-inner"></div>
+      <div class="core-dot"></div>
+      <svg class="loader-svg" viewBox="0 0 160 160">
+        <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+        <circle id="progress-ring" class="circle-progress" cx="80" cy="80" r="70"></circle>
+      </svg>
+    </div>
+
+    <!-- Loading text -->
+    <div class="loading-text">
+      <div class="loader-percentage" id="loader-percentage">0%</div>
+      <div class="loader-status" id="loader-status">INITIALIZING...</div>
+    </div>
+  </div>
+
+  <!-- Loading screen JS: track real frame progress -->
+  <script>
+    (function(){
+      var wrapper = document.getElementById('loader-wrapper');
+      var ring    = document.getElementById('progress-ring');
+      var pctEl   = document.getElementById('loader-percentage');
+      var statusEl= document.getElementById('loader-status');
+
+      // Lock scroll
+      document.body.style.overflow = 'hidden';
+
+      // SVG ring perimeter
+      var radius = 70;
+      var circumference = 2 * Math.PI * radius;
+      ring.style.strokeDasharray = circumference + ' ' + circumference;
+      ring.style.strokeDashoffset = circumference;
+
+      var statusMsgs = [
+        [0, 15, '初始化...'],
+        [15, 35, '正在加载...'],
+        [35, 55, '加载中...'],
+        [55, 75, '快了...'],
+        [75, 99, '马上就好...'],
+        [100, 100, '✓ 搞定']
+      ];
+
+      function setProgress(pct) {
+        var offset = circumference - (pct / 100) * circumference;
+        ring.style.strokeDashoffset = offset;
+        pctEl.textContent = Math.round(pct) + '%';
+
+        for (var i = 0; i < statusMsgs.length; i++) {
+          if (pct >= statusMsgs[i][0] && pct <= statusMsgs[i][1]) {
+            statusEl.textContent = statusMsgs[i][2];
+            break;
+          }
+        }
+      }
+
+      // Poll frame loading progress
+      var tick = setInterval(function(){
+        var p = window._frameLoadProgress;
+        if (p !== undefined) {
+          var pct = Math.min(p * 100, 100);
+          setProgress(pct);
+          if (p >= 1) {
+            clearInterval(tick);
+            statusEl.textContent = '✓ 搞定';
+            pctEl.textContent = '100%';
+            setProgress(100);
+            setTimeout(function(){
+              wrapper.classList.add('is-hidden');
+              document.body.style.overflow = '';
+            }, 600);
+          }
+        }
+      }, 100);
+
+      // Safety: dismiss after 20s max
+      setTimeout(function(){
+        if (!wrapper.classList.contains('is-hidden')) {
+          clearInterval(tick);
+          setProgress(100);
+          statusEl.textContent = '✓ 搞定';
+          setTimeout(function(){
+            wrapper.classList.add('is-hidden');
+            document.body.style.overflow = '';
+          }, 600);
+        }
+      }, 20000);
+    })();
+  </script>
 
   <!-- ===== Hero ===== -->
   <section class="hero">
@@ -715,6 +959,7 @@
             img.src = FRAME_DIR + 'frame-' + num + '.webp';
             img.onload = img.onerror = function(){
               loaded++;
+              window._frameLoadProgress = loaded / TOTAL_FRAMES;
               images[idx] = img;
               if (loadingTxt) {
                 loadingTxt.textContent = (loaded < TOTAL_FRAMES)
