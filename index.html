@@ -635,12 +635,12 @@
       ring.style.strokeDashoffset = circumference;
 
       var statusMsgs = [
-        [0, 15, '初始化...'],
-        [15, 35, '正在加载...'],
-        [35, 55, '加载中...'],
-        [55, 75, '快了...'],
-        [75, 99, '马上就好...'],
-        [100, 100, '✓ 搞定']
+        [0, 15, '热身...'],
+        [15, 35, '助跑...'],
+        [35, 55, '起跳！'],
+        [55, 75, '空中转体...'],
+        [75, 99, '稳稳落地...'],
+        [100, 100, '✓ 完美落地']
       ];
 
       function setProgress(pct) {
@@ -664,7 +664,7 @@
           setProgress(pct);
           if (p >= 0.8) {
             clearInterval(tick);
-            statusEl.textContent = '✓ 搞定';
+            statusEl.textContent = '✓ 完美落地';
             pctEl.textContent = '100%';
             setProgress(100);
             setTimeout(function(){
