@@ -638,9 +638,9 @@
         [0, 15, '热身...'],
         [15, 35, '助跑...'],
         [35, 55, '起跳！'],
-        [55, 75, '空中转体...'],
-        [75, 99, '稳稳落地...'],
-        [100, 100, '✓ 完美落地']
+        [55, 75, '侧跨...'],
+        [75, 99, '落地...'],
+        [100, 100, '✓ 完美']
       ];
 
       function setProgress(pct) {
@@ -664,7 +664,7 @@
           setProgress(pct);
           if (p >= 0.8) {
             clearInterval(tick);
-            statusEl.textContent = '✓ 完美落地';
+            statusEl.textContent = '✓ 完美';
             pctEl.textContent = '100%';
             setProgress(100);
             setTimeout(function(){
