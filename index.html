@@ -246,111 +246,163 @@
       letter-spacing: -0.02em;
       margin-bottom: 3rem;
     }
-    /* ===== Portfolio Gallery (Coverflow) ===== */
-    .portfolio-gallery {
+    /* ===== Misprint Cards Gallery (replaces Coverflow) ===== */
+    .mistake-gallery {
       position: relative;
       width: 100%;
-      height: 460px;
-      margin-top: -5rem;
+      max-width: 1180px;
+      margin: 0 auto;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
+      gap: 64px 60px;
+      padding: 50px 0 20px;
     }
-    .portfolio-track {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    .portfolio-item {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: min(440px, 74vw);
-      aspect-ratio: 4 / 3;
-      margin: 0;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #111;
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      display: block;
+
+    .mc-card-link {
       text-decoration: none;
       color: inherit;
-      transform: translate(-50%, -50%) translateX(var(--tx, 0px)) scale(var(--scale, 1)) rotateY(var(--rot, 0deg));
-      transition: border-color .3s ease;
-      will-change: transform, opacity;
-      --tx: 0px;
-      --scale: 1;
-      --rot: 0deg;
+      display: block;
+      position: relative;
+      z-index: 1;
     }
-    .portfolio-item.is-active {
-      border-color: rgba(255,255,255,0.22);
-      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.85);
+    .mistake-gallery .mc-card-link:hover {
+      z-index: 100;
+    }
+    .mc-card {
+      --base: 0deg;
+      --rx: 0deg;
+      --ry: 0deg;
+      --ty: 0px;
+      --sc: 1;
+      position: relative;
+      width: 300px;
+      background: #e9e6df;
+      border-radius: 16px;
+      padding: 16px 16px 22px;
+      box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.06),
+        0 6px 16px rgba(0, 0, 0, 0.28),
+        0 22px 44px rgba(0, 0, 0, 0.25);
+      transform: perspective(800px)
+                 translateY(var(--ty))
+                 rotateX(var(--rx))
+                 rotateY(var(--ry))
+                 rotate(var(--base))
+                 scale(var(--sc));
+      transition: transform 0.18s ease-out, box-shadow 0.3s ease;
       cursor: pointer;
     }
-    .portfolio-item:not(.is-active):hover {
-      border-color: rgba(255,255,255,0.18);
+    .mistake-gallery .mc-card:hover {
+      --base: 0deg;
+      transform: perspective(800px)
+                 translateY(-14px)
+                 rotateX(var(--rx))
+                 rotateY(var(--ry))
+                 rotate(var(--base))
+                 scale(1.05);
+      box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.08),
+        0 12px 28px rgba(0, 0, 0, 0.38),
+        0 34px 60px rgba(0, 0, 0, 0.32);
+      z-index: 100;
     }
-    .portfolio-item img {
+    .mistake-gallery .mc-card-link:nth-child(1) .mc-card { --base: -7deg; }
+    .mistake-gallery .mc-card-link:nth-child(2) .mc-card { --base: 5deg; }
+    .mistake-gallery .mc-card-link:nth-child(3) .mc-card { --base: -4deg; }
+    .mistake-gallery > .mc-card:nth-child(4) { --base: 6deg; }
+    .mistake-gallery > .mc-card:nth-child(5) { --base: -3deg; }
+    .mistake-gallery > .mc-card:nth-child(6) { --base: 4deg; }
+    .mistake-gallery > .mc-card:nth-child(7) { --base: -5deg; }
+
+    .mc-photo {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .mc-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.14);
+      pointer-events: none;
+    }
+    .mc-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+      border-radius: 10px;
+      filter: brightness(0.97) saturate(1.02);
+    }
+
+    .mc-tape {
+      position: absolute;
+      top: -13px;
+      left: 27%;
+      width: 46%;
+      height: 24px;
+      background: rgba(255, 230, 105, 0.82);
+      transform: rotate(-3deg);
+      transform-origin: center;
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      z-index: 5;
       pointer-events: none;
     }
-    .portfolio-item .info {
+    .mc-tape::before,
+    .mc-tape::after {
+      content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 1.2rem;
-      background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
-      pointer-events: none;
+      top: 2px;
+      bottom: 2px;
+      width: 0;
+      border-left: 1px dotted rgba(170, 150, 70, 0.45);
     }
-    .portfolio-item .info h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-    .portfolio-item .info p {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.45);
-      margin-top: 0.2rem;
-    }
+    .mc-tape::before { left: 5px; }
+    .mc-tape::after { right: 5px; }
 
-    /* Nav arrows */
-    .pg-nav {
+    .mc-label {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 200;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(20,20,20,0.6);
-      color: #fff;
-      font-size: 1.4rem;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(6px);
-      transition: background .25s ease, border-color .25s ease;
+      top: -10px;
+      right: -16px;
+      background: #ffe86e;
+      color: #c23a52;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transform: rotate(9deg);
+      transform-origin: top right;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      z-index: 6;
+      white-space: nowrap;
     }
-    .pg-nav:hover {
-      background: rgba(40,40,40,0.8);
-      border-color: rgba(255,255,255,0.4);
-    }
-    .pg-prev { left: 0; }
-    .pg-next { right: 0; }
-    .pg-nav:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .mistake-gallery .mc-card-link:nth-child(1) .mc-label { transform: rotate(-14deg); }
+    .mistake-gallery .mc-card-link:nth-child(2) .mc-label { transform: rotate(-16deg); }
+    .mistake-gallery .mc-card-link:nth-child(3) .mc-label { transform: rotate(-9deg); }
+    .mistake-gallery > .mc-card:nth-child(4) .mc-label { transform: rotate(-12deg); }
+    .mistake-gallery > .mc-card:nth-child(5) .mc-label { transform: rotate(-15deg); }
+    .mistake-gallery > .mc-card:nth-child(6) .mc-label { transform: rotate(-13deg); }
+    .mistake-gallery > .mc-card:nth-child(7) .mc-label { transform: rotate(-11deg); }
 
-    /* Dots */
-    @media (max-width: 640px) {
-      .portfolio-gallery { height: 380px; }
-      .pg-nav { width: 38px; height: 38px; font-size: 1.2rem; }
+    .mc-batch {
+      margin-top: 13px;
+      font-size: 15px;
+      color: #7c776f;
+      letter-spacing: 0.02em;
     }
 
+    @media (max-width: 560px) {
+      .mistake-gallery { gap: 56px 28px; }
+      .mc-card { width: 100%; max-width: 360px; }
+    }
     /* ===== Thanks Section ===== */
     .thanks {
       position: relative;
@@ -604,7 +656,7 @@
         if (p !== undefined) {
           var pct = Math.min(p * 100, 100);
           setProgress(pct);
-          if (p >= 1) {
+          if (p >= 0.8) {
             clearInterval(tick);
             statusEl.textContent = '✓ 搞定';
             pctEl.textContent = '100%';
@@ -730,61 +782,84 @@
       <img class="portfolio-top-img" src="pic/背景图-偷看.webp" alt="" />
     </div>
     <div class="portfolio-inner">
-      <div class="portfolio-gallery" id="portfolioGallery" role="region" aria-roledescription="carousel" aria-label="精选作品画廊">
-        <button class="pg-nav pg-prev" id="pgPrev" aria-label="上一个作品">&#8249;</button>
-        <div class="portfolio-track" id="portfolioTrack">
-          <a class="portfolio-item" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener">
-            <img src="pic/作品封面/双铃坠封面 2.webp" alt="双铃坠" loading="lazy" />
-            <div class="info">
-              <h3>双铃坠</h3>
-              <p>短篇动画 · 2026</p>
-            </div>
-          </a>
-          <a class="portfolio-item" href="http://history.jonlab.cn/maplibre_3d_history.html" target="_blank" rel="noopener">
-            <img src="pic/作品封面/中国古代疆域.webp" alt="中国古代疆域" loading="lazy" />
-            <div class="info">
-              <h3>中国古代疆域</h3>
-              <p>3D 地图可视化 · 2026</p>
-            </div>
-          </a>
-          <a class="portfolio-item" href="https://history.jonlab.cn/maplibre_3d_history.html?mode=poem" target="_blank" rel="noopener">
+      <div class="mistake-gallery" id="mistakeGallery" role="region" aria-label="作品卡片画廊">
+        <a class="mc-card-link" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&amp;vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener noreferrer">
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
+            <img src="pic/作品封面/双铃坠封面 2.webp" alt="双灵坠" loading="lazy" />
+          </div>
+          <span class="mc-label">动画短片</span>
+
+          <p class="mc-batch">双灵坠</p>
+        </article>
+        </a>
+
+        <a class="mc-card-link" href="http://history.jonlab.cn/maplibre_3d_history.html" target="_blank" rel="noopener noreferrer">
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
+            <img src="pic/作品封面/中国古代疆域.webp" alt="中国古代疆域地图" loading="lazy" />
+          </div>
+          <span class="mc-label">数据可视化</span>
+
+          <p class="mc-batch">中国古代疆域地图</p>
+        </article>
+        </a>
+
+        <a class="mc-card-link" href="https://history.jonlab.cn/maplibre_3d_history.html?mode=poem" target="_blank" rel="noopener noreferrer">
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
             <img src="pic/作品封面/中国古代诗词地图.webp" alt="中国古代诗词地图" loading="lazy" />
-            <div class="info">
-              <h3>中国古代诗词地图</h3>
-              <p>诗词地图 · 2026</p>
-            </div>
-          </a>
-          <div class="portfolio-item">
+          </div>
+          <span class="mc-label">数据可视化</span>
+
+          <p class="mc-batch">中国古代诗词地图</p>
+        </article>
+        </a>
+
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
             <img src="pic/作品封面/玉米黄金美洲豹.webp" alt="玉米·黄金·美洲豹" loading="lazy" />
-            <div class="info">
-              <h3>玉米·黄金·美洲豹</h3>
-              <p>策略游戏 · 2026</p>
-            </div>
           </div>
-          <div class="portfolio-item">
+          <span class="mc-label">策略塔防游戏</span>
+
+          <p class="mc-batch">玉米·黄金·美洲豹</p>
+        </article>
+
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
             <img src="pic/作品封面/人物设定图.webp" alt="人物设定" loading="lazy" />
-            <div class="info">
-              <h3>人物设定</h3>
-              <p>角色设计 · 2026</p>
-            </div>
           </div>
-          <div class="portfolio-item">
-            <img src="pic/作品封面/卫星.webp" alt="军事卫星设计图" loading="lazy" />
-            <div class="info">
-              <h3>军事卫星设计图</h3>
-              <p>卫星设计 · 2026</p>
-            </div>
+          <span class="mc-label">人物设计</span>
+
+          <p class="mc-batch">人物设定图</p>
+        </article>
+
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
+            <img src="pic/作品封面/卫星.webp" alt="近地轨道军事卫星设计图" loading="lazy" />
           </div>
-          <div class="portfolio-item">
+          <span class="mc-label">3D 建模</span>
+
+          <p class="mc-batch">近地轨道军事卫星设计图</p>
+        </article>
+
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
             <img src="pic/作品封面/飞船.webp" alt="星际飞船设计图" loading="lazy" />
-            <div class="info">
-              <h3>星际飞船设计图</h3>
-              <p>飞船设计 · 2026</p>
-            </div>
           </div>
-        </div>
-        <button class="pg-nav pg-next" id="pgNext" aria-label="下一个作品">&#8250;</button>
+          <span class="mc-label">3D 建模</span>
+
+          <p class="mc-batch">星际飞船设计图</p>
+        </article>
       </div>
+
     </div>
   </section>
 
@@ -1054,150 +1129,25 @@
   </script>
 
   <script>
-    // ===== Portfolio Coverflow Gallery (looping, center-enlarged) =====
+    // ===== Misprint Cards: cursor-follow 3D tilt (scheme A) =====
     (function () {
-      var gallery = document.getElementById('portfolioGallery');
-      if (!gallery) return;
-      var items = Array.prototype.slice.call(gallery.querySelectorAll('.portfolio-item'));
-      var n = items.length;
-      if (n === 0) return;
-      // 默认让中间那一项放大（3 项时即第 2 项）
-      var active = Math.floor(n / 2);
-      if (active >= n) active = 0;
-
-      // 根据容器宽度自适应两侧偏移量
-      function getGap() {
-        var cardW = Math.min(440, (gallery.clientWidth || window.innerWidth) * 0.74);
-        return Math.max(cardW * 0.95, 180);
-      }
-
-      function setActive(i) {
-        active = ((i % n) + n) % n;   // 取模实现首尾循环
-        var gap = getGap();
-        items.forEach(function (el, idx) {
-          // 计算相对当前项的偏移，并归一化到最近距离以实现循环
-          var off = idx - active;
-          if (off > n / 2) off -= n;
-          if (off < -n / 2) off += n;
-          var abs = Math.abs(off);
-          var scale = abs === 0 ? 1 : (abs === 1 ? 0.78 : 0.55);
-          var rot = off === 0 ? 0 : (off < 0 ? 28 : -28);
-          el.style.setProperty('--tx', (off * gap) + 'px');
-          el.style.setProperty('--scale', scale);
-          el.style.setProperty('--rot', rot + 'deg');
-          el.style.zIndex = String(100 - abs);
-          el.style.opacity = abs > 2 ? '0.15' : (abs === 0 ? '1' : (abs === 1 ? '0.85' : '0.5'));
-          el.style.filter = 'none';
-          var isActive = off === 0;
-          el.classList.toggle('is-active', isActive);
-          el.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-          el.tabIndex = isActive ? 0 : -1;
+      var cards = document.querySelectorAll('.mistake-gallery .mc-card');
+      cards.forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var r = card.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width - 0.5;
+          var py = (e.clientY - r.top) / r.height - 0.5;
+          card.style.setProperty('--ry', (px * 30).toFixed(2) + 'deg');
+          card.style.setProperty('--rx', (-py * 30).toFixed(2) + 'deg');
         });
-      }
-
-      // 点击非中间卡片：切换居中，不触发链接跳转
-      items.forEach(function (el, idx) {
-        el.addEventListener('click', function (e) {
-          if (!el.classList.contains('is-active')) {
-            e.preventDefault();
-            setActive(idx);
-          }
+        card.addEventListener('mouseleave', function () {
+          card.style.setProperty('--ry', '0deg');
+          card.style.setProperty('--rx', '0deg');
         });
       });
-
-      document.getElementById('pgPrev').addEventListener('click', function () { setActive(active - 1); });
-      document.getElementById('pgNext').addEventListener('click', function () { setActive(active + 1); });
-
-      // 键盘左右切换（无障碍）
-      gallery.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') { e.preventDefault(); setActive(active - 1); }
-        else if (e.key === 'ArrowRight') { e.preventDefault(); setActive(active + 1); }
-      });
-
-      // 尺寸变化时重算偏移
-      var rt;
-      window.addEventListener('resize', function () {
-        clearTimeout(rt);
-        rt = setTimeout(function () { setActive(active); }, 120);
-      });
-
-      // ===== 持续缓慢漂移动画（所有卡片一直平滑移动） =====
-      var SPEED = 0.002;          // 每帧推进量，完成一次完整循环约 33 秒
-      var autoProgress = active;  // 连续浮点值，范围 0~n
-      var isAnimating = true;
-      var isPaused = false;       // 鼠标悬停/触摸时暂停推进
-      var isSnapping = false;     // 是否正在快速滑向目标
-      var targetProgress = null;  // 点击后的目标位置
-
-      function updateGallery(noAdvance) {
-        if (!isAnimating) return;
-
-        // 快速滑向目标（不受 isPaused 影响，点击后必须完成）
-        if (isSnapping && targetProgress !== null) {
-          var diff = targetProgress - autoProgress;
-          while (diff > n / 2) diff -= n;
-          while (diff < -n / 2) diff += n;
-          if (Math.abs(diff) < 0.002) {
-            autoProgress = targetProgress;
-            isSnapping = false;
-          } else {
-            autoProgress += diff * 0.15;
-            if (autoProgress >= n) autoProgress -= n;
-            if (autoProgress < 0) autoProgress += n;
-          }
-        } else if (!noAdvance && !isPaused) {
-          autoProgress += SPEED;
-          if (autoProgress >= n) autoProgress -= n;
-          if (autoProgress < 0) autoProgress += n;
-        }
-
-        var gap = getGap();
-        var nearest = Math.round(autoProgress) % n;
-        if (nearest < 0) nearest += n;
-
-        items.forEach(function (el, idx) {
-          var off = idx - autoProgress;
-          if (off > n / 2) off -= n;
-          if (off < -n / 2) off += n;
-
-          var d = Math.abs(off);
-          var scale = 1 - 0.45 * Math.min(d * 0.7, 1);
-          var opacity = Math.max(0.7, 1 - Math.min(d * 0.5, 1));
-          var filter = 'none';
-
-          el.style.transform = 'translate(-50%,-50%) translateX(' + (off * gap) + 'px) scale(' + scale + ')';
-          el.style.zIndex = String(Math.round(100 - d * 25));
-          el.style.opacity = opacity;
-          el.style.filter = filter;
-
-          var isActive = d < 0.35;
-          el.classList.toggle('is-active', isActive);
-          el.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-          el.tabIndex = isActive ? 0 : -1;
-        });
-
-        if (isAnimating) requestAnimationFrame(function () { updateGallery(false); });
-      }
-
-      // 用户交互时快速平滑滑到目标（而非瞬间跳转）
-      setActive = function (i) {
-        active = (i % n + n) % n;
-        targetProgress = active;
-        isSnapping = true;
-      };
-
-      // 鼠标悬停在任意作品上时暂停推进，移出恢复
-      var trackEl = document.getElementById('portfolioTrack');
-      trackEl.addEventListener('mouseenter', function () { isPaused = true; });
-      trackEl.addEventListener('mouseleave', function () { isPaused = false; });
-      // 移动端触摸同理
-      trackEl.addEventListener('touchstart', function () { isPaused = true; }, { passive: true });
-      trackEl.addEventListener('touchend', function () { isPaused = false; }, { passive: true });
-
-      // 启动持续动画
-      updateGallery(false);
     })();
   </script>
+
 
 </body>
 </html>
