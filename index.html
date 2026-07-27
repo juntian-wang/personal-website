@@ -438,6 +438,23 @@
       background-size: 40px 40px;
     }
 
+    /* Background image (behind grid) */
+    #loader-bg-img {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: url('pic/跑步背景图.webp') center/cover no-repeat;
+      opacity: 0.3;
+      filter: blur(2px);
+    }
+    #loader-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+    }
+
     /* Core loading ring */
     .loader-ring {
       position: relative;
@@ -541,21 +558,12 @@
       .core-dot { animation: none; }
     }
   </style>
-
-  <!-- Three.js importmap -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
 </head>
 <body>
 
   <!-- ===== Loading Screen (cyberpunk style) ===== -->
   <div id="loader-wrapper">
+    <div id="loader-bg-img"></div>
     <div id="loader-grid"></div>
     <!-- Outer spinning ring -->
     <div class="spinner-outer"></div>
