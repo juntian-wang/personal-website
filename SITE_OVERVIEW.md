@@ -115,7 +115,7 @@
 
 | 层级 | 内容 |
 |---|---|
-| z-index 0 | Unicorn Studio WebGL 3D 场景（Project: `D9oxW7Kg2t9vuTZh39jk`，SDK v2.2.8） |
+| z-index 0 | Unicorn Studio WebGL 3D 场景（Project: `b4yDz9Fg5aupJU3GGOTp`，SDK v2.2.8） |
 | z-index 0 | Loading 占位 spinner（场景渲染后自动消失） |
 
 - 纯 3D 场景，**无任何文案**
@@ -128,9 +128,12 @@
 | 作品 | 封面 | 链接 |
 |---|---|---|
 | **双铃坠** | `作品封面/双铃坠封面 2.webp` | [B站视频](https://www.bilibili.com/video/BV1JrQ9B1Ecp/) ↗ |
-| **中国古代疆域** | `作品封面/中国古代疆域.webp` | [3D地图](https://jonlib.top/maplibre_3d_history.html) ↗ |
+| **中国古代疆域** | `作品封面/中国古代疆域.webp` | [3D地图](http://history.jonlab.cn/maplibre_3d_history.html) ↗ |
+| **中国古代诗词地图** | `作品封面/中国古代诗词地图.webp` | [诗词地图](https://history.jonlab.cn/maplibre_3d_history.html?mode=poem) ↗ |
 | **玉米·黄金·美洲豹** | `作品封面/玉米黄金美洲豹.webp` | 暂无 |
 | **人物设定** | `作品封面/人物设定图.webp` | 暂无 |
+| **军事卫星设计图** | `作品封面/卫星.webp` | 暂无 |
+| **星际飞船设计图** | `作品封面/飞船.webp` | 暂无 |
 
 - 纯黑背景 `#000` + Unicorn Studio WebGL 3D 场景作为动态背景（Project: `lEMBUE0ODtdPgc7dwRWz`，opacity 0.3，`data-us-production`）
 - Coverflow 焦点画廊：所有作品排成一排同时可见，中间最大、两侧渐小，持续缓慢向左漂移（rAF 驱动，~33 秒一圈）
