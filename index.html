@@ -636,6 +636,9 @@
       ring.style.strokeDasharray = circumference + ' ' + circumference;
       ring.style.strokeDashoffset = circumference;
 
+      // Minimum display time: at least 2 seconds
+      var startTime = Date.now();
+
       var statusMsgs = [
         [0, 15, '热身...'],
         [15, 35, '助跑...'],
@@ -664,7 +667,7 @@
         if (p !== undefined) {
           var pct = Math.min(p * 100, 100);
           setProgress(pct);
-          if (p >= 0.8) {
+          if (p >= 0.8 && (Date.now() - startTime) >= 2000) {
             clearInterval(tick);
             statusEl.textContent = '✓ 完美';
             pctEl.textContent = '100%';
@@ -682,7 +685,7 @@
         if (!wrapper.classList.contains('is-hidden')) {
           clearInterval(tick);
           setProgress(100);
-          statusEl.textContent = '✓ 搞定';
+          statusEl.textContent = '✓ 完美';
           setTimeout(function(){
             wrapper.classList.add('is-hidden');
             document.body.style.overflow = '';
