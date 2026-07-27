@@ -61,7 +61,6 @@
       position: absolute;
       inset: 0;
       z-index: -2;
-      will-change: transform;
     }
     .hero-bg-image img {
       width: 100%;
@@ -114,6 +113,8 @@
       height: 100vh;
       overflow: hidden;
       background: #000;
+      opacity: var(--sv-op, 1);
+      will-change: opacity;
     }
     .scroll-video-loading {
       position: absolute;
@@ -224,7 +225,9 @@
     .portfolio-top-img {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.15);
     }
     .portfolio-inner {
       position: relative;
@@ -583,6 +586,12 @@
     @media (prefers-reduced-motion: reduce) {
       .spinner-inner, .spinner-outer { animation: none; }
       .core-dot { animation: none; }
+    }
+  
+    /* 整页（section）整体视差：案例页 / 结尾页随滚动整体差速，制造页面之间的层次 */
+    .portfolio, .thanks {
+      transform: translateY(var(--sec-p, 0px));
+      will-change: transform;
     }
   </style>
 </head>
@@ -979,6 +988,8 @@
     })();
   </script>
 
+
+
   <script>
     // ===== Scroll-Driven Canvas Image Sequence (Page 2) =====
     // Preloads all 361 frames as WebP images, draws to canvas based on scroll.
@@ -1148,6 +1159,41 @@
     })();
   </script>
 
+
+
+  <script>
+    // ===== Section-level parallax (between pages) =====
+    (function () {
+      var sv   = document.querySelector('.scroll-video-sticky');
+      var pf   = document.querySelector('.portfolio');
+      var th   = document.querySelector('.thanks');
+      var vh = window.innerHeight;
+      var ticking = false;
+      function update() {
+        if (sv) {
+          var r2 = sv.getBoundingClientRect();
+          var p2 = (r2.top + r2.height / 2 - vh / 2) / vh;
+          if (p2 > 1) p2 = 1; else if (p2 < -1) p2 = -1;
+          var op = 1 - Math.abs(p2) * 0.4;
+          if (op < 0.6) op = 0.6;
+          sv.style.setProperty('--sv-op', op.toFixed(2));
+        }
+        [[pf, 80], [th, -90]].forEach(function (pair) {
+          var sec = pair[0]; if (!sec) return;
+          var r = sec.getBoundingClientRect();
+          var p = (r.top + r.height / 2 - vh / 2) / vh;
+          if (p > 1) p = 1; else if (p < -1) p = -1;
+          sec.style.setProperty('--sec-p', (p * pair[1]).toFixed(1) + 'px');
+        });
+        ticking = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+      }, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+  </script>
 
 </body>
 </html>

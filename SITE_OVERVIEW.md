@@ -1,6 +1,6 @@
 # 个人网站 — 项目概览
 
-> 最后更新: 2026-07-27 12:16
+> 最后更新: 2026-07-27 20:52
 
 ---
 
@@ -8,31 +8,29 @@
 
 ```
 /Users/Andy/Desktop/个人网站/
-├── index.html              ← 主页面（含加载页）
-├── edit.html               ← 可视化文案编辑器
+├── index.html              ← 主页面（加载页 + Hero + 滚动视频 + 作品集 + 感谢页）
+├── edit.html               ← Hero 文案可视化编辑器
+├── video-edit.html         ← 视频文案可视化编辑器
 ├── SITE_OVERVIEW.md        ← 本文件
 ├── pic/
-│   ├── 作品封面/
-│   │   ├── 双铃坠封面 2.png
-│   │   ├── 中国古代疆域.png
-│   │   └── 玉米黄金美洲豹.png
+│   ├── 作品封面/        ← 7 张作品封面（均 WebP）
 │   ├── 背景扩图.webp
 │   ├── 背景.webp
 │   ├── 线稿.webp
 │   ├── 赛博身体.webp
 │   ├── 前景.webp
-│   ├── 跑步背景图.webp    ← 加载页背景（87.7KB）
-│   ├── loading-humanoid.glb ← 3D 模型（未使用，待定）
+│   ├── 跑步背景图.webp
 │   └── 视频/
-│       ├── 个人介绍页视频720.mp4     ← 旧版原始（19.6MB）
-│       ├── 个人介绍页视频II720.mp4   ← 新版原始（17.2MB）
-│       ├── intro-scroll.mp4          ← 旧版压缩（1.2MB，已弃用）
-│       └── intro-scroll-kf.mp4       ← 当前使用（15.6MB，全关键帧）
+│       ├── 个人介绍页视频720.mp4     ← v1 原始 19.6MB
+│       ├── 个人介绍页视频II720.mp4   ← v2 原始 17.2MB
+│       ├── 个人介绍页视频2.mp4       ← v3 原始 13.5MB
+│       ├── 个人介绍页视频III2K.mp4   ← v4 原始 2K 79.8MB
+│       ├── intro-scroll.mp4          ← 旧版压缩 1.2MB（已弃用）
+│       └── intro-scroll-kf.mp4       ← 当前使用 29.8MB（1080p 全关键帧）
 ├── backup/                 ← 当前版本备份
-│   ├── index.html
-│   ├── edit.html
-│   └── SITE_OVERVIEW.md
-└── .workbuddy/
+├── .workbuddy/
+│   └── memory/             ← 工作日志归档
+└── CNAME                   ← jonlab.cn
 ```
 
 ---
@@ -41,150 +39,129 @@
 
 ### 加载页（全屏，所有内容之前）
 
-位于 `<body>` 最前面，`z-index: 1000`。加载页是 CSS/SVG 赛博朋克风格，覆盖第二屏 361 帧 WebP 的加载等待。图层顺序（从底到顶）：
-
-| 层级 | 内容 | 说明 |
-|------|------|------|
-| 底 | `pic/跑步背景图.webp` | 2752×1536, 87.7KB, opacity 0.3 + blur 2px |
-| | 径向渐变遮罩 | 伪元素，边缘暗中间透 |
-| 顶 | 旋转环 + SVG 进度圆环 + 百分比 + 状态文字 | neon 青色调 |
+CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）：
+- `pic/跑步背景图.webp`（2752×1536, 87.7KB, opacity 0.3 + blur 2px）
+- 径向渐变遮罩（边缘暗中间透）
+- 旋转环 + SVG 进度圆环 + 百分比 + 状态文字（neon 青色调）
 
 **交互**：
-- 帧加载进度真实追踪（轮询 `window._frameLoadProgress`）
-- 加载期间 `overflow: hidden` 锁定滚动
-- 完成后 0.6s 渐隐消失
-- 20s 强制超时兜底
-
-**状态文字**（6 段对应真实进度）：
-| 进度 | 文字 |
-|------|------|
-| 0% ~ 15% | 初始化... |
-| 15% ~ 35% | 正在加载... |
-| 35% ~ 55% | 加载中... |
-| 55% ~ 75% | 快了... |
-| 75% ~ 99% | 马上就好... |
-| 100% | ✓ 搞定 |
+- 真实追踪帧加载进度 `window._frameLoadProgress`
+- **80% 帧加载完即可退出**（`p >= 0.8`），剩余 20% 后台下载
+- 0.6s 渐隐消失，20s 强制超时兜底
 
 ### 第一屏 — Hero
 
-从上到下层叠顺序（z-index 从低到高）：
+| 层级 | 内容 |
+|---|---|
+| z-index -2 | `pic/背景扩图.webp` 全屏背景 |
+| z-index -1 | 文案 "Hi there / I am Jon"（62px + 183px, 渐变文字） |
+| z-index 0 | Unicorn Studio 3D 场景（Project: `Sduh8PTMFfeiFEU6lmXA`） |
 
-| z-index | 内容 | 说明 |
-|---|---|---|
-| -2 | `pic/背景扩图.webp` | 全屏背景图 |
-| -1 | 文案 "Hi there / I am Jon" | 两行白色粗体文字 |
-| 0 | Unicorn Studio WebGL 3D 场景 | Project ID: `Sduh8PTMFfeiFEU6lmXA`，SDK v2.2.8 |
-| 0 | Loading 占位 spinner | 场景渲染后自动消失 |
-
-### 🎬 视差效果
-向下滚动时多层变速，制造纵深推进感：
-
-| 层级 | 滚动速度 | 技术实现 |
-|---|---|---|
-| 背景图 (背景扩图.webp) | 0.3x 🐢 最慢 | JS requestAnimationFrame + translateY |
-| 文案 "Hi there" | 0.55x | JS requestAnimationFrame + translateY（慢于第二行） |
-| 文案 "I am Jon" | 0.65x | JS requestAnimationFrame + translateY（快于第一行） |
-| 3D 场景 (Unicorn Studio) | 1.0x 🚀 正常 | 自然滚动，无干预 |
-
-### 文案样式（已定稿）
-
-```css
-.hero-bg-text {
-  justify-content: center;
-  /* translateY 由 JS 视差控制，初始偏移 -107px */
-}
-
-.line-1 /* "Hi there" */ {
-  font-size: 62px;
-  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transform: translateX(-362px);  /* 左移 */
-  margin-bottom: 0px;
-}
-
-.line-2 /* "I am Jon" */ {
-  font-size: 183px;
-  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transform: translateX(-146px);  /* 左移 */
-}
-```
-
-> 文案采用 Apple 发布会风格的上亮下暗渐变效果。
+**视差**：向下滚动时多层变速（背景 0.3x → 文案 0.55x/0.65x → 3D 场景 1.0x）
 
 ### 第二屏 — 滚动逐帧视频
 
 | 层级 | 内容 |
 |---|---|
-| `<video>` | 全屏 `<video>` 元素，`object-fit: cover` 裁剪，直接渲染 |
-| 加载 spinner | 视频加载中显示，`canplay` 后自动消失 |
-| 进度条 | 底部 3px 白条，随滚动实时填充 |
-
-**交互**：进入该区域后，视频画面固定（`position: sticky; top: 0`），用户滚动 ≈ 播放进度条。**500vh 总区域，400vh 滚动空间 = 15 秒视频慢速播放**（约 2 倍于正常滚动速度）。
+| `<video>` | 全屏，`object-fit: cover`，直接渲染 |
+| 文字叠加 | 5 段文案，随视频时间滚动浮现/消失（纯白 + 双层光晕） |
+| 加载 spinner | `canplay` 后自动消失 |
+| 进度条 | 底部 3px 白条 |
 
 **技术细节**：
-- 零 Canvas 开销，直接操作 `<video>.currentTime`，浏览器硬件加速渲染
-- 视频 `intro-scroll-kf.mp4` 用 ffmpeg 以 `-g 1 -keyint_min 1` 编码，**361 帧全是关键帧**，滚动到任意位置瞬间解码无需等待
-- 画质：`-crf 18`（视觉无损）+ `-preset veryslow`，15.6MB 比原版 17.2MB 还小
+- 零 Canvas，直接 `<video>.currentTime` 硬件加速渲染
+- 视频 `intro-scroll-kf.mp4`：3184×1792 2K 原片 → ffmpeg 缩至 1080p + `-g 1` 全关键帧 + `-crf 18` 视觉无损，**29.8MB**
 - 时长自动检测 `video.duration`，换视频无需改代码
-- `prefers-reduced-motion` 用户自动静帧（由浏览器原生处理）
+- 500vh 总高，400vh 滚动空间 → 15 秒慢速播放
+- `prefers-reduced-motion` 用户自动静帧
 
-**视频文件清单**：
-| 文件 | 大小 | 用途 |
-|------|------|------|
-| `个人介绍页视频II720.mp4` | 17.2 MB | 原始文件，不做压缩 |
-| `intro-scroll-kf.mp4` | 15.6 MB | **当前使用**，全关键帧编码 |
-| `intro-scroll.mp4` | 1.2 MB | 旧版 WiFi 预设压缩（已弃用） |
-| `个人介绍页视频720.mp4` | 19.6 MB | 第一版原始文件 |
+**5 段文案**（最终定稿）：
+
+| 段 | 时间 | 文字 | 位置 | 偏移 |
+|---|------|------|------|------|
+| 1 | 0→1.6s | 我是王壮壮，我有很多爱好…… | 居中 | -180px |
+| 2 | 2→5.2s | 首先，是喝牛奶 / 才怪，我爸让我写的 😅 | 底部左对齐 | — |
+| 3 | 6→8.9s | 最近，爱上了 AI 编程 / 做了很多好玩的事儿～ | 左侧 | +140px 下移 |
+| 4 | 9.8→12.6s | 我还爱画画 / 随手画的那种🤣 | 左侧 | +25px, +105px |
+| 5 | 13.9→15s | 跑酷，练了八年！ | 左侧 | +65px, -125px |
+
+### 第三屏 — 作品集（"Our Best Mistakes" 卡片画廊）
+
+复刻 halftone.aura.build 的 "our best mistakes" 风格（黄胶带 + 红字标签拍立得卡片）。**已替换原 Coverflow 焦点画廊**，旧 Coverflow 代码见 `backup/SITE_OVERVIEW.md`。
+
+| 作品 | 封面 | 标签 | 标题（显示） | 链接 |
+|---|---|---|---|---|
+| 双灵坠 | `双铃坠封面 2.webp` | 动画短片 | 双灵坠 | [B站](https://www.bilibili.com/video/BV1JrQ9B1Ecp/) ↗ |
+| 中国古代疆域地图 | `中国古代疆域.webp` | 数据可视化 | 中国古代疆域地图 | [3D地图](http://history.jonlab.cn/maplibre_3d_history.html) ↗ |
+| 中国古代诗词地图 | `中国古代诗词地图.webp` | 数据可视化 | 中国古代诗词地图 | [诗词地图](https://history.jonlab.cn/maplibre_3d_history.html?mode=poem) ↗ |
+| 玉米·黄金·美洲豹 | `玉米黄金美洲豹.webp` | 策略塔防游戏 | 玉米·黄金·美洲豹 | 暂无 |
+| 人物设定图 | `人物设定图.webp` | 人物设计 | 人物设定图 | 暂无 |
+| 近地轨道军事卫星设计图 | `卫星.webp` | 3D 建模 | 近地轨道军事卫星设计图 | 暂无 |
+| 星际飞船设计图 | `飞船.webp` | 3D 建模 | 星际飞船设计图 | 暂无 |
+
+- 纯黑底 `#000` + Unicorn Studio 动态背景（Project: `lEMBUE0ODtdPgc7dwRWz`，opacity 0.3）
+- 7 卡 flex 横排换行居中（`.mistake-gallery`，`max-width:1180px`，`gap:64px 60px`）
+- 暖米灰浅卡 `#e9e6df`（300px，圆角 16px）+ 4:3 照片轻暗角；黄胶带 `.mc-tape`（`top:-13px; left:27%; width:46%`，`rotate(-3deg)`）；右上红字黄底标签 `.mc-label`（`#ffe86e`/`#c23a52`，`right:-16px` 斜贴角）
+- 散落感：每卡独立倾斜角 `--base`（`-7/5/-4/6/-3/4/-5°`）+ 标签旋转（全逆时针 `-14/-16/-9/-12/-15/-13/-11°`）
+- 3D 鼠标跟随：JS 监听 `#mistakeGallery` 内 `mousemove` 设 `--rx/--ry`（±15°）；hover 上浮 `translateY(-14px) scale(1.05)` 并 `z-index:100`
+- 卡片 1–3 用 `<a class="mc-card-link">` 包裹可跳转（新窗口 + `rel="noopener noreferrer"`），4–7 纯展示
+
+**⚠️ 改此区块必看**：
+1. nth-child 分两套：1–3 写 `.mc-card-link:nth-child(N)`，4–7 写 `.mistake-gallery > .mc-card:nth-child(N)`，混用则角度/标签回退成统一基础值。
+2. 裸卡 `--base` 规则勿多写 `.mc-card`（写成 `… :nth-child(4) .mc-card` 匹配不到，卡片仍平直）。
+3. 标签须放 `.mc-photo` 外（照片 `overflow:hidden` 会裁掉），作 `.mc-card` 直接子元素。
+4. 长标签 `right` 探出 + 旋转会超右缘，列距不足时右卡（DOM 靠后）会盖住；当前 `right:-16px` + 列距 `60px` + 字号 `12px` 已规避。
 
 ### 第四屏 — 感谢页
 
-| 层级 | 内容 |
-|---|---|
-| z-index 0 | Unicorn Studio WebGL 3D 场景（Project: `HTkCrCAs4VhJld61Baso`，SDK v2.2.8） |
-| z-index 0 | Loading 占位 spinner（场景渲染后自动消失） |
-
-- 纯 3D 场景，**无任何文案**
-- 复用 SDK 自加载脚本，无需额外引入
+纯 Unicorn Studio 3D 场景（Project: `HTkCrCAs4VhJld61Baso`），**无任何文案**。
 
 ---
 
-### 第三屏 — 作品集（焦点画廊 Coverflow）
+## 屏间滚动视差（inter-section parallax）
 
-| 作品 | 封面 | 链接 |
-|---|---|---|
-| **双铃坠** | `作品封面/双铃坠封面 2.webp` | [B站视频](https://www.bilibili.com/video/BV1JrQ9B1Ecp/) ↗ |
-| **中国古代疆域** | `作品封面/中国古代疆域.webp` | [3D地图](http://history.jonlab.cn/maplibre_3d_history.html) ↗ |
-| **中国古代诗词地图** | `作品封面/中国古代诗词地图.webp` | [诗词地图](https://history.jonlab.cn/maplibre_3d_history.html?mode=poem) ↗ |
-| **玉米·黄金·美洲豹** | `作品封面/玉米黄金美洲豹.webp` | 暂无 |
-| **人物设定** | `作品封面/人物设定图.webp` | 暂无 |
-| **军事卫星设计图** | `作品封面/卫星.webp` | 暂无 |
-| **星际飞船设计图** | `作品封面/飞船.webp` | 暂无 |
+作品集 / 视频 / 感谢页三屏之间在滚动时做**整体差速位移**，形成屏与屏之间的层次感。
 
-- 纯黑背景 `#000` + Unicorn Studio WebGL 3D 场景作为动态背景（Project: `lEMBUE0ODtdPgc7dwRWz`，opacity 0.3，`data-us-production`）
-- Coverflow 焦点画廊：所有作品排成一排同时可见，中间最大、两侧渐小，持续缓慢向左漂移（rAF 驱动，~33 秒一圈）
-- 纯 2D 变换（`translateX + scale`），无 rotateY
-- 交互：左右箭头 / 点击两侧卡片 / 键盘 ← → / 底部指示点切换；首尾循环（取模归一化）
-- **点击两侧卡片不是瞬间跳转，而是快速平滑滑到中间**（指数衰减，`diff * 0.15`/帧，约 0.3 秒完成）
-- **鼠标悬停在任意作品上暂停漂移**，移出恢复（移动端触摸同理）
-- 仅中间（active）作品可点击跳转，两侧点击仅切换居中
-- 响应式：`gap = cardWidth * 0.95` 保证不重叠，移动端自适应
-- 封面图已缩放至宽 880px 并转 WebP（保留透明），原 PNG 作源文件保留在 `pic/作品封面/`
-- ⚠️ **水印**：Unicorn Studio 免费版会在场景渲染"made with unicorn.studio"水印，`data-us-production` 和 CSS 均无法移除，需付费许可去除
+**关键定义**：这是「section 之间」的视差，**不是**「板块内部元素各自错位」。早期曾误做成作品集内部 5 层（背景图 / 标题 / 标签 / 画廊 / 每张卡）独立位移，用户纠正后改为整屏整体差速。
+
+**参与屏与差速方式**：
+
+| 屏 | 差速方式 | CSS 变量 | 满位移量 | 说明 |
+|---|---|---|---|---|
+| 第二屏 滚动视频 | opacity 淡入差速 | `--sv-op` | 0.6→1 | 屏内 `<video>` 用 `position:sticky` 钉住，整体 translateY 会破坏 sticky 定位 → 改用不透明度差速（0.6~1），不影响视频播放 |
+| 第三屏 作品集 | translateY 差速 | `--sec-p` | +80px | 进入视口时相对上移、离开时下移 |
+| 第四屏 感谢页 | translateY 差速 | `--sec-p` | -90px | 与作品集反向，强化屏间层次 |
+| 第一屏 Hero | 不参与屏间差速 | — | — | Hero 本身已有内部多层视差（背景 0.3x → 文案 0.55/0.65x → 3D 场景 1.0x），再加整体位移多余，故仅保留内部视差 |
+
+**实现要点**：
+- 用 `getBoundingClientRect()` 算**相对视口**进度 `p`（非全局 `scrollY`）：`p = (rect.top + rect.height/2 - vh/2) / vh`，clamp 到 [-1, 1]。中部屏必须用相对定位，全局 scrollY 在页面中部早已 clamp 失效。
+- 独立 IIFE，`requestAnimationFrame` 节流（passive scroll 监听），`resize` 重算。
+- JS 只 `setProperty` 设 `--sec-p` / `--sv-op`，**绝不拼接 transform 字符串** —— 因此与作品集卡片 3D 鼠标跟随（`--rx/--ry` 在同 transform 内叠加）零冲突。
+- CSS：`.portfolio, .thanks { transform: translateY(var(--sec-p,0px)); will-change: transform; }`；`.scroll-video-sticky { opacity: var(--sv-op,1); will-change: opacity; }`
+
+**⚠️ 改此区块必看**：
+1. 视频屏内部 `position:sticky` 容器**不能**整体 translateY，否则 sticky 失效 → 只能用 opacity 差速。
+2. 屏间视差幅度在纯黑底上会被「黑底随黑底走」吞掉，幅度需够大（portfolio 80 / thanks -90）才可见；±10px 几乎看不出。
+3. Hero 无 `--sec-p`，不要给它加，否则与内部多层视差叠加产生抖动。
 
 ---
 
 ## 技术依赖
 
-- **Unicorn Studio SDK v2.2.8** — 通过 self-loading snippet 动态加载
-- **CDN**: `cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8`
-- 纯静态 HTML/CSS/JS，无框架依赖
-
----
+- **Unicorn Studio SDK v2.2.8** — self-loading snippet，CDN: `cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8`
+- **ffmpeg 7.1** — 视频重编码（全关键帧）
+- 纯静态 HTML/CSS/JS，零框架依赖
 
 ## 相关工具
 
-- `edit.html` — 可视化编辑器，可在浏览器中拖拽调整两行文案的字号、颜色、横向/纵向偏移
-- 编辑器中调整满意后点击「生成 CSS 代码」，将输出值替换到 `index.html` 对应位置
+- `edit.html` — Hero 文案字号/颜色/偏移可视化编辑器
+- `video-edit.html` — 视频 5 段文案时间线/内容/位置/偏移可视化编辑器
+
+## 开发历程
+
+| 日期 | 内容 |
+|------|------|
+| 7/25 | 加载页、Hero 视差、作品集 Coverflow 画廊 |
+| 7/26 | 滚动视频播放、全关键帧编码、5 段文案系统、视频编辑器 |
+| 7/27 | 2K→1080p 升级、编辑器 Bug 修复、文案定稿、文字效果优化、作品集替换为 Our Best Mistakes 卡片画廊 |
+| 7/27 (晚) | 屏间滚动视差定稿：作品集(+80)/感谢页(-90) translateY 差速 + 视频屏 opacity 淡入差速(0.6~1)；Hero 不参与仅留内部多层视差；早期误做的板块内 5 层视差已清除 |
