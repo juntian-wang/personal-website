@@ -1,6 +1,6 @@
 # 个人网站 — 项目概览
 
-> 最后更新: 2026-07-27 22:27
+> 最后更新: 2026-07-27 23:41
 
 ---
 
@@ -135,26 +135,30 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 
 ## 滚动差速效果（视差与淡入）
 
-**当前方案**：无整屏间位移差速（--sec-p 已移除）。作品集内部保有一层微妙的卡片比图片更快的差速，视频屏保留 opacity 淡入。
+**当前方案**：作品集做小幅屏间位移差速（`--sec-p ±80px`，仅限作品集），同时保留内部卡片比图片更快的差速（`--card-p 1.6x`），视频屏保留 opacity 淡入。感谢页不参与视差。
 
 ### 视频屏淡入（--sv-op）
 
 | 屏 | 差速方式 | CSS 变量 | 范围 | 说明 |
 |---|---|---|---|---|
-| 第二屏 滚动视频 | opacity 淡入差速 | `--sv-op` | 0.6→1 | 一直保留。屏内 `<video>` 用 `position:sticky` 钉住，整体 translateY 会破坏 sticky 定位 → 不透明度差速不影响视频播放。JS 基于 `getBoundingClientRect` 相对视口进度驱动。 |
+| 第二屏 滚动视频 | opacity 淡入差速 | `--sv-op` | 0.6→1 | 屏内 `<video>` 用 `position:sticky` 钉住，整体 translateY 会破坏 sticky 定位 → 不透明度差速不影响视频播放。JS 基于 `getBoundingClientRect` 相对视口进度驱动。 |
 
-### 作品集内部卡差速（--card-p）
+### 作品集屏间位移（--sec-p）与内部卡差速（--card-p）
 
-| 目标 | 差速方式 | CSS 变量 | 系数 | 说明 |
+| 层级 | 差速方式 | CSS 变量 | 系数 | 说明 |
 |---|---|---|---|---|
-| 卡片（`.portfolio-inner`） | 比图片快 | `--card-p` | 1.6x | 图片跟随自然滚动无额外位移，卡片在整体位移基础上额外快移（p × 160 × 1.6，最大值约 256px），形成「卡片冲得比图片快」的内部层次感。 |
-
-**历史**：曾有过 `--sec-p` 整屏位移方案（作品集+160px/感谢页-90px），但因 sticky 导致的视觉割裂和双滚动条问题，已移除。
+| 作品集整屏（`.portfolio`） | 屏间位移 | `--sec-p` | ±80px | 仅作品集参与屏间差速，感谢页不做。与 sticky 视频形成轻微进退感。 |
+| 卡片（`.portfolio-inner`） | 内部快移 | `--card-p` | 1.6x（p × 160） | 图片跟随自然滚动，卡片在整屏位移基础上额外快移（最大值约 256px），形成「卡片比顶图快」的层次。 |
 
 ### 实现要点
-- 视频屏和内部卡差速共用同一个 IIFE，`requestAnimationFrame` 节流（passive scroll 监听），`resize` 重算。
-- JS 只 `setProperty` 设 `--sv-op` / `--card-p`，绝不拼 transform 字符串 → 与卡片 3D 鼠标跟随（`--rx/--ry`）零冲突。
-- CSS：`.portfolio-inner { transform: translateY(var(--card-p,0px)); will-change: transform; }`；`.scroll-video-sticky { opacity: var(--sv-op,1); will-change: opacity; }`
+- 视频屏 opacity、作品集 `--sec-p`、内部 `--card-p` 共用同一个 IIFE，`requestAnimationFrame` 节流（passive scroll 监听），`resize` 重算。
+- JS 只 `setProperty` 设 `--sv-op` / `--sec-p` / `--card-p`，绝不拼 transform 字符串 → 与卡片 3D 鼠标跟随（`--rx/--ry`）零冲突。
+- CSS：`.portfolio { transform: translateY(var(--sec-p,0px)); will-change: transform; }`；`.portfolio-inner { transform: translateY(var(--card-p,0px)); will-change: transform; }`；`.scroll-video-sticky { opacity: var(--sv-op,1); will-change: opacity; }`
+
+### ⚠️ 改此区块必看
+1. 视频屏内部 `position:sticky` 容器**不能**整体 translateY，否则 sticky 失效 → 只能用 opacity 差速。
+2. `.portfolio` 已用 `overflow: clip`（替代 `overflow-x: hidden`），不可回退——`overflow-x:hidden + overflow-y:visible` 会触发 CSS 规范自动生成次级滚动条。
+3. 感谢页没有 `--sec-p`，不要给它加。
 
 ---
 
@@ -180,3 +184,4 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 | 7/27 (补) | 作品集视差加强：±80px → ±160px（翻倍），其他屏不变 |
 | 7/27 (晚修) | 作品集内部视差加卡片快于图片（--card-p 1.6x）；修复 sticky 双滚动条根因（overflow-x:hidden→overflow:clip）；--sec-p 整屏位移因双滚动条问题已整体移除；滚动差速章节重写 |
 | 7/27 (3D) | 3D 卡片效果加强：视角 ±15°→±19°(×38)、perspective 800px→700px |
+| 7/27 (视差定稿) | 作品集屏间视差恢复 ±80px（仅作品集，感谢页不做）；内部卡片差速 1.6x 保留；溢出修复/双滚动条陷阱记入文档 |

@@ -216,6 +216,8 @@
       padding: 0 2rem 6rem;
       background: #000;
       overflow: clip;
+      transform: translateY(var(--sec-p, 0px));
+      will-change: transform;
     }
     .portfolio-top-img-wrap {
       width: 100vw;
@@ -1174,6 +1176,13 @@
           var op = 1 - Math.abs(p2) * 0.4;
           if (op < 0.6) op = 0.6;
           sv.style.setProperty('--sv-op', op.toFixed(2));
+        }
+        // Portfolio section parallax: slight inter-screen displacement
+        if (pf) {
+          var rPS = pf.getBoundingClientRect();
+          var pPS = (rPS.top + rPS.height / 2 - vh / 2) / vh;
+          if (pPS > 1) pPS = 1; else if (pPS < -1) pPS = -1;
+          pf.style.setProperty('--sec-p', (pPS * 80).toFixed(1) + 'px');
         }
         // Internal portfolio parallax: cards faster (1.6x) than the image
         var ci = document.querySelector('.portfolio-inner');
