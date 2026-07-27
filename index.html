@@ -1027,7 +1027,7 @@
             var img = new Image();
             var num = String(idx + 1).padStart(4, '0');
             img.src = FRAME_DIR + 'frame-' + num + '.webp';
-            img.onload = img.onerror = function(){
+            img.onload = function(){
               loaded++;
               window._frameLoadProgress = loaded / TOTAL_FRAMES;
               images[idx] = img;
@@ -1043,6 +1043,9 @@
                 drawFrame(0);
                 updateTextOverlays(0);
               }
+            };
+            img.onerror = function(){
+              // Failed frame: don't count toward progress, leave images[idx] as null
             };
             images[idx] = null;
           })(i);
