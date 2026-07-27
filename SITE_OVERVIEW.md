@@ -1,6 +1,6 @@
 # 个人网站 — 项目概览
 
-> 最后更新: 2026-07-27 20:52
+> 最后更新: 2026-07-27 22:27
 
 ---
 
@@ -103,7 +103,7 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 - 7 卡 flex 横排换行居中（`.mistake-gallery`，`max-width:1180px`，`gap:64px 60px`）
 - 暖米灰浅卡 `#e9e6df`（300px，圆角 16px）+ 4:3 照片轻暗角；黄胶带 `.mc-tape`（`top:-13px; left:27%; width:46%`，`rotate(-3deg)`）；右上红字黄底标签 `.mc-label`（`#ffe86e`/`#c23a52`，`right:-16px` 斜贴角）
 - 散落感：每卡独立倾斜角 `--base`（`-7/5/-4/6/-3/4/-5°`）+ 标签旋转（全逆时针 `-14/-16/-9/-12/-15/-13/-11°`）
-- 3D 鼠标跟随：JS 监听 `#mistakeGallery` 内 `mousemove` 设 `--rx/--ry`（±15°）；hover 上浮 `translateY(-14px) scale(1.05)` 并 `z-index:100`
+- 3D 鼠标跟随：JS 监听 `#mistakeGallery` 内 `mousemove` 设 `--rx/--ry`（±19° `*38`，perspective 700px）；hover 上浮 `translateY(-14px) scale(1.05)` 并 `z-index:100`
 - 卡片 1–3 用 `<a class="mc-card-link">` 包裹可跳转（新窗口 + `rel="noopener noreferrer"`），4–7 纯展示
 
 **⚠️ 改此区块必看**：
@@ -111,6 +111,7 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 2. 裸卡 `--base` 规则勿多写 `.mc-card`（写成 `… :nth-child(4) .mc-card` 匹配不到，卡片仍平直）。
 3. 标签须放 `.mc-photo` 外（照片 `overflow:hidden` 会裁掉），作 `.mc-card` 直接子元素。
 4. 长标签 `right` 探出 + 旋转会超右缘，列距不足时右卡（DOM 靠后）会盖住；当前 `right:-16px` + 列距 `60px` + 字号 `12px` 已规避。
+5. **`.portfolio` 勿用 `overflow-x: hidden`**（已踩坑）。CSS 规范规定：`overflow-x: hidden` + `overflow-y` 默认 `visible` 时，`visible` 视同为 `auto`→浏览器生成次级垂直滚动条。改用 `overflow: clip` 可裁切溢出且不触发滚动上下文。2026-07-27 用户报告双滚动条，根源即此。
 
 ### 第四屏 — 感谢页
 
@@ -118,31 +119,28 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 
 ---
 
-## 屏间滚动视差（inter-section parallax）
+## 滚动差速效果（视差与淡入）
 
-作品集 / 视频 / 感谢页三屏之间在滚动时做**整体差速位移**，形成屏与屏之间的层次感。
+**当前方案**：无整屏间位移差速（--sec-p 已移除）。作品集内部保有一层微妙的卡片比图片更快的差速，视频屏保留 opacity 淡入。
 
-**关键定义**：这是「section 之间」的视差，**不是**「板块内部元素各自错位」。早期曾误做成作品集内部 5 层（背景图 / 标题 / 标签 / 画廊 / 每张卡）独立位移，用户纠正后改为整屏整体差速。
+### 视频屏淡入（--sv-op）
 
-**参与屏与差速方式**：
-
-| 屏 | 差速方式 | CSS 变量 | 满位移量 | 说明 |
+| 屏 | 差速方式 | CSS 变量 | 范围 | 说明 |
 |---|---|---|---|---|
-| 第二屏 滚动视频 | opacity 淡入差速 | `--sv-op` | 0.6→1 | 屏内 `<video>` 用 `position:sticky` 钉住，整体 translateY 会破坏 sticky 定位 → 改用不透明度差速（0.6~1），不影响视频播放 |
-| 第三屏 作品集 | translateY 差速 | `--sec-p` | +80px | 进入视口时相对上移、离开时下移 |
-| 第四屏 感谢页 | translateY 差速 | `--sec-p` | -90px | 与作品集反向，强化屏间层次 |
-| 第一屏 Hero | 不参与屏间差速 | — | — | Hero 本身已有内部多层视差（背景 0.3x → 文案 0.55/0.65x → 3D 场景 1.0x），再加整体位移多余，故仅保留内部视差 |
+| 第二屏 滚动视频 | opacity 淡入差速 | `--sv-op` | 0.6→1 | 一直保留。屏内 `<video>` 用 `position:sticky` 钉住，整体 translateY 会破坏 sticky 定位 → 不透明度差速不影响视频播放。JS 基于 `getBoundingClientRect` 相对视口进度驱动。 |
 
-**实现要点**：
-- 用 `getBoundingClientRect()` 算**相对视口**进度 `p`（非全局 `scrollY`）：`p = (rect.top + rect.height/2 - vh/2) / vh`，clamp 到 [-1, 1]。中部屏必须用相对定位，全局 scrollY 在页面中部早已 clamp 失效。
-- 独立 IIFE，`requestAnimationFrame` 节流（passive scroll 监听），`resize` 重算。
-- JS 只 `setProperty` 设 `--sec-p` / `--sv-op`，**绝不拼接 transform 字符串** —— 因此与作品集卡片 3D 鼠标跟随（`--rx/--ry` 在同 transform 内叠加）零冲突。
-- CSS：`.portfolio, .thanks { transform: translateY(var(--sec-p,0px)); will-change: transform; }`；`.scroll-video-sticky { opacity: var(--sv-op,1); will-change: opacity; }`
+### 作品集内部卡差速（--card-p）
 
-**⚠️ 改此区块必看**：
-1. 视频屏内部 `position:sticky` 容器**不能**整体 translateY，否则 sticky 失效 → 只能用 opacity 差速。
-2. 屏间视差幅度在纯黑底上会被「黑底随黑底走」吞掉，幅度需够大（portfolio 80 / thanks -90）才可见；±10px 几乎看不出。
-3. Hero 无 `--sec-p`，不要给它加，否则与内部多层视差叠加产生抖动。
+| 目标 | 差速方式 | CSS 变量 | 系数 | 说明 |
+|---|---|---|---|---|
+| 卡片（`.portfolio-inner`） | 比图片快 | `--card-p` | 1.6x | 图片跟随自然滚动无额外位移，卡片在整体位移基础上额外快移（p × 160 × 1.6，最大值约 256px），形成「卡片冲得比图片快」的内部层次感。 |
+
+**历史**：曾有过 `--sec-p` 整屏位移方案（作品集+160px/感谢页-90px），但因 sticky 导致的视觉割裂和双滚动条问题，已移除。
+
+### 实现要点
+- 视频屏和内部卡差速共用同一个 IIFE，`requestAnimationFrame` 节流（passive scroll 监听），`resize` 重算。
+- JS 只 `setProperty` 设 `--sv-op` / `--card-p`，绝不拼 transform 字符串 → 与卡片 3D 鼠标跟随（`--rx/--ry`）零冲突。
+- CSS：`.portfolio-inner { transform: translateY(var(--card-p,0px)); will-change: transform; }`；`.scroll-video-sticky { opacity: var(--sv-op,1); will-change: opacity; }`
 
 ---
 
@@ -165,3 +163,6 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 | 7/26 | 滚动视频播放、全关键帧编码、5 段文案系统、视频编辑器 |
 | 7/27 | 2K→1080p 升级、编辑器 Bug 修复、文案定稿、文字效果优化、作品集替换为 Our Best Mistakes 卡片画廊 |
 | 7/27 (晚) | 屏间滚动视差定稿：作品集(+80)/感谢页(-90) translateY 差速 + 视频屏 opacity 淡入差速(0.6~1)；Hero 不参与仅留内部多层视差；早期误做的板块内 5 层视差已清除 |
+| 7/27 (补) | 作品集视差加强：±80px → ±160px（翻倍），其他屏不变 |
+| 7/27 (晚修) | 作品集内部视差加卡片快于图片（--card-p 1.6x）；修复 sticky 双滚动条根因（overflow-x:hidden→overflow:clip）；--sec-p 整屏位移因双滚动条问题已整体移除；滚动差速章节重写 |
+| 7/27 (3D) | 3D 卡片效果加强：视角 ±15°→±19°(×38)、perspective 800px→700px |

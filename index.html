@@ -215,7 +215,7 @@
       width: 100%;
       padding: 0 2rem 6rem;
       background: #000;
-      overflow-x: hidden;
+      overflow: clip;
     }
     .portfolio-top-img-wrap {
       width: 100vw;
@@ -234,6 +234,8 @@
       max-width: 1100px;
       margin: 0 auto;
       z-index: 1;
+      transform: translateY(var(--card-p, 0px));
+      will-change: transform;
     }
     .portfolio-label {
       font-size: 0.7rem;
@@ -288,7 +290,7 @@
         0 1px 1px rgba(0, 0, 0, 0.06),
         0 6px 16px rgba(0, 0, 0, 0.28),
         0 22px 44px rgba(0, 0, 0, 0.25);
-      transform: perspective(800px)
+      transform: perspective(700px)
                  translateY(var(--ty))
                  rotateX(var(--rx))
                  rotateY(var(--ry))
@@ -299,7 +301,7 @@
     }
     .mistake-gallery .mc-card:hover {
       --base: 0deg;
-      transform: perspective(800px)
+      transform: perspective(700px)
                  translateY(-14px)
                  rotateX(var(--rx))
                  rotateY(var(--ry))
@@ -588,11 +590,7 @@
       .core-dot { animation: none; }
     }
   
-    /* 整页（section）整体视差：案例页 / 结尾页随滚动整体差速，制造页面之间的层次 */
-    .portfolio, .thanks {
-      transform: translateY(var(--sec-p, 0px));
-      will-change: transform;
-    }
+    /* (已移除 --sec-p 整屏位移：sticky 导致作品集看起来像独立滑窗) */
   </style>
 </head>
 <body>
@@ -1148,8 +1146,8 @@
           var r = card.getBoundingClientRect();
           var px = (e.clientX - r.left) / r.width - 0.5;
           var py = (e.clientY - r.top) / r.height - 0.5;
-          card.style.setProperty('--ry', (px * 30).toFixed(2) + 'deg');
-          card.style.setProperty('--rx', (-py * 30).toFixed(2) + 'deg');
+          card.style.setProperty('--ry', (px * 38).toFixed(2) + 'deg');
+          card.style.setProperty('--rx', (-py * 38).toFixed(2) + 'deg');
         });
         card.addEventListener('mouseleave', function () {
           card.style.setProperty('--ry', '0deg');
@@ -1178,13 +1176,14 @@
           if (op < 0.6) op = 0.6;
           sv.style.setProperty('--sv-op', op.toFixed(2));
         }
-        [[pf, 80], [th, -90]].forEach(function (pair) {
-          var sec = pair[0]; if (!sec) return;
-          var r = sec.getBoundingClientRect();
-          var p = (r.top + r.height / 2 - vh / 2) / vh;
-          if (p > 1) p = 1; else if (p < -1) p = -1;
-          sec.style.setProperty('--sec-p', (p * pair[1]).toFixed(1) + 'px');
-        });
+        // Internal portfolio parallax: cards faster (1.6x) than the image
+        var ci = document.querySelector('.portfolio-inner');
+        if (pf && ci) {
+          var rP = pf.getBoundingClientRect();
+          var pP = (rP.top + rP.height / 2 - vh / 2) / vh;
+          if (pP > 1) pP = 1; else if (pP < -1) pP = -1;
+          ci.style.setProperty('--card-p', (pP * 160 * 1.6).toFixed(1) + 'px');
+        }
         ticking = false;
       }
       window.addEventListener('scroll', function () {
