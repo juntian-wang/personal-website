@@ -1023,7 +1023,6 @@
           (function(idx){
             var img = new Image();
             var num = String(idx + 1).padStart(4, '0');
-            img.src = FRAME_DIR + 'frame-' + num + '.webp';
             img.onload = function(){
               loaded++;
               window._frameLoadProgress = loaded / TOTAL_FRAMES;
@@ -1044,6 +1043,7 @@
             img.onerror = function(){
               // Failed frame: don't count toward progress, leave images[idx] as null
             };
+            img.src = FRAME_DIR + 'frame-' + num + '.webp';
             images[idx] = null;
           })(i);
         }
