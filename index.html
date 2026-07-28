@@ -670,8 +670,6 @@
           if (p >= 0.8 && (Date.now() - startTime) >= 2000) {
             clearInterval(tick);
             statusEl.textContent = '✓ 完美';
-            pctEl.textContent = '100%';
-            setProgress(100);
             setTimeout(function(){
               wrapper.classList.add('is-hidden');
               document.body.style.overflow = '';
@@ -684,7 +682,6 @@
       setTimeout(function(){
         if (!wrapper.classList.contains('is-hidden')) {
           clearInterval(tick);
-          setProgress(100);
           statusEl.textContent = '✓ 完美';
           setTimeout(function(){
             wrapper.classList.add('is-hidden');
