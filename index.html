@@ -11,6 +11,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #000;
       color: #fff;
+      overflow-x: hidden;
     }
 
     /* ===== Hero ===== */
@@ -220,7 +221,8 @@
       will-change: transform;
     }
     .portfolio-top-img-wrap {
-      width: 100vw;
+      margin-left: -2rem;
+      width: calc(100% + 4rem);
       overflow: hidden;
       height: 38vw;
     }
@@ -322,6 +324,7 @@
     .mistake-gallery > .mc-card:nth-child(5) { --base: -3deg; }
     .mistake-gallery > .mc-card:nth-child(6) { --base: 4deg; }
     .mistake-gallery > .mc-card:nth-child(7) { --base: -5deg; }
+    .mistake-gallery .mc-card-link:nth-child(8) .mc-card { --base: 3deg; }
 
     .mc-photo {
       position: relative;
@@ -336,6 +339,18 @@
       border-radius: 10px;
       box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.14);
       pointer-events: none;
+    }
+    .mc-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #d4cdc1;
+      color: #888;
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
     }
     .mc-photo img {
       width: 100%;
@@ -398,6 +413,7 @@
     .mistake-gallery > .mc-card:nth-child(5) .mc-label { transform: rotate(-15deg); }
     .mistake-gallery > .mc-card:nth-child(6) .mc-label { transform: rotate(-13deg); }
     .mistake-gallery > .mc-card:nth-child(7) .mc-label { transform: rotate(-11deg); }
+    .mistake-gallery .mc-card-link:nth-child(8) .mc-label { transform: rotate(-10deg); }
 
     .mc-batch {
       margin-top: 13px;
@@ -419,6 +435,7 @@
       align-items: center;
       justify-content: center;
       background: #000;
+      overflow: hidden;
     }
     .thanks-scene {
       position: absolute;
@@ -589,6 +606,82 @@
     @media (prefers-reduced-motion: reduce) {
       .spinner-inner, .spinner-outer { animation: none; }
       .core-dot { animation: none; }
+    }
+
+    /* ===== Thanks Contact Overlay ===== */
+    .thanks-contact {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: var(--tc-align, flex-start);
+      justify-content: var(--tc-justify, flex-end);
+      padding: var(--tc-pad, 60px 50px);
+      pointer-events: none;
+    }
+    .thanks-contact-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: var(--tc-align, flex-start);
+      gap: var(--tc-gap, 16px);
+      pointer-events: auto;
+    }
+    .tc-avatar {
+      width: var(--tc-avatar-size, 80px);
+      height: var(--tc-avatar-size, 80px);
+      border-radius: 50%;
+      object-fit: cover;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+      position: relative;
+    }
+    .thanks-contact-inner:hover .tc-avatar {
+      opacity: 1;
+    }
+    .thanks-contact-copy {
+      font-size: var(--tc-copy-size, 0.75rem);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.35);
+      position: relative;
+    }
+    .thanks-contact-links {
+      display: flex;
+      align-items: center;
+      gap: var(--tc-icon-gap, 28px);
+      position: relative;
+    }
+    .tc-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.5);
+      transition: color 0.2s, transform 0.2s;
+      pointer-events: auto;
+    }
+    .tc-item-nolink {
+      cursor: default;
+    }
+    .tc-item:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .tc-icon {
+      width: var(--tc-icon-size, 26px);
+      height: var(--tc-icon-size, 26px);
+      opacity: 0.65;
+      transition: opacity 0.2s;
+    }
+    .tc-item:hover .tc-icon {
+      opacity: 1;
+    }
+    .tc-name {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
   
     /* (已移除 --sec-p 整屏位移：sticky 导致作品集看起来像独立滑窗) */
@@ -795,15 +888,15 @@
         <article class="mc-card">
           <div class="mc-tape"></div>
           <div class="mc-photo">
-            <img src="pic/作品封面/双铃坠封面 2.webp" alt="双灵坠" loading="lazy" />
+            <img src="pic/作品封面/双铃坠封面 2.webp" alt="双铃坠" loading="lazy" />
           </div>
           <span class="mc-label">动画短片</span>
 
-          <p class="mc-batch">双灵坠</p>
+          <p class="mc-batch">双铃坠</p>
         </article>
         </a>
 
-        <a class="mc-card-link" href="http://history.jonlab.cn/maplibre_3d_history.html" target="_blank" rel="noopener noreferrer">
+        <a class="mc-card-link" href="https://history.jonlab.cn/" target="_blank" rel="noopener noreferrer">
         <article class="mc-card">
           <div class="mc-tape"></div>
           <div class="mc-photo">
@@ -866,6 +959,18 @@
 
           <p class="mc-batch">星际飞船设计图</p>
         </article>
+
+        <a class="mc-card-link" href="https://ai-summer.jonlab.cn" target="_blank" rel="noopener noreferrer">
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
+            <img src="pic/作品封面/ai-can-bb.webp" alt="AI CAN BB" loading="lazy" style="transform: scale(1.15); transform-origin: top center;" />
+          </div>
+          <span class="mc-label">AI奇葩说</span>
+
+          <p class="mc-batch">AI CAN BB</p>
+        </article>
+        </a>
       </div>
 
     </div>
@@ -883,6 +988,43 @@
     <div class="thanks-placeholder" id="thanks-placeholder">
       <div class="spinner"></div>
     </div>
+
+    <!-- ===== Contact overlay on top of 3D scene ===== -->
+    <div class="thanks-contact" id="thanksContact" style="--tc-align:flex-start;--tc-justify:flex-end;--tc-pad:60px 50px;--tc-gap:16px">
+      <div class="thanks-contact-inner">
+        <img class="tc-avatar" src="pic/壮壮头像.webp" alt="头像" width="46" height="46" style="width:46px;height:46px;left:56px;top:94px">
+        <div class="thanks-contact-copy" style="font-size:0.8rem;left:56px;top:94px">© 2026 Jon's Lab. All rights reserved.</div>
+        <div class="thanks-contact-links" style="left:126px;top:2px">
+
+          <a class="tc-item" href="https://space.bilibili.com/1551587375" target="_blank" rel="noopener noreferrer">
+            <svg class="tc-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="7" width="18" height="13" rx="3" stroke="#fff" stroke-width="1.5"/>
+              <path d="M7 7L5.5 4M17 7l1.5-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+              <rect x="8" y="11" width="8" height="5" rx="1.5" stroke="#fff" stroke-width="1.2"/>
+            </svg>
+            <span class="tc-name">bilibili</span>
+          </a>
+
+          <a class="tc-item" href="https://www.xiaohongshu.com/user/profile/62c7adc9000000000e00cbd3" target="_blank" rel="noopener noreferrer">
+            <svg class="tc-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="18" rx="5" stroke="#fff" stroke-width="1.5"/>
+              <path d="M8 9.5h8M8 13h6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span class="tc-name">小红书</span>
+          </a>
+
+          <div class="tc-item tc-item-nolink">
+            <svg class="tc-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="18" rx="5" stroke="#fff" stroke-width="1.5"/>
+              <path d="M7 12c0-2 2-3 3-2l2 4 2-4c1-1 3 0 3 2s-2 3-3 2l-2-4-2 4c-1 1-3 0-3-2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+            </svg>
+            <span class="tc-name">视频号</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- ===== End contact overlay ===== -->
 
   </section>
 
@@ -1202,6 +1344,45 @@
       }, { passive: true });
       window.addEventListener('resize', update);
       update();
+    })();
+  </script>
+
+  <script>
+    // ===== Load saved contact overlay settings =====
+    (function(){
+      try {
+        var saved = JSON.parse(localStorage.getItem('footer-edit-vars'));
+        if (saved) {
+          var el = document.querySelector('.thanks-contact');
+          if (!el) return;
+          var a = el.querySelector('.tc-avatar');
+          var t = el.querySelector('.thanks-contact-copy');
+          var i = el.querySelector('.thanks-contact-links');
+          if (saved.align)     el.style.setProperty('--tc-align', saved.align);
+          if (saved.justify)   el.style.setProperty('--tc-justify', saved.justify);
+          if (saved.iconSize)  el.style.setProperty('--tc-icon-size', saved.iconSize + 'px');
+          if (saved.iconGap)   el.style.setProperty('--tc-icon-gap', saved.iconGap + 'px');
+          if (saved.titleGap)  el.style.setProperty('--tc-gap', saved.titleGap + 'px');
+          if (saved.padX || saved.padY) {
+            el.style.setProperty('--tc-pad', (saved.padY || 60) + 'px ' + (saved.padX || 50) + 'px');
+          }
+          // Direct style on element
+          if (a) {
+            if (saved.avatarSize) { a.style.width = saved.avatarSize + 'px'; a.style.height = saved.avatarSize + 'px'; }
+            a.style.left = (saved.avatarX || 0) + 'px';
+            a.style.top = (saved.avatarY || 0) + 'px';
+          }
+          if (t) {
+            if (saved.copySize) t.style.fontSize = saved.copySize + 'rem';
+            t.style.left = (saved.copyX || 0) + 'px';
+            t.style.top = (saved.copyY || 0) + 'px';
+          }
+          if (i) {
+            i.style.left = (saved.iconsX || 0) + 'px';
+            i.style.top = (saved.iconsY || 0) + 'px';
+          }
+        }
+      } catch(e) {}
     })();
   </script>
 

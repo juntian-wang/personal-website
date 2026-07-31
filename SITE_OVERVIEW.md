@@ -106,13 +106,14 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 
 | 作品 | 封面 | 标签 | 标题（显示） | 链接 |
 |---|---|---|---|---|
-| 双灵坠 | `双铃坠封面 2.webp` | 动画短片 | 双灵坠 | [B站](https://www.bilibili.com/video/BV1JrQ9B1Ecp/) ↗ |
+| 双铃坠 | `双铃坠封面 2.webp` | 动画短片 | 双铃坠 | [B站](https://www.bilibili.com/video/BV1JrQ9B1Ecp/) ↗ |
 | 中国古代疆域地图 | `中国古代疆域.webp` | 数据可视化 | 中国古代疆域地图 | [3D地图](http://history.jonlab.cn/maplibre_3d_history.html) ↗ |
 | 中国古代诗词地图 | `中国古代诗词地图.webp` | 数据可视化 | 中国古代诗词地图 | [诗词地图](https://history.jonlab.cn/maplibre_3d_history.html?mode=poem) ↗ |
 | 玉米·黄金·美洲豹 | `玉米黄金美洲豹.webp` | 策略塔防游戏 | 玉米·黄金·美洲豹 | 暂无 |
 | 人物设定图 | `人物设定图.webp` | 人物设计 | 人物设定图 | 暂无 |
 | 近地轨道军事卫星设计图 | `卫星.webp` | 3D 建模 | 近地轨道军事卫星设计图 | 暂无 |
 | 星际飞船设计图 | `飞船.webp` | 3D 建模 | 星际飞船设计图 | 暂无 |
+| AI CAN BB（原名 AI奇葩说） | `ai-can-bb.webp`（官网截图） | AI奇葩说 | AI CAN BB | [官网](https://ai-summer.jonlab.cn) ↗ |
 
 - 纯黑底 `#000` + Unicorn Studio 动态背景（Project: `lEMBUE0ODtdPgc7dwRWz`，opacity 0.3）
 - 7 卡 flex 横排换行居中（`.mistake-gallery`，`max-width:1180px`，`gap:64px 60px`）
