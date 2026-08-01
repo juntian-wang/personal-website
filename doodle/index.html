@@ -175,6 +175,40 @@
     .nav { padding: 0.9rem 1rem; }
   }
 
+  /* ===== 底部返回导航 ===== */
+  .back-nav {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .back-nav a, .back-nav button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .back-nav a:hover, .back-nav button:hover {
+    border-color: rgba(255,255,255,0.45);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .back-nav svg { width: 14px; height: 14px; }
+
   /* ===== 底部版权 + 社媒 ===== */
   .doodle-footer {
     max-width: 1180px;
@@ -274,6 +308,17 @@
 </section>
 
 <main class="doodle-grid" id="grid"></main>
+
+<nav class="back-nav">
+  <a href="https://jonlab.cn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    返回作品集
+  </a>
+  <button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    回到顶部
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+</nav>
 
 <footer class="doodle-footer">
   <div class="df-copy">© 2026 Jon's Lab. All rights reserved.</div>
