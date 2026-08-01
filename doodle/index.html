@@ -175,6 +175,36 @@
     .nav { padding: 0.9rem 1rem; }
   }
 
+  /* ===== 底部版权 + 社媒 ===== */
+  .doodle-footer {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.2rem 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .df-copy { font-size: 0.78rem; color: rgba(255,255,255,0.3); }
+  .df-links { display: flex; align-items: center; gap: 1.3rem; }
+  .df-links a, .df-links span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .df-links a:hover { color: #fff; }
+  .df-links svg { width: 16px; height: 16px; }
+  @media (max-width: 560px) {
+    .doodle-footer { justify-content: center; text-align: center; }
+    .df-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  }
+
   /* ===== Lightbox 点击放大 ===== */
   .lightbox {
     position: fixed;
@@ -245,6 +275,24 @@
 </section>
 
 <main class="doodle-grid" id="grid"></main>
+
+<footer class="doodle-footer">
+  <div class="df-copy">© 2026 Jon's Lab. All rights reserved.</div>
+  <div class="df-links">
+    <a href="https://space.bilibili.com/1551587375" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 7L5.5 4M17 7l1.5-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="8" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+      bilibili
+    </a>
+    <a href="https://www.xiaohongshu.com/user/profile/62c7adc9000000000e00cbd3" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="18" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M8 9.5h8M8 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      小红书
+    </a>
+    <span>
+      <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="18" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M7 12c0-2 2-3 3-2l2 4 2-4c1-1 3 0 3 2s-2 3-3 2l-2-4-2 4c-1 1-3 0-3-2z" stroke="currentColor" stroke-width="1.2"/></svg>
+      视频号
+    </span>
+  </div>
+</footer>
 
 <div class="lightbox" id="lightbox">
   <div class="lightbox-close" id="lbClose">✕</div>
