@@ -702,6 +702,14 @@
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .group-card .g-img:hover img { transform: scale(1.06); }
+  /* 动画卡片：多帧绝对定位叠放，JS 切换 .active 显示 */
+  .group-card .g-img.anim-card { position: relative; }
+  .group-card .g-img.anim-card img {
+    position: absolute;
+    inset: 0;
+    display: none;
+  }
+  .group-card .g-img.anim-card img.active { display: block; }
   .group-card .fig-cap { margin-top: 0.6rem; }
   @media (max-width: 640px) {
     .group-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
@@ -1180,10 +1188,10 @@ const PROJECT = {
       name: "英雄", en: "HERO",
       items: [
         { src: "pic/人物/ref_mage_512.webp", caption: "大祭司巴兰 · 基础形象" },
-        { src: "pic/人物/21.webp", caption: "待机动画帧" },
-        { src: "pic/人物/stand/41.webp", caption: "待机动画 Set2" },
-        { src: "pic/人物/run/30.webp", caption: "奔跑动画" },
-        { src: "pic/人物/ref_mage_cast1_512.webp", caption: "施法动画" },
+        { src: "pic/人物/21.webp", caption: "待机动画", frames: ["pic/人物/21.webp","pic/人物/23.webp","pic/人物/22.webp","pic/人物/23.webp","pic/人物/24.webp","pic/人物/24.webp","pic/人物/23.webp","pic/人物/22.webp","pic/人物/23.webp"], speed: 200 },
+        { src: "pic/人物/stand/41.webp", caption: "待机动画 Set2", frames: ["pic/人物/stand/41.webp","pic/人物/stand/42.webp","pic/人物/stand/43.webp","pic/人物/stand/44.webp","pic/人物/stand/45.webp","pic/人物/stand/45.webp"], speed: 200 },
+        { src: "pic/人物/run/30.webp", caption: "奔跑动画", frames: ["pic/人物/run/30.webp","pic/人物/run/31.webp","pic/人物/run/32.webp","pic/人物/run/33.webp","pic/人物/run/34.webp"], speed: 140 },
+        { src: "pic/人物/ref_mage_cast1_512.webp", caption: "施法动画", frames: ["pic/人物/ref_mage_cast1_512.webp","pic/人物/ref_mage_cast2_512.webp","pic/人物/ref_mage_cast3_512.webp"], speed: 200 },
         { src: "pic/人物/hero_avatar.webp", caption: "英雄头像 · 面板" },
         { src: "pic/人物/hero_panel_bg.webp", caption: "面板底图（4 格）" },
         { src: "pic/物品/抠图-1784641170884.webp", caption: "脚下光环 1" },
@@ -1194,26 +1202,26 @@ const PROJECT = {
       name: "我方单位", en: "ALLY",
       items: [
         { src: "pic/人物/ref_sword_512.webp", caption: "剑兵 · 近战 ATK12" },
-        { src: "pic/人物/ref_sword_attack1_512.webp", caption: "剑兵 · 进攻动画" },
+        { src: "pic/人物/ref_sword_attack1_512.webp", caption: "剑兵 · 进攻动画", frames: ["pic/人物/ref_sword_attack1_512.webp","pic/人物/ref_sword_atk_mid_512.webp","pic/人物/ref_sword_attack2_512.webp"] },
         { src: "pic/人物/ref_archer_512.webp", caption: "弓箭手 · 射程180" },
-        { src: "pic/人物/ref_archer_attack1_512.webp", caption: "弓箭手 · 进攻动画" },
+        { src: "pic/人物/ref_archer_attack1_512.webp", caption: "弓箭手 · 进攻动画", frames: ["pic/人物/ref_archer_attack1_512.webp","pic/人物/ref_archer_atk_mid_512.webp","pic/人物/ref_archer_attack2_512.webp"] },
         { src: "pic/人物/ref_guardian_512.webp", caption: "图腾战士 · 治疗光环" },
-        { src: "pic/人物/ref_guardian_cast1_512.webp", caption: "图腾战士 · 施法" },
+        { src: "pic/人物/ref_guardian_cast1_512.webp", caption: "图腾战士 · 施法", frames: ["pic/人物/ref_guardian_cast1_512.webp","pic/人物/ref_guardian_cast2_512.webp","pic/人物/ref_guardian_cast3_512.webp"] },
         { src: "pic/人物/bear/抠图-1784701709051.webp", caption: "野熊 · 英雄召唤" },
-        { src: "pic/人物/bear/run/1.webp", caption: "野熊 · 奔跑动画" },
-        { src: "pic/人物/bear/攻击/1.webp", caption: "野熊 · 攻击动画" },
+        { src: "pic/人物/bear/run/1.webp", caption: "野熊 · 奔跑动画", frames: ["pic/人物/bear/run/1.webp","pic/人物/bear/run/2.webp","pic/人物/bear/run/3.webp","pic/人物/bear/run/4.webp","pic/人物/bear/run/5.webp","pic/人物/bear/run/6.webp","pic/人物/bear/run/7.webp"], speed: 120 },
+        { src: "pic/人物/bear/攻击/1.webp", caption: "野熊 · 攻击动画", frames: ["pic/人物/bear/攻击/1.webp","pic/人物/bear/攻击/2.webp","pic/人物/bear/攻击/2.webp","pic/人物/bear/攻击/3.webp","pic/人物/bear/攻击/4.webp","pic/人物/bear/攻击/4.webp","pic/人物/bear/攻击/5.webp"], speed: 200 },
       ],
     },
     {
       name: "敌方单位", en: "ENEMY",
       items: [
-        { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 迷途亡灵" },
-        { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 被腐蚀的守护兽" },
-        { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 堕落神之造物" },
-        { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 只识黄金" },
-        { src: "pic/人物/ref_boss_512.webp", caption: "枯骨王 卡班 · BOSS" },
-        { src: "pic/人物/ref_boss_attack1_512.webp", caption: "BOSS · 攻击动画" },
-        { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 丛林异变" },
+        { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 迷途亡灵", frames: ["pic/人物/ref_enemy_warrior_512.webp","pic/人物/ref_warrior_move1_512.webp","pic/人物/ref_warrior_move2_512.webp"] },
+        { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 被腐蚀的守护兽", frames: ["pic/人物/ref_jaguar_move0_512.webp","pic/人物/ref_jaguar_512.webp","pic/人物/ref_jaguar_move2_512.webp"] },
+        { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 堕落神之造物", frames: ["pic/人物/ref_serpent_move1_512.webp","pic/人物/ref_serpent_move2_512.webp"] },
+        { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 只识黄金", frames: ["pic/人物/ref_conquistador_512.webp","pic/人物/ref_conquistador_move1_512.webp","pic/人物/ref_conquistador_move2_512.webp"] },
+        { src: "pic/人物/ref_boss_512.webp", caption: "枯骨王 卡班 · BOSS", frames: ["pic/人物/ref_boss_512.webp","pic/人物/ref_boss_move1_512.webp","pic/人物/ref_boss_move2_512.webp"] },
+        { src: "pic/人物/ref_boss_attack1_512.webp", caption: "BOSS · 攻击动画", frames: ["pic/人物/ref_boss_attack1_512.webp","pic/人物/ref_boss_attack2_512.webp","pic/人物/ref_boss_attack3_512.webp","pic/人物/ref_boss_attack4_512.webp","pic/人物/ref_boss_attack5_512.webp"] },
+        { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 丛林异变", frames: ["pic/人物/ref_bat_512.webp","pic/人物/ref_bat_fly_512.webp"] },
       ],
     },
     {
@@ -1390,11 +1398,22 @@ var gallery = document.getElementById('gallery');
     (group.items || []).forEach(function(item, i){
       var d = document.createElement('div');
       d.className = 'group-card';
-      d.innerHTML =
-        '<div class="g-img" data-zoom><img loading="lazy" alt=""></div>' +
-        '<div class="fig-cap"></div>';
-      d.querySelector('img').src = item.src;
-      d.querySelector('img').alt = item.caption || '';
+      var frames = (item.frames && item.frames.length > 1) ? item.frames : null;
+      if (frames) {
+        // 多帧动画卡片
+        var imgs = frames.map(function(f, fi){
+          return '<img src="' + f + '" alt="" loading="lazy" class="' + (fi === 0 ? 'active' : '') + '">';
+        }).join('');
+        d.innerHTML =
+          '<div class="g-img anim-card" data-frames=\'' + JSON.stringify(frames) + '\' data-speed="' + (item.speed || 200) + '" data-zoom>' + imgs + '</div>' +
+          '<div class="fig-cap"></div>';
+      } else {
+        d.innerHTML =
+          '<div class="g-img" data-zoom><img loading="lazy" alt=""></div>' +
+          '<div class="fig-cap"></div>';
+        d.querySelector('img').src = item.src;
+        d.querySelector('img').alt = item.caption || '';
+      }
       renderFigCap(d.querySelector('.fig-cap'), item.caption);
       grid.appendChild(d);
     });
@@ -1569,6 +1588,21 @@ var specs = document.getElementById('specs');
   d.querySelector('.spec-label').textContent = s.label;
   d.querySelector('.spec-value').textContent = s.value;
   specs.appendChild(d);
+});
+
+// ===== 图鉴动画：多帧卡片循环播放（不同卡片可不同速度） =====
+document.querySelectorAll('.group-card .anim-card').forEach(function(wrap){
+  var frames = [];
+  try { frames = JSON.parse(wrap.dataset.frames); } catch(e) { return; }
+  var imgs = wrap.querySelectorAll('img');
+  if (!imgs.length) return;
+  var idx = 0;
+  imgs[0].classList.add('active');
+  setInterval(function(){
+    imgs.forEach(function(img){ img.classList.remove('active'); });
+    idx = (idx + 1) % imgs.length;
+    if (imgs[idx]) imgs[idx].classList.add('active');
+  }, parseInt(wrap.dataset.speed) || 200);
 });
 
 // Next Project（null 不渲染；url 为空时回首页）
