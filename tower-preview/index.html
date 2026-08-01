@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玛雅塔防 · 美术预览</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0d8c8;font-family:'Segoe UI',system-ui,sans-serif;padding:24px}
+h1{text-align:center;font-size:28px;margin-bottom:8px;color:#f0e4b0}
+h2{font-size:18px;margin:24px 0 12px;padding-bottom:4px;border-bottom:1px solid #3a3a5a;color:#d4c090}
+.gallery{display:flex;flex-wrap:wrap;gap:16px}
+.card{background:#2a2a42;border-radius:12px;padding:12px;text-align:center;width:140px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+.card .img-wrap{width:128px;height:128px;display:flex;align-items:center;justify-content:center;margin:0 auto;background:#1e1e32;border-radius:8px;overflow:hidden}
+.card img{max-width:120px;max-height:120px;image-rendering:auto}
+.card .name{font-size:13px;margin-top:6px;color:#c8b890}
+.card .sub{font-size:11px;color:#8a7a6a;margin-top:2px}
+.anim-icon{display:inline-block;width:8px;height:8px;border-radius:50%;background:#60d060;margin-right:4px;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+
+<h1>🏛 玛雅塔防 · 美术预览</h1>
+<p style="text-align:center;color:#8a7a6a;font-size:14px;margin-bottom:20px">所有单位 · 仅作参考（WebP 压缩版） · 游戏内实际尺寸按缩放比例绘制</p>
+
+<!-- ========== 大祭司英雄 ========== -->
+<h2>🧙 大祭司英雄</h2>
+<div class="gallery" id="hero"></div>
+
+<!-- ========== 我方单位 ========== -->
+<h2>⚔ 我方单位</h2>
+<div class="gallery" id="ally"></div>
+
+<!-- ========== 敌方单位 ========== -->
+<h2>💀 敌方单位</h2>
+<div class="gallery" id="enemy"></div>
+
+<!-- ========== 建筑 ========== -->
+<h2>🏗 建筑</h2>
+<div class="gallery" id="building"></div>
+
+<!-- ========== 物品/投射物 ========== -->
+<h2>🏹 物品/投射物</h2>
+<div class="gallery" id="item"></div>
+
+<script>
+const UNITS = {
+  hero: [
+    {name:'大祭司 (静态)', img:'pic/人物/ref_mage_512.webp', note:'英雄基础形象 · 复用祭司图'},
+    {name:'待机动画 Set0 (21→23→22→23→24→24→23→22→23)', img:['pic/人物/21.webp','pic/人物/23.webp','pic/人物/22.webp','pic/人物/23.webp','pic/人物/24.webp','pic/人物/24.webp','pic/人物/23.webp','pic/人物/22.webp','pic/人物/23.webp'], note:'50%概率·9帧·200ms/帧', anim:true, speed:200},
+    {name:'待机动画 Set1 (41→45→45)', img:['pic/人物/stand/41.webp','pic/人物/stand/42.webp','pic/人物/stand/43.webp','pic/人物/stand/44.webp','pic/人物/stand/45.webp','pic/人物/stand/45.webp'], note:'50%概率·6帧·200ms/帧', anim:true, speed:200},
+    {name:'奔跑动画 (30→31→32→33→34)', img:['pic/人物/run/30.webp','pic/人物/run/31.webp','pic/人物/run/32.webp','pic/人物/run/33.webp','pic/人物/run/34.webp'], note:'移动时循环播放', anim:true, speed:140},
+    {name:'施法动画 (cast1-3)', img:['pic/人物/ref_mage_cast1_512.webp','pic/人物/ref_mage_cast2_512.webp','pic/人物/ref_mage_cast3_512.webp'], note:'施放技能时触发', anim:true, speed:200},
+    {name:'脚下光环1', img:'pic/物品/抠图-1784641170884.webp', note:'轮播1/2 · 忽明忽暗'},
+    {name:'脚下光环2', img:'pic/物品/抠图-1784641174926.webp', note:'轮播2/2 · 忽明忽暗'},
+  ],
+  ally: [
+    {name:'剑兵 sword (静止)', img:'pic/人物/ref_sword_512.webp', note:'近战输出 · HP40 ATK7'},
+    {name:'剑兵 sword (进攻)', img:['pic/人物/ref_sword_attack1_512.webp','pic/人物/ref_sword_atk_mid_512.webp','pic/人物/ref_sword_attack2_512.webp'], note:'攻击动画', anim:true},
+    {name:'弓箭手 archer (静止)', img:'pic/人物/ref_archer_512.webp', note:'远程输出 · 射程144'},
+    {name:'弓箭手 archer (进攻)', img:['pic/人物/ref_archer_attack1_512.webp','pic/人物/ref_archer_atk_mid_512.webp','pic/人物/ref_archer_attack2_512.webp'], note:'攻击动画', anim:true},
+    {name:'祭司 mage (静止)', img:'pic/人物/ref_mage_512.webp', note:'虚弱光环 · 敌人-20%攻'},
+    {name:'祭司 mage (施法)', img:['pic/人物/ref_mage_cast1_512.webp','pic/人物/ref_mage_cast2_512.webp','pic/人物/ref_mage_cast3_512.webp'], note:'施法动画', anim:true},
+    {name:'图腾战士 guardian (静止)', img:'pic/人物/ref_guardian_512.webp', note:'治疗光环 · 每帧回血'},
+    {name:'图腾战士 guardian (施法)', img:['pic/人物/ref_guardian_cast1_512.webp','pic/人物/ref_guardian_cast2_512.webp','pic/人物/ref_guardian_cast3_512.webp'], note:'施法动画', anim:true},
+    {name:'野熊 bear (静止)', img:'pic/人物/bear/抠图-1784701709051.webp', note:'英雄召唤·HP80 ATK15'},
+    {name:'野熊 bear (奔跑)', img:['pic/人物/bear/run/1.webp','pic/人物/bear/run/2.webp','pic/人物/bear/run/3.webp','pic/人物/bear/run/4.webp','pic/人物/bear/run/5.webp','pic/人物/bear/run/6.webp','pic/人物/bear/run/7.webp'], note:'7帧·120ms/帧·第4/5帧游戏内放大1.3×', anim:true, speed:120, bear:true},
+    {name:'野熊 bear (攻击)', img:['pic/人物/bear/攻击/1.webp','pic/人物/bear/攻击/2.webp','pic/人物/bear/攻击/2.webp','pic/人物/bear/攻击/3.webp','pic/人物/bear/攻击/4.webp','pic/人物/bear/攻击/4.webp','pic/人物/bear/攻击/5.webp'], note:'7帧·2和4多播一次·攻击时循环', anim:true, speed:200},
+  ],
+  enemy: [
+    {name:'骷髅兵 warrior (行进)', img:['pic/人物/ref_enemy_warrior_512.webp','pic/人物/ref_warrior_move1_512.webp','pic/人物/ref_warrior_move2_512.webp'], note:'基础近战 · HP40', anim:true},
+    {name:'豹骑 jaguar (行进)', img:['pic/人物/ref_jaguar_move0_512.webp','pic/人物/ref_jaguar_512.webp','pic/人物/ref_jaguar_move2_512.webp'], note:'高速 · 穿透第1个士兵', anim:true},
+    {name:'巨蟒 serpent (行进)', img:['pic/人物/ref_serpent_move1_512.webp','pic/人物/ref_serpent_move2_512.webp'], note:'高血量肉盾 · HP1400', anim:true},
+    {name:'征服者 conquistador (行进)', img:['pic/人物/ref_conquistador_512.webp','pic/人物/ref_conquistador_move1_512.webp','pic/人物/ref_conquistador_move2_512.webp'], note:'精英兵 · HP1200', anim:true},
+    {name:'骷髅BOSS boss (行进)', img:['pic/人物/ref_boss_512.webp','pic/人物/ref_boss_move1_512.webp','pic/人物/ref_boss_move2_512.webp'], note:'巨型BOSS · HP1500', anim:true},
+    {name:'骷髅BOSS boss (进攻)', img:['pic/人物/ref_boss_attack1_512.webp','pic/人物/ref_boss_attack2_512.webp','pic/人物/ref_boss_attack3_512.webp','pic/人物/ref_boss_attack4_512.webp','pic/人物/ref_boss_attack5_512.webp'], note:'5帧攻击动画 · 砸地碎石', anim:true},
+    {name:'蝙蝠 bat (行进)', img:['pic/人物/ref_bat_512.webp','pic/人物/ref_bat_fly_512.webp'], note:'飞行单位 · 剑兵无法攻击', anim:true},
+  ],
+  building: [
+    {name:'剑士营 Lv1', img:'pic/建筑/ref_barracks_512.webp', note:'40🌽 · 送3剑兵'},
+    {name:'剑士营 Lv2', img:'pic/建筑/ref_barracks_lv2_512.webp', note:'升级30🌽'},
+    {name:'剑士营 Lv3', img:'pic/建筑/ref_barracks_lv3_512.webp', note:'升级50🌽'},
+    {name:'射手营 Lv1', img:'pic/建筑/ref_archer_range_512.webp', note:'60🌽 · 送2弓手'},
+    {name:'射手营 Lv2', img:'pic/建筑/ref_archer_range_lv2_512.webp', note:'升级40🌽'},
+    {name:'射手营 Lv3', img:'pic/建筑/ref_archer_range_lv3_512.webp', note:'升级60🌽'},
+    {name:'祭坛 altar', img:'pic/建筑/ref_altar_512.webp', note:'60🌽 · 祭司'},
+    {name:'治疗之泉 Lv1', img:'pic/建筑/ref_temple_512.webp', note:'60🌽 · 图腾战士'},
+    {name:'治疗之泉 Lv2', img:'pic/建筑/ref_temple_lv2_512.webp', note:'范围+回血提升'},
+    {name:'治疗之泉 Lv3', img:'pic/建筑/ref_temple_lv3_512.webp', note:'范围+回血提升'},
+    {name:'玉米田 Lv1', img:'pic/建筑/ref_cornfield_lv1_512.webp', note:'产3🌽/天'},
+    {name:'玉米田 Lv2', img:'pic/建筑/ref_cornfield_lv2_512.webp', note:'产5🌽/天'},
+    {name:'玉米田 Lv3', img:'pic/建筑/ref_cornfield_lv3_512.webp', note:'产10🌽/天'},
+    {name:'栅栏 Lv1', img:'pic/建筑/ref_fence_512.webp', note:'30🌽 · HP30 · 阻挡敌人'},
+    {name:'栅栏 Lv2', img:'pic/建筑/ref_fence_lv2_512.webp', note:'升级20🌽 · HP50 · 更坚固'},
+    {name:'斧头投手塔', img:'pic/建筑/塔.webp', note:'投掷斧子 · 慢速高伤 · 60🌽 · HP40'},
+    {name:'喷火塔 (待机)', img:['pic/建筑/抠图-1784812779922.webp','pic/建筑/抠图-1784812782580.webp'], note:'70🌽 · HP50 · 固定向左下喷火', anim:true, speed:600},
+    {name:'喷火塔 (攻击)', img:'pic/建筑/抠图-1784812856759.webp', note:'攻击时切换此帧'},
+  ],
+  item: [
+    {name:'箭矢 arrow', img:'pic/物品/ref_arrow_512.webp', note:'弓箭手投射物'},
+    {name:'斧子 axe', img:'pic/物品/斧子.webp', note:'斧头投手投射物 · 逆时针旋转'},
+    {name:'火焰 flame', img:'pic/物品/抠图-1784812899152.webp', note:'喷火塔火焰效果'},
+    {name:'沼泽', img:'pic/物品/沼泽.webp', note:'技能·沼泽 地形效果'},
+    {name:'荆棘', img:'pic/物品/荆棘.webp', note:'技能·荆棘 地形效果'},
+    {name:'炸弹花', img:'pic/物品/抠图-1784640332919.webp', note:'技能·爆炸 投射物·旋转'},
+    {name:'爆炸特效', img:'pic/物品/抠图-1784774768047.webp', note:'炸弹爆炸光晕·0.5s渐隐'},
+    {name:'英雄头像', img:'pic/人物/hero_avatar.webp', note:'面板头像 120×120'},
+    {name:'技能图标·沼泽', img:'pic/人物/skill_root.webp', note:'面板技能1'},
+    {name:'技能图标·荆棘', img:'pic/人物/skill_terrain.webp', note:'面板技能2'},
+    {name:'技能图标·爆炸', img:'pic/人物/图片生成-1784775674904.webp', note:'面板技能3'},
+    {name:'技能图标·召唤野熊', img:'pic/人物/图片生成-1784701243035.webp', note:'面板技能2（替换荆棘）'},
+    {name:'面板底图（4格）', img:'pic/人物/hero_panel_bg.webp', note:'2516×1074·含边框'},
+  ]
+};
+
+function buildGallery(containerId, list) {
+  const container = document.getElementById(containerId);
+  list.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let imgHtml = '';
+    if (Array.isArray(item.img)) {
+      // 多帧 → 创建动画
+      if (item.anim) {
+        const spd = item.speed || 500;
+        const bearAttr = item.bear ? ' data-bear="true"' : '';
+        const imgs = item.img.map(src => `<img src="${src}" data-src="${src}" style="display:none">`).join('');
+        imgHtml = `<div class="img-wrap" data-frames='${JSON.stringify(item.img)}' data-anim="true" data-speed="${spd}"${bearAttr}>${imgs}</div>`;
+      } else {
+        imgHtml = `<div class="img-wrap"><img src="${item.img[0]}"></div>`;
+      }
+    } else {
+      imgHtml = `<div class="img-wrap"><img src="${item.img}"></div>`;
+    }
+    const animDot = item.anim ? '<span class="anim-icon"></span>' : '';
+    card.innerHTML = imgHtml + `<div class="name">${animDot}${item.name}</div><div class="sub">${item.note}</div>`;
+    container.appendChild(card);
+  });
+}
+
+buildGallery('hero', UNITS.hero);
+buildGallery('ally', UNITS.ally);
+buildGallery('enemy', UNITS.enemy);
+buildGallery('building', UNITS.building);
+buildGallery('item', UNITS.item);
+
+// 启动所有动画（支持不同速度）
+document.querySelectorAll('[data-anim="true"]').forEach(wrap => {
+  let frames, spd=parseInt(wrap.dataset.speed)||500;
+  try { frames = JSON.parse(wrap.dataset.frames); } catch(e) { return; }
+  const imgs = wrap.querySelectorAll('img');
+  let idx = 0;
+  if (imgs.length) imgs[0].style.display = 'block';
+  setInterval(() => {
+    imgs.forEach(img => {
+      img.style.display = 'none';
+      img.style.transform = ''; // 清除缩放
+    });
+    idx = (idx + 1) % imgs.length;
+    if (imgs[idx]) {
+      imgs[idx].style.display = 'block';
+      // 熊奔跑第4/5帧（索引3、4）模拟游戏内放大2倍
+      if (wrap.dataset.bear === 'true' && (idx === 3 || idx === 4)) {
+        imgs[idx].style.transform = 'scale(1.3)';
+      }
+    }
+  }, spd);
+});
+</script>
+
+</body>
+</html>
