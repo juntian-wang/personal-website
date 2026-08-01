@@ -81,6 +81,40 @@
     color: rgba(255,255,255,0.35);
   }
 
+  /* ===== 关于这件作品 ===== */
+  .about {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 1rem 2rem 2.5rem;
+  }
+  .sec-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 0.6rem;
+  }
+  .about-title {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.35) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .about-copy {
+    max-width: 680px;
+    font-size: 1rem;
+    line-height: 2;
+    color: rgba(255,255,255,0.72);
+  }
+  .about-copy p + p { margin-top: 1.2rem; }
+  .about-copy strong { color: #fff; font-weight: 600; }
+  @media (max-width: 640px) { .about { padding: 0.5rem 1rem 2rem; } }
+
   /* ===== 图集网格 ===== */
   .doodle-grid {
     max-width: 1180px;
@@ -160,6 +194,15 @@
   <h1>涂鸦</h1>
   <p>DOODLES · 随手画的小画</p>
 </header>
+
+<section class="about">
+  <div class="sec-label">OVERVIEW</div>
+  <h2 class="about-title">关于这件作品</h2>
+  <div class="about-copy">
+    <p>这些是<strong>我自己画的涂鸦</strong>——上课走神、等人无聊、灵感冒头的时候，随手记下来的小画。没有严格的构图，也没有统一的主题，就是想画就画。</p>
+    <p>每一张都对应一个当时的心情：有的画完很满意，有的画完自己都笑了。手绘的快乐，大概就是这样。</p>
+  </div>
+</section>
 
 <main class="doodle-grid" id="grid"></main>
 
