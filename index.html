@@ -352,7 +352,7 @@
     .gallery-works .mc-card-link:nth-child(4) .mc-card { --base: 6deg; }
     .gallery-works > .mc-card:nth-child(5) { --base: 3deg; }
     /* 设定集组 5 张（1、2 裸卡；3、4、5 链接） */
-    .gallery-artbooks > .mc-card:nth-child(1) { --base: -5deg; }
+    .gallery-artbooks .mc-card-link:nth-child(1) .mc-card { --base: -5deg; }
     .gallery-artbooks .mc-card-link:nth-child(2) .mc-card { --base: 4deg; }
     .gallery-artbooks > .mc-card:nth-child(3) { --base: -3deg; }
     .gallery-artbooks .mc-card-link:nth-child(4) .mc-card { --base: 6deg; }
@@ -443,7 +443,7 @@
     .gallery-works .mc-card-link:nth-child(3) .mc-label { transform: rotate(-9deg); }
     .gallery-works .mc-card-link:nth-child(4) .mc-label { transform: rotate(-12deg); }
     .gallery-works > .mc-card:nth-child(5) .mc-label { transform: rotate(-10deg); }
-    .gallery-artbooks > .mc-card:nth-child(1) .mc-label { transform: rotate(-13deg); }
+    .gallery-artbooks .mc-card-link:nth-child(1) .mc-label { transform: rotate(-13deg); }
     .gallery-artbooks .mc-card-link:nth-child(2) .mc-label { transform: rotate(-15deg); }
     .gallery-artbooks > .mc-card:nth-child(3) .mc-label { transform: rotate(-11deg); }
     .gallery-artbooks .mc-card-link:nth-child(4) .mc-label { transform: rotate(-12deg); }
@@ -980,6 +980,7 @@
       <div class="gallery-group gallery-artbooks">
         <div class="gallery-group-title"><span class="gg-num">02</span>ARTBOOKS · 设定集</div>
         <div class="gallery-group-grid">
+        <a class="mc-card-link" href="/doodle/" rel="noopener noreferrer">
         <article class="mc-card">
           <div class="mc-tape"></div>
           <div class="mc-photo">
@@ -989,6 +990,7 @@
 
           <p class="mc-batch">涂鸦</p>
         </article>
+        </a>
 
 <a class="mc-card-link" href="/satellite/" rel="noopener noreferrer">
         <article class="mc-card">

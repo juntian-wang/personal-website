@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>涂鸦 · Jon's Lab</title>
+
+<!-- Space Grotesk 西文字体（jsdelivr fontsource，中文自动回退系统字体） -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/space-grotesk@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/space-grotesk@latest/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/space-grotesk@latest/700.css">
+
+<!-- ============================================================
+     Jon's Lab 作品详情页 · 通用模板
+     ------------------------------------------------------------
+     复用方法：只需修改底部 <script> 中的 PROJECT 配置对象，
+     页面所有内容（标题 / 文字 / 图片 / 视频 / 3D 模型）由数据驱动渲染。
+     支持的内容区块：
+       intro     文字介绍（段落数组）
+       heroMedia 主视觉（图片或视频）
+       gallery   图片画廊（贴纸卡片风格，与首页作品卡一致）
+       structure 结构解析（大图 + 模块标签）
+       video     视频区块
+       model     3D 模型查看器（glb/gltf，null 则整区块不渲染）
+       specs     参数格子
+     ============================================================ -->
+
+<style>
+  /* ===== Reset ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 巨型描边背景字（区块英文标签放大） ===== */
+  .bg-word {
+    position: absolute;
+    top: 4.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    text-align: center;
+    font-size: clamp(4.5rem, 14vw, 11.5rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.095);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+  .section > *:not(.bg-word) { position: relative; z-index: 1; }
+  img, video { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  /* ===== 渐变标题（与首页 Hero 同款） ===== */
+  .grad-text {
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ===== 小标签（区块编号 + 分类名） ===== */
+  .sec-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .sec-label .sec-num {
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+  }
+  .sec-label .sec-num::after {
+    content: '';
+    display: inline-block;
+    width: 2.2rem;
+    height: 1px;
+    background: rgba(255,255,255,0.18);
+    margin-left: 0.9rem;
+    vertical-align: middle;
+  }
+  /* Hero 内的小标签恢复无编号样式 */
+  .hero .sec-label .sec-num::after { display: none; }
+
+  /* ===== Nav ===== */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    transition: background 0.35s ease, backdrop-filter 0.35s ease;
+  }
+  .nav.is-solid {
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .nav-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    transition: color 0.2s ease;
+  }
+  .nav-home:hover { color: #fff; }
+  .nav-home svg { width: 15px; height: 15px; }
+  .nav-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+  }
+
+  /* ===== Hero（工作室式：左下超大标题） ===== */
+  .hero {
+    position: relative;
+    min-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: left;
+    padding: 7rem 4rem 5.5rem;
+    overflow: hidden;
+  }
+  /* 背后的主视觉图：压暗 + 模糊，做氛围底 */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+    filter: saturate(1.05);
+    transform: scale(1.12);
+  }
+  .hero.is-in .hero-bg img { transform: scale(1.04); }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.82) 92%);
+  }
+  .hero-title {
+    font-size: clamp(3rem, 8.5vw, 6.6rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    margin: 0.8rem 0 1.2rem;
+  }
+  /* 英文副题（标题下方小字） */
+  .hero-title-en {
+    font-size: clamp(0.8rem, 1.4vw, 1rem);
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin: -0.2rem 0 1.4rem;
+  }
+  .hero-subtitle {
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    color: rgba(255,255,255,0.62);
+    font-weight: 400;
+    max-width: 520px;
+    line-height: 1.75;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.6rem 2.6rem;
+    margin-top: 2.8rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    width: min(680px, 100%);
+  }
+  .hero-meta .hm {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+  .hero-meta .hm-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.42);
+  }
+  /* Hero 内的小标签可读性增强 */
+  .hero .sec-label { color: rgba(255,255,255,0.45); }
+  .hero-meta .hm-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 4rem;
+    width: 1px;
+    height: 52px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+    overflow: hidden;
+  }
+  .hero-scroll::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: #fff;
+    animation: scrollHint 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollHint {
+    0% { top: -50%; } 100% { top: 110%; }
+  }
+
+  /* ===== Section 通用 ===== */
+  .section {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 6.5rem 2rem 1rem;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    margin-bottom: 2.6rem;
+  }
+  /* 区块标题渐变收实（小字号下保持可读） */
+  .section-title.grad-text {
+    background-image: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.62) 100%);
+  }
+  .section-head-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .section-note {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 2.2rem;
+  }
+  /* 媒体出血：图片/视频比文字栏更宽（1100 → 1240） */
+  .wide-media {
+    width: min(1240px, calc(100vw - 3rem));
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* ===== 滚动渐入 ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero-scroll::after { animation: none; }
+    .reveal .sec-label, .reveal .section-title, .reveal .section-note,
+    .reveal .g-img img, .reveal .d-img img, .reveal .p-img img,
+    .reveal .hero-media img, .reveal .structure-img img, .reveal .v-img img,
+    .hero .sec-label, .hero-title, .hero-title-en, .hero-subtitle, .hero-meta {
+      opacity: 1 !important; transform: none !important; transition: none !important;
+    }
+    .hero-bg img { transform: scale(1.04) !important; transition: none !important; }
+  }
+
+  /* ===== Intro 文字 ===== */
+  .intro-copy {
+    max-width: 680px;
+    font-size: 1.02rem;
+    line-height: 2.05;
+    color: rgba(255,255,255,0.72);
+  }
+  .intro-copy p + p { margin-top: 1.4rem; }
+  .intro-copy strong { color: #fff; font-weight: 600; }
+
+  /* ===== 主视觉大图 ===== */
+  .hero-media {
+    margin-top: 3.2rem;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .hero-media img { width: 100%; }
+  .media-caption {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.3);
+    margin-top: 0.9rem;
+    text-align: center;
+  }
+
+  /* ===== 图集瀑布流（双列错列，图片保持原始比例） ===== */
+  .gallery-masonry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.6rem;
+    align-items: start;
+  }
+  .g-col { display: flex; flex-direction: column; gap: 2.4rem; }
+  /* 第二列整体下移，形成错列节奏 */
+  .g-col:nth-child(2) { margin-top: 3.5rem; }
+  .g-item .g-img {
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: #050505;
+  }
+  .g-item .g-img img {
+    width: 100%;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .g-item .g-img:hover img { transform: scale(1.025); }
+
+  /* ===== 结构解析 ===== */
+  .structure-img {
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .module-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1.8rem;
+  }
+  .chip {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.65);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 0.4rem 0.95rem;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .chip:hover { border-color: rgba(255,255,255,0.45); color: #fff; }
+
+  /* ===== 视频区块 ===== */
+  .video-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    aspect-ratio: 16 / 9;
+  }
+  .video-wrap video { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ===== 3D 模型区块 ===== */
+  .model-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    /* 深空星空背景：星点 + 星云 + 深蓝黑渐变 */
+    background:
+      radial-gradient(ellipse 340px 240px at 22% 32%, rgba(96, 128, 255, 0.10), transparent),
+      radial-gradient(ellipse 280px 200px at 80% 70%, rgba(168, 118, 255, 0.08), transparent),
+      radial-gradient(1px 1px at 18% 24%, rgba(255,255,255,0.55), transparent),
+      radial-gradient(1px 1px at 64% 12%, rgba(255,255,255,0.45), transparent),
+      radial-gradient(1.5px 1.5px at 38% 55%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 82% 38%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 10% 72%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 52% 82%, rgba(255,255,255,0.45), transparent),
+      radial-gradient(1px 1px at 72% 58%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1.5px 1.5px at 90% 88%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(ellipse at 50% 42%, #101a2e 0%, #060a14 55%, #02040a 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .model-wrap model-viewer {
+    width: 100%;
+    height: 70vh;
+    min-height: 420px;
+    --poster-color: transparent;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+  .model-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
+    padding: 0.8rem 0 1.1rem;
+  }
+
+  /* ===== Specs 参数格 ===== */
+  .specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .spec {
+    background: #000;
+    padding: 1.6rem 1.4rem;
+  }
+  .spec-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 0.55rem;
+  }
+  .spec-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.5;
+  }
+
+  /* ===== 底部导航 ===== */
+  .bottom-nav {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .bn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 0.8rem 1.5rem;
+    transition: all 0.25s ease;
+  }
+  .bn-link:hover { color: #fff; border-color: rgba(255,255,255,0.45); }
+  .bn-link svg { width: 15px; height: 15px; }
+
+  /* ===== Footer（与首页一致） ===== */
+  .footer {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 3rem;
+  }
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.2rem 2rem 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footer-copy {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.35);
+  }
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+  }
+  .footer-links a, .footer-links span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .footer-links a:hover { color: #fff; }
+  .footer-links svg { width: 17px; height: 17px; }
+
+  /* ===== 图注编号系统（case study 风格） ===== */
+  .fig-cap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-top: 0.9rem;
+  }
+  .fig-num {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.3);
+    white-space: nowrap;
+  }
+  .fig-text {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.6;
+  }
+
+  /* ===== 全幅出血大图 ===== */
+  .full-bleed {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+  .full-bleed .fb-img { cursor: zoom-in; }
+  .full-bleed img {
+    width: 100%;
+    max-height: 90vh;
+    object-fit: cover;
+  }
+  .full-bleed .fig-cap {
+    max-width: 1100px;
+    margin: 1rem auto 0;
+    padding: 0 2rem;
+  }
+  /* 沉浸版：96vh + 视差 + 叠字 */
+  .atmosphere-bleed { height: 96vh; margin-top: 0; }
+  .atmosphere-bleed .fb-img { position: absolute; inset: 0; }
+  .atmosphere-bleed .fb-img img {
+    width: 100%;
+    height: 118%;
+    max-height: none;
+    object-fit: cover;
+    will-change: transform;
+  }
+  .atmosphere-bleed::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.15) 65%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+  }
+  .atmo-copy {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+  .atmo-line {
+    font-size: clamp(2.4rem, 7.5vw, 6rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+  }
+  .atmo-sub {
+    margin-top: 1.2rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+  .atmosphere-bleed .fig-cap {
+    position: absolute;
+    bottom: 1.6rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+  }
+
+  /* ===== 超大数字展示 ===== */
+  .big-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem 1.6rem;
+    margin-top: 4.5rem;
+    padding: 2.8rem 0 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .big-stat .bs-num {
+    font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .big-stat .bs-label {
+    margin-top: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  /* ===== 编排出场动效 ===== */
+  .reveal .sec-label,
+  .reveal .section-title,
+  .reveal .section-note {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal .section-title { transition-delay: 0.12s; transform: translateY(38px); }
+  .reveal.is-visible .sec-label,
+  .reveal.is-visible .section-title,
+  .reveal.is-visible .section-note { opacity: 1; transform: none; }
+  /* 图片缩放揭示 */
+  .reveal .g-img img,
+  .reveal .d-img img,
+  .reveal .p-img img,
+  .reveal .hero-media img,
+  .reveal .structure-img img,
+  .reveal .v-img img {
+    transform: scale(1.1);
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
+  }
+  .reveal.is-visible .g-img img,
+  .reveal.is-visible .d-img img,
+  .reveal.is-visible .p-img img,
+  .reveal.is-visible .hero-media img,
+  .reveal.is-visible .structure-img img,
+  .reveal.is-visible .v-img img { transform: scale(1); }
+
+  /* ===== Hero 入场 ===== */
+  .hero .sec-label,
+  .hero-title,
+  .hero-title-en,
+  .hero-subtitle,
+  .hero-meta {
+    opacity: 0;
+    transform: translateY(34px);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero .sec-label   { transition-delay: 0.05s; }
+  .hero-title        { transition-delay: 0.15s; }
+  .hero-title-en     { transition-delay: 0.28s; }
+  .hero-subtitle     { transition-delay: 0.38s; }
+  .hero-meta         { transition-delay: 0.5s; }
+  .hero.is-in .sec-label,
+  .hero.is-in .hero-title,
+  .hero.is-in .hero-title-en,
+  .hero.is-in .hero-subtitle,
+  .hero.is-in .hero-meta { opacity: 1; transform: none; }
+  .hero-bg img { transition: transform 2.6s cubic-bezier(0.22, 1, 0.36, 1); }
+
+  /* ===== 细节特写（四联排，统一 4:5 比例） ===== */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.4rem;
+  }
+  .detail-item .d-img {
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    aspect-ratio: 4 / 5;
+  }
+  .detail-item .d-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .detail-item .d-img:hover img { transform: scale(1.03); }
+
+  /* ===== 多角度三联排 ===== */
+  .views-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+  }
+  .view-item .v-img {
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: #050505;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .view-item .v-img img {
+    width: 100%;
+    transition: transform 0.5s ease;
+  }
+  .view-item .v-img:hover img { transform: scale(1.03); }
+
+  /* ===== 设计过程时间线 ===== */
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+  }
+  .process-step .p-img {
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    margin-bottom: 1.1rem;
+    aspect-ratio: 4 / 5;
+  }
+  .process-step .p-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.88) contrast(1.03);
+    transition: filter 0.3s ease;
+  }
+  .process-step .p-img:hover img { filter: none; }
+  .p-step {
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 0.4rem;
+  }
+  .p-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    margin-bottom: 0.45rem;
+  }
+  .p-desc {
+    font-size: 0.84rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.45);
+  }
+
+  /* ===== Brief 布局（左文右栏，case study 标配） ===== */
+  .brief {
+    display: grid;
+    grid-template-columns: 1.9fr 1fr;
+    gap: 4.5rem;
+    align-items: start;
+  }
+  .brief-facts {
+    border-top: 1px solid rgba(255,255,255,0.14);
+    margin-top: 0.4rem;
+  }
+  .brief-fact {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.2rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .bf-label {
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    white-space: nowrap;
+  }
+  .bf-value {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.82);
+    text-align: right;
+  }
+
+  /* ===== Pull Quote 大引言 ===== */
+  .pull-quote {
+    max-width: 860px;
+    margin: 5rem auto 0;
+    text-align: center;
+  }
+  .pull-quote .pq-mark {
+    font-size: 3.4rem;
+    line-height: 0.5;
+    font-weight: 700;
+    color: rgba(255,255,255,0.14);
+    display: block;
+    margin-bottom: 1.6rem;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .pull-quote blockquote {
+    font-size: clamp(1.35rem, 3vw, 1.9rem);
+    font-weight: 600;
+    line-height: 1.75;
+    letter-spacing: -0.01em;
+  }
+  .pull-quote .pq-attr {
+    margin-top: 1.4rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ===== Next Project 下一个作品 ===== */
+  .next-project {
+    display: block;
+    text-decoration: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 5rem;
+    padding: 4.5rem 2rem 4rem;
+    text-align: center;
+    transition: background 0.35s ease;
+  }
+  .next-project:hover { background: rgba(255,255,255,0.03); }
+  .next-project .np-title {
+    font-size: clamp(1.9rem, 5vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .next-project .np-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+  .next-project:hover .np-arrow { transform: translateX(10px); }
+
+  /* ===== Lightbox ===== */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    cursor: zoom-out;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .lightbox.is-open { opacity: 1; pointer-events: auto; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 12px;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.8);
+  }
+
+  @media (max-width: 640px) {
+    .section { padding: 4rem 1.3rem 1rem; }
+    .hero { padding: 6rem 1.3rem 3rem; }
+    .bottom-nav { padding: 3.5rem 1.3rem 1.5rem; }
+    .footer-inner { padding: 1.8rem 1.3rem 2.2rem; }
+    .detail-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .views-row,
+    .process-steps { grid-template-columns: 1fr; }
+    .brief { grid-template-columns: 1fr; gap: 2.8rem; }
+    .pull-quote { margin-top: 3.5rem; }
+    .hero { padding: 6rem 1.3rem 4rem; }
+    .hero-scroll { right: 1.3rem; }
+    .wide-media { width: 100%; margin-left: 0; transform: none; }
+    .gallery-masonry { grid-template-columns: 1fr; }
+    .g-col:nth-child(2) { margin-top: 2.4rem; }
+    .big-stats { grid-template-columns: 1fr 1fr; gap: 1.8rem 1rem; }
+    .atmosphere-bleed { height: 72vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav class="nav" id="nav">
+  <a class="nav-home" id="navHome" href="https://jonlab.cn">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Jon's Lab
+  </a>
+  <span class="nav-tag" id="navTag">作品</span>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+  <div class="hero-bg"><img id="heroBgImg" src="" alt="" /></div>
+  <div class="sec-label" id="heroLabel"></div>
+  <h1 class="hero-title grad-text" id="heroTitle"></h1>
+  <div class="hero-title-en" id="heroTitleEn"></div>
+  <p class="hero-subtitle" id="heroSubtitle"></p>
+  <div class="hero-meta" id="heroMeta"></div>
+  <div class="hero-scroll"></div>
+</header>
+
+<main id="main">
+
+  <!-- ===== Brief 项目概述（左文右栏） ===== -->
+  <section class="section reveal" data-block="intro">
+    <div class="sec-label">OVERVIEW</div>
+    <h2 class="section-title grad-text">关于这件作品</h2>
+    <div class="brief">
+      <div class="intro-copy" id="introCopy"></div>
+      <aside class="brief-facts" id="briefFacts"></aside>
+    </div>
+
+    <!-- Pull Quote 大引言（PROJECT.quote 存在才渲染） -->
+    <div class="pull-quote" id="pullQuote" style="display:none">
+      <span class="pq-mark">"</span>
+      <blockquote class="grad-text" id="pqText"></blockquote>
+      <div class="pq-attr" id="pqAttr"></div>
+    </div>
+
+    <!-- 超大数字展示（PROJECT.stats 非空才渲染） -->
+    <div class="big-stats" id="bigStats" style="display:none"></div>
+
+    <div class="hero-media wide-media" data-zoom id="heroMediaWrap">
+      <img id="heroMediaImg" src="" alt="" />
+    </div>
+    <div class="fig-cap" id="heroMediaCaption"></div>
+  </section>
+
+  <!-- ===== 设计过程（PROJECT.process 非空才渲染） ===== -->
+  <section class="section reveal" data-block="process" id="processSection" style="display:none">
+    <div class="sec-label">PROCESS</div>
+    <h2 class="section-title grad-text">设计过程</h2>
+    <div class="process-steps" id="processSteps"></div>
+  </section>
+
+  <!-- ===== 图片画廊（智能瀑布流，任意比例自动编排） ===== -->
+  <section class="section reveal" data-block="gallery">
+    <div class="sec-label">GALLERY</div>
+    <h2 class="section-title grad-text">设计图集</h2>
+    <div class="gallery-masonry" id="gallery"></div>
+  </section>
+
+  <!-- ===== 细节特写（PROJECT.details 非空才渲染） ===== -->
+  <section class="section reveal" data-block="details" id="detailsSection" style="display:none">
+    <div class="sec-label">DETAILS</div>
+    <h2 class="section-title grad-text">细节特写</h2>
+    <div class="detail-grid" id="detailGrid"></div>
+  </section>
+
+  <!-- ===== 多角度视图（PROJECT.views 非空才渲染） ===== -->
+  <section class="section reveal" data-block="views" id="viewsSection" style="display:none">
+    <div class="sec-label">VIEWS</div>
+    <h2 class="section-title grad-text">多角度视图</h2>
+    <div class="views-row" id="viewsRow"></div>
+  </section>
+
+  <!-- ===== 结构解析 ===== -->
+  <section class="section reveal" data-block="structure">
+    <div class="sec-label">STRUCTURE</div>
+    <div class="section-head-row">
+      <h2 class="section-title grad-text">结构解析</h2>
+      <p class="section-note" id="structureNote"></p>
+    </div>
+    <div class="structure-img wide-media" data-zoom>
+      <img id="structureImg" src="" alt="结构爆炸图" />
+    </div>
+    <div class="fig-cap" id="structureCap"></div>
+    <div class="module-chips" id="moduleChips"></div>
+  </section>
+
+  <!-- ===== 宽幅氛围图（PROJECT.atmosphere 存在才渲染，全幅沉浸 + 视差） ===== -->
+  <section class="section reveal" data-block="atmosphere" id="atmosphereSection" style="display:none">
+    <div class="full-bleed atmosphere-bleed">
+      <div class="fb-img" data-zoom><img id="atmosphereImg" data-parallax="56" src="" alt="" /></div>
+      <div class="atmo-copy">
+        <div class="atmo-line grad-text" id="atmoLine"></div>
+        <div class="atmo-sub" id="atmoSub"></div>
+      </div>
+      <div class="fig-cap" id="atmosphereCap"></div>
+    </div>
+  </section>
+
+  <!-- ===== 视频 ===== -->
+  <section class="section reveal" data-block="video">
+    <div class="sec-label">VIDEO</div>
+    <h2 class="section-title grad-text">动态演示</h2>
+    <div class="video-wrap wide-media">
+      <video id="projectVideo" controls preload="metadata" playsinline></video>
+    </div>
+    <div class="fig-cap" id="videoCaption"></div>
+  </section>
+
+  <!-- ===== 3D 模型（PROJECT.model 存在时才渲染） ===== -->
+  <section class="section reveal" data-block="model" id="modelSection" style="display:none">
+    <div class="sec-label">3D MODEL</div>
+    <h2 class="section-title grad-text">可交互 3D 模型</h2>
+    <div class="model-wrap">
+      <model-viewer id="projectModel"
+        camera-controls auto-rotate auto-rotate-delay="800" rotation-per-second="12deg"
+        exposure="0.55" tone-mapping="neutral" environment-image="assets/cloudy.hdr"
+        scene-background="transparent" background-color="transparent"
+        shadow-intensity="1.1" shadow-softness="0.85"
+        camera-orbit="38deg 68deg 110%" min-camera-orbit="auto 15deg auto" max-camera-orbit="auto 95deg auto">
+        <directional-light intensity="2.6" color="#e8f0ff" slot="light"></directional-light>
+      </model-viewer>
+    </div>
+    <p class="model-hint">拖动旋转 · 滚轮缩放 · 右键平移</p>
+  </section>
+
+  <!-- ===== 参数 ===== -->
+  <section class="section reveal" data-block="specs">
+    <div class="sec-label">SPECS</div>
+    <h2 class="section-title grad-text">设计参数</h2>
+    <div class="specs" id="specs"></div>
+  </section>
+
+</main>
+
+<!-- ===== Next Project（PROJECT.nextProject 存在才渲染） ===== -->
+<a class="next-project" id="nextProject" style="display:none" href="#">
+  <div class="sec-label">NEXT PROJECT</div>
+  <span class="np-title grad-text">
+    <span id="npTitle"></span>
+    <span class="np-arrow">→</span>
+  </span>
+</a>
+
+<!-- ===== 底部导航 ===== -->
+<div class="bottom-nav">
+  <a class="bn-link" id="backHome" href="https://jonlab.cn">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    返回作品列表
+  </a>
+  <a class="bn-link" href="#" id="toTop">
+    回到顶部
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 15l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</div>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-copy">© 2026 Jon's Lab. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="https://space.bilibili.com/1551587375" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 7L5.5 4M17 7l1.5-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="8" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        bilibili
+      </a>
+      <a href="https://www.xiaohongshu.com/user/profile/62c7adc9000000000e00cbd3" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="18" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M8 9.5h8M8 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        小红书
+      </a>
+      <span>
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="18" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M7 12c0-2 2-3 3-2l2 4 2-4c1-1 3 0 3 2s-2 3-3 2l-2-4-2 4c-1 1-3 0-3-2z" stroke="currentColor" stroke-width="1.2"/></svg>
+        视频号
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== Lightbox ===== -->
+<div class="lightbox" id="lightbox"><img id="lightboxImg" src="" alt="" /></div>
+
+<script>
+/* ============================================================
+   PROJECT 配置 —— 复用模板时，只需要修改这个对象
+   ------------------------------------------------------------
+   homeUrl    返回首页的地址
+   category   作品分类标签（与首页卡片标签一致）
+   title      作品标题
+   subtitle   一句话简介
+   meta       Hero 区元信息 [{label, value}]
+   intro      介绍文字（段落数组，** ** 内为加粗）
+   facts      Brief 侧栏 [{label, value}]，空数组则侧栏不渲染
+   quote      大引言 {text, author}，null 则不渲染
+   heroMedia  主视觉 {src, caption, alt}
+   process    设计过程 [{img, step, title, desc}]，空数组则不渲染
+   gallery    图片画廊 [{src, caption, size:'tall'|'wide'}]
+   details    细节特写 [{src, cap}]，空数组则不渲染
+   views      多角度视图 [{src, cap}]，空数组则不渲染
+   structure  结构解析 {img, note, modules[]}
+   atmosphere 宽幅氛围图 {src, cap}，null 则不渲染（全幅出血展示）
+   video      视频 {src, poster, caption}，null 则不渲染
+   model      3D 模型 {src}（glb/gltf），null 则不渲染
+   specs      参数 [{label, value}]
+   nextProject 下一个作品 {title, url}，null 则不渲染
+   ============================================================ */
+const PROJECT = {
+  homeUrl: "https://jonlab.cn",
+
+  category: "插画",
+  title: "涂鸦",
+  titleEn: "DOODLES",
+  subtitle: "随手画的一些小画 · 记录手绘的快乐",
+  meta: [
+    { label: "TYPE", value: "手绘 / 板绘" },
+    { label: "YEAR", value: "2026" },
+    { label: "COUNT", value: "7 张" },
+  ],
+
+  intro: [
+    "这些是**我自己画的涂鸦**——上课走神、等人无聊、灵感冒头的时候，随手记下来的小画。没有严格的构图，也没有统一的主题，就是想画就画。",
+    "每一张都对应一个当时的心情：有的画完很满意，有的画完自己都笑了。手绘的快乐，大概就是这样。",
+  ],
+  facts: [
+    { label: "MEDIUM",  value: "手绘 / 板绘" },
+    { label: "COUNT",   value: "7 张" },
+    { label: "STYLE",   value: "自由涂鸦 · 无主题" },
+    { label: "YEAR",    value: "2026" },
+  ],
+  quote: null,
+  heroMedia: {
+    src: "assets/doodle-01.webp",
+    alt: "涂鸦作品 01",
+    caption: "涂鸦 · 01",
+  },
+  heroBg: "assets/doodle-01.webp",
+
+  stats: [
+    { num: "7",   label: "手绘涂鸦" },
+    { num: "4:3", label: "原始比例" },
+    { num: "🎨",  label: "随手就画" },
+  ],
+
+  process: [],
+  gallery: [
+    { src: "assets/doodle-01.webp", caption: "涂鸦 · 01" },
+    { src: "assets/doodle-02.webp", caption: "涂鸦 · 02" },
+    { src: "assets/doodle-03.webp", caption: "涂鸦 · 03" },
+    { src: "assets/doodle-04.webp", caption: "涂鸦 · 04" },
+    { src: "assets/doodle-05.webp", caption: "涂鸦 · 05" },
+    { src: "assets/doodle-06.webp", caption: "涂鸦 · 06" },
+    { src: "assets/doodle-07.webp", caption: "涂鸦 · 07" },
+  ],
+  details: [],
+  views: [],
+  structure: null,
+  video: null,
+  model: null,
+
+  specs: [
+    { label: "MEDIUM", value: "手绘 / 板绘" },
+    { label: "COUNT",  value: "7 张" },
+    { label: "RATIO",  value: "4:3 原始比例" },
+    { label: "YEAR",   value: "2026" },
+  ],
+
+  nextProject: null,
+};
+
+/* ==================== 以下为渲染逻辑，一般不用改 ==================== */
+
+// Hero
+document.getElementById('navTag').textContent = PROJECT.category;
+document.getElementById('heroLabel').textContent = "WORK · " + PROJECT.category;
+document.getElementById('heroTitle').textContent = PROJECT.title;
+document.getElementById('heroTitleEn').textContent = PROJECT.titleEn || '';
+document.getElementById('heroSubtitle').textContent = PROJECT.subtitle;
+document.getElementById('heroBgImg').src = PROJECT.heroMedia.src;
+
+// 返回首页链接
+['navHome', 'backHome'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el && PROJECT.homeUrl) el.href = PROJECT.homeUrl;
+});
+
+// Meta
+var heroMeta = document.getElementById('heroMeta');
+(PROJECT.meta || []).forEach(function(m){
+  var d = document.createElement('div');
+  d.className = 'hm';
+  d.innerHTML = '<span class="hm-label"></span><span class="hm-value"></span>';
+  d.querySelector('.hm-label').textContent = m.label;
+  d.querySelector('.hm-value').textContent = m.value;
+  heroMeta.appendChild(d);
+});
+
+// Intro（支持 **加粗** 简写）
+function boldify(text){
+  return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+var introCopy = document.getElementById('introCopy');
+(PROJECT.intro || []).forEach(function(p){
+  var el = document.createElement('p');
+  el.innerHTML = boldify(p);
+  introCopy.appendChild(el);
+});
+
+// Brief 侧栏 facts（空数组不渲染）
+if (PROJECT.facts && PROJECT.facts.length) {
+  var factsEl = document.getElementById('briefFacts');
+  PROJECT.facts.forEach(function(f){
+    var d = document.createElement('div');
+    d.className = 'brief-fact';
+    d.innerHTML = '<span class="bf-label"></span><span class="bf-value"></span>';
+    d.querySelector('.bf-label').textContent = f.label;
+    d.querySelector('.bf-value').textContent = f.value;
+    factsEl.appendChild(d);
+  });
+} else {
+  var bf = document.getElementById('briefFacts');
+  if (bf) bf.style.display = 'none';
+}
+
+// Pull Quote（null 不渲染）
+if (PROJECT.quote && PROJECT.quote.text) {
+  document.getElementById('pullQuote').style.display = '';
+  document.getElementById('pqText').textContent = PROJECT.quote.text;
+  document.getElementById('pqAttr').textContent = PROJECT.quote.author || '';
+}
+
+// ===== 图注编号器：FIG. 01 / 02 / 03 ... 按页面顺序自动编号 =====
+var figCounter = 1;
+function renderFigCap(el, text) {
+  if (!el) return;
+  if (!text) { el.style.display = 'none'; return; }
+  el.innerHTML =
+    '<span class="fig-num">FIG. ' + (figCounter < 10 ? '0' + figCounter : figCounter) + '</span>' +
+    '<span class="fig-text"></span>';
+  el.querySelector('.fig-text').textContent = text;
+  figCounter++;
+}
+
+// 主视觉
+var heroMediaImg = document.getElementById('heroMediaImg');
+heroMediaImg.src = PROJECT.heroMedia.src;
+heroMediaImg.alt = PROJECT.heroMedia.alt || PROJECT.title;
+renderFigCap(document.getElementById('heroMediaCaption'), PROJECT.heroMedia.caption);
+
+// 设计过程（空数组不渲染）
+if (PROJECT.process && PROJECT.process.length) {
+  document.getElementById('processSection').style.display = '';
+  var steps = document.getElementById('processSteps');
+  PROJECT.process.forEach(function(p){
+    var d = document.createElement('div');
+    d.className = 'process-step';
+    d.innerHTML =
+      '<div class="p-img" data-zoom><img loading="lazy" alt=""></div>' +
+      '<div class="p-step"></div>' +
+      '<div class="p-title"></div>' +
+      '<div class="p-desc"></div>';
+    d.querySelector('img').src = p.img;
+    d.querySelector('img').alt = p.title || '';
+    d.querySelector('.p-step').textContent = p.step || '';
+    d.querySelector('.p-title').textContent = p.title || '';
+    d.querySelector('.p-desc').textContent = p.desc || '';
+    steps.appendChild(d);
+  });
+}
+
+// 画廊（瀑布流：Z 字顺序分两列，图片保持原始比例，参与 FIG 编号）
+var gallery = document.getElementById('gallery');
+(function(){
+  var items = PROJECT.gallery || [];
+  if (!items.length) { gallery.closest('section').style.display = 'none'; return; }
+  var cols = [document.createElement('div'), document.createElement('div')];
+  cols[0].className = 'g-col';
+  cols[1].className = 'g-col';
+  items.forEach(function(item, i){
+    var d = document.createElement('div');
+    d.className = 'g-item';
+    d.innerHTML =
+      '<div class="g-img" data-zoom><img loading="lazy" alt=""></div>' +
+      '<div class="fig-cap"></div>';
+    d.querySelector('img').src = item.src;
+    d.querySelector('img').alt = item.caption || '';
+    renderFigCap(d.querySelector('.fig-cap'), item.caption);
+    cols[i % 2].appendChild(d);
+  });
+  gallery.appendChild(cols[0]);
+  gallery.appendChild(cols[1]);
+})();
+
+// 细节特写（空数组不渲染）
+if (PROJECT.details && PROJECT.details.length) {
+  document.getElementById('detailsSection').style.display = '';
+  var dg = document.getElementById('detailGrid');
+  PROJECT.details.forEach(function(item){
+    var d = document.createElement('div');
+    d.className = 'detail-item';
+    d.innerHTML =
+      '<div class="d-img" data-zoom><img loading="lazy" alt=""></div>' +
+      '<div class="fig-cap"></div>';
+    d.querySelector('img').src = item.src;
+    d.querySelector('img').alt = item.cap || '';
+    renderFigCap(d.querySelector('.fig-cap'), item.cap);
+    dg.appendChild(d);
+  });
+}
+
+// 多角度视图（空数组不渲染）
+if (PROJECT.views && PROJECT.views.length) {
+  document.getElementById('viewsSection').style.display = '';
+  var vr = document.getElementById('viewsRow');
+  PROJECT.views.forEach(function(item){
+    var d = document.createElement('div');
+    d.className = 'view-item';
+    d.innerHTML =
+      '<div class="v-img" data-zoom><img loading="lazy" alt=""></div>' +
+      '<div class="fig-cap"></div>';
+    d.querySelector('img').src = item.src;
+    d.querySelector('img').alt = item.cap || '';
+    renderFigCap(d.querySelector('.fig-cap'), item.cap);
+    vr.appendChild(d);
+  });
+}
+
+// 结构解析
+var st = PROJECT.structure;
+if (st) {
+  document.getElementById('structureImg').src = st.img;
+  document.getElementById('structureNote').textContent = st.note || '';
+  renderFigCap(document.getElementById('structureCap'), st.cap || '全站爆炸分解 · 模块标注图');
+  var chips = document.getElementById('moduleChips');
+  (st.modules || []).forEach(function(name){
+    var c = document.createElement('span');
+    c.className = 'chip';
+    c.textContent = name;
+    chips.appendChild(c);
+  });
+}
+
+// 超大数字展示
+if (PROJECT.stats && PROJECT.stats.length) {
+  var bs = document.getElementById('bigStats');
+  bs.style.display = '';
+  PROJECT.stats.forEach(function(s){
+    var d = document.createElement('div');
+    d.className = 'big-stat';
+    d.innerHTML = '<div class="bs-num grad-text"></div><div class="bs-label"></div>';
+    d.querySelector('.bs-num').textContent = s.num;
+    d.querySelector('.bs-label').textContent = s.label;
+    bs.appendChild(d);
+  });
+}
+
+// 宽幅氛围图（null 不渲染）
+if (PROJECT.atmosphere && PROJECT.atmosphere.src) {
+  document.getElementById('atmosphereSection').style.display = '';
+  var aImg = document.getElementById('atmosphereImg');
+  aImg.src = PROJECT.atmosphere.src;
+  aImg.alt = PROJECT.atmosphere.cap || '';
+  renderFigCap(document.getElementById('atmosphereCap'), PROJECT.atmosphere.cap);
+  if (PROJECT.atmosphere.line) document.getElementById('atmoLine').textContent = PROJECT.atmosphere.line;
+  if (PROJECT.atmosphere.sub)  document.getElementById('atmoSub').textContent = PROJECT.atmosphere.sub;
+}
+
+// 视频（静音循环，滚动进入视口自动播放，离开暂停；用户手动暂停后不再自动播）
+if (PROJECT.video) {
+  var v = document.getElementById('projectVideo');
+  v.src = PROJECT.video.src;
+  if (PROJECT.video.poster) v.poster = PROJECT.video.poster;
+  v.muted = true;
+  v.loop = true;
+  v.setAttribute('muted', '');
+  renderFigCap(document.getElementById('videoCaption'), PROJECT.video.caption);
+
+  var userPaused = false, ioPause = false;
+  v.addEventListener('pause', function(){ if (!ioPause) userPaused = true; });
+  v.addEventListener('play',  function(){ userPaused = false; });
+  var vio = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting) {
+        if (!userPaused) v.play().catch(function(){});
+      } else {
+        ioPause = true; v.pause(); ioPause = false;
+      }
+    });
+  }, { threshold: 0.35 });
+  vio.observe(v);
+} else {
+  document.querySelector('[data-block="video"]').style.display = 'none';
+}
+
+// 3D 模型（懒加载：滚到区块附近才加载脚本 + 模型 + HDRI；失败/不支持时给提示）
+if (PROJECT.model && PROJECT.model.src) {
+  var ms = document.getElementById('modelSection');
+  ms.style.display = '';
+
+  var mvScriptLoaded = false;
+  function loadModelViewer() {
+    if (mvScriptLoaded) return;
+    mvScriptLoaded = true;
+    var mvScript = document.createElement('script');
+    mvScript.type = 'module';
+    mvScript.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
+    mvScript.onload = function () {
+      var mv = document.getElementById('projectModel');
+      mv.addEventListener('error', function () { showModelFallback(); });
+      mv.setAttribute('src', PROJECT.model.src);
+    };
+    mvScript.onerror = function () { showModelFallback(); };
+    document.head.appendChild(mvScript);
+  }
+
+  // 用户滚到区块附近（提前 400px）才开始加载
+  var modelIO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        loadModelViewer();
+        modelIO.disconnect();
+      }
+    });
+  }, { rootMargin: '400px' });
+  modelIO.observe(ms);
+
+  function showModelFallback() {
+    var box = document.getElementById('modelSection').querySelector('.model-wrap');
+    if (!document.getElementById('modelFallback')) {
+      var fb = document.createElement('div');
+      fb.id = 'modelFallback';
+      fb.style.cssText = 'display:flex;align-items:center;justify-content:center;height:70vh;min-height:420px;text-align:center;color:rgba(255,255,255,0.45);font-size:0.95rem;line-height:1.9;padding:2rem;';
+      fb.textContent = '3D 模型需要支持 WebGL 的浏览器（Chrome / Safari / Edge 最新版）。请用完整浏览器打开本页查看。';
+      box.innerHTML = '';
+      box.appendChild(fb);
+    }
+  }
+}
+
+// Specs
+var specs = document.getElementById('specs');
+(PROJECT.specs || []).forEach(function(s){
+  var d = document.createElement('div');
+  d.className = 'spec';
+  d.innerHTML = '<div class="spec-label"></div><div class="spec-value"></div>';
+  d.querySelector('.spec-label').textContent = s.label;
+  d.querySelector('.spec-value').textContent = s.value;
+  specs.appendChild(d);
+});
+
+// Next Project（null 不渲染；url 为空时回首页）
+if (PROJECT.nextProject && PROJECT.nextProject.title) {
+  var np = document.getElementById('nextProject');
+  np.style.display = '';
+  np.href = PROJECT.nextProject.url || PROJECT.homeUrl || '#';
+  if (np.href.indexOf('http') === 0) { np.target = '_blank'; np.rel = 'noopener'; }
+  document.getElementById('npTitle').textContent = PROJECT.nextProject.title;
+}
+
+// 区块自动编号：01 — OVERVIEW / 02 — PROCESS ...（隐藏区块不占号）
+var secIdx = 0;
+document.querySelectorAll('.section .sec-label').forEach(function(el){
+  var sec = el.closest('section');
+  if (sec && getComputedStyle(sec).display !== 'none') {
+    secIdx++;
+    var num = document.createElement('span');
+    num.className = 'sec-num';
+    num.textContent = (secIdx < 10 ? '0' + secIdx : secIdx);
+    el.prepend(num);
+  }
+});
+
+// 巨型描边背景字：取每个区块 label 的英文文本放大做背景
+document.querySelectorAll('.section').forEach(function(sec){
+  var label = sec.querySelector('.sec-label');
+  if (!label || getComputedStyle(sec).display === 'none') return;
+  var word = Array.prototype.filter.call(label.childNodes, function(n){ return n.nodeType === 3; })
+    .map(function(n){ return n.textContent; }).join('').trim();
+  if (!word) return;
+  var bg = document.createElement('div');
+  bg.className = 'bg-word';
+  bg.setAttribute('aria-hidden', 'true');
+  bg.textContent = word;
+  sec.insertBefore(bg, sec.firstChild);
+});
+
+// Nav 滚动状态
+var nav = document.getElementById('nav');
+window.addEventListener('scroll', function(){
+  nav.classList.toggle('is-solid', window.scrollY > 40);
+}, { passive: true });
+
+// 回到顶部
+document.getElementById('toTop').addEventListener('click', function(e){
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Hero 入场
+requestAnimationFrame(function(){
+  requestAnimationFrame(function(){
+    document.querySelector('.hero').classList.add('is-in');
+  });
+});
+
+// 滚动渐入
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if (en.isIntersecting) {
+      en.target.classList.add('is-visible');
+      io.unobserve(en.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+// 视差（data-parallax 元素，数值为位移幅度 px）
+(function(){
+  var pxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
+  if (!pxEls.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ticking = false;
+  function update(){
+    var vh = window.innerHeight;
+    pxEls.forEach(function(el){
+      var host = el.closest('.full-bleed') || el.parentElement;
+      var r = host.getBoundingClientRect();
+      var p = (r.top + r.height / 2 - vh / 2) / vh;
+      if (p > 1.4) p = 1.4; else if (p < -1.4) p = -1.4;
+      var sp = parseFloat(el.getAttribute('data-parallax')) || 40;
+      el.style.transform = 'translateY(' + (p * sp).toFixed(1) + 'px)';
+    });
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  update();
+})();
+
+// Lightbox 图片放大
+var lightbox = document.getElementById('lightbox');
+var lightboxImg = document.getElementById('lightboxImg');
+document.addEventListener('click', function(e){
+  var t = e.target.closest('[data-zoom]');
+  if (t) {
+    var img = t.tagName === 'IMG' ? t : t.querySelector('img');
+    if (img && img.src) {
+      lightboxImg.src = img.src;
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+  } else if (lightbox.classList.contains('is-open') && e.target.closest('.lightbox')) {
+    lightbox.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && lightbox.classList.contains('is-open')) {
+    lightbox.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+});
+</script>
+</body>
+</html>
