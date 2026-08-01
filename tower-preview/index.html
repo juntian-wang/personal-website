@@ -1128,44 +1128,50 @@ const PROJECT = {
   homeUrl: "https://jonlab.cn",
 
   category: "策略塔防游戏",
-  title: "玛雅塔防",
-  titleEn: "MAYA TOWER DEFENSE",
-  subtitle: "玛雅文明主题的策略塔防 · 英雄、单位与建筑美术图鉴",
+  title: "玉米·黄金·美洲豹",
+  titleEn: "CORN · GOLD · JAGUAR",
+  subtitle: "羽蛇神守护 · 玛雅塔防 — 白天种玉米，夜里守城邦",
   meta: [
-    { label: "TYPE", value: "策略塔防游戏" },
+    { label: "TYPE", value: "策略塔防 · 兵种操控" },
     { label: "YEAR", value: "2026" },
-    { label: "UNITS", value: "20+ 角色单位" },
-    { label: "BUILDINGS", value: "18 个建筑" },
+    { label: "LEVELS", value: "7 关 · 10-15 分钟/局" },
+    { label: "PLATFORM", value: "浏览器 · PC" },
   ],
 
   intro: [
-    "这是我正在做的**玛雅塔防**——一款以玛雅文明为背景的策略塔防游戏。在这片玉米丛生的丛林里，**玉米就是货币**：招募剑兵、建造祭坛、培育玉米田，抵御一波波来自丛林的敌人。",
-    "这一页是它的**美术图鉴**：大祭司英雄、我方与敌方单位、建筑和物品的设定图，按类别分组收录。",
+    "在丛林最深的褶皱里，有一座神不愿提起的山谷。传说**羽蛇神**在那里埋下一粒玉米，说：**谁守得住它，谁就守得住文明**。很久以后，一个叫巴兰的祭司来了——故事，从这里开始。",
+    "《玉米·黄金·美洲豹》是一款**玛雅城邦防守游戏**。玉米是唯一货币，也是文明存续的血肉：白天种田、建军、升级，夜里迎击从丛林涌入的来犯者。从迷途的亡灵，到被黄金蛊惑的殖民者——你守护的，不只是这座城。",
   ],
   facts: [
-    { label: "CLIENT",   value: "Jon's Lab" },
-    { label: "ROLE",     value: "美术设计 · 玩法设计" },
-    { label: "YEAR",     value: "2026" },
-    { label: "UNITS",    value: "20+ 角色单位" },
-    { label: "BUILDINGS", value: "18 个建筑" },
-    { label: "CURRENCY", value: "玉米 🌽" },
+    { label: "TITLE",    value: "玉米·黄金·美洲豹" },
+    { label: "STORY",    value: "羽蛇神守护 · 玛雅塔防" },
+    { label: "HERO",     value: "大祭司 巴兰" },
+    { label: "LEVELS",   value: "7 关（1→7）" },
+    { label: "CURRENCY", value: "玉米 🌽（唯一货币）" },
+    { label: "CYCLE",    value: "昼夜循环 · 白天经营/夜晚防守" },
   ],
   quote: {
-    text: "每一格地图上，都应该有一个奔跑的小人。",
-    author: "JON · 设计师",
+    text: "谁守得住它，谁就守得住文明。",
+    author: "羽蛇神 库库尔坎 · 序章旁白",
   },
   heroMedia: {
     src: "pic/人物/ref_mage_512.webp",
-    alt: "大祭司英雄形象",
-    caption: "英雄 · 大祭司 基础形象（512×512）",
+    alt: "大祭司巴兰 英雄形象",
+    caption: "英雄 · 大祭司 巴兰（全场唯一英雄）",
   },
   heroBg: "pic/hero-bg.webp",
 
   stats: [
+    { num: "7",   label: "战役关卡" },
     { num: "20+", label: "角色单位" },
     { num: "18",  label: "建筑" },
-    { num: "9",   label: "待机动画帧" },
     { num: "🌽",  label: "玉米货币" },
+  ],
+
+  process: [
+    { img: "pic/battlefield-day.webp", step: "白天 · DAY", title: "经营", desc: "种玉米、建兵营、招募剑兵与弓箭手——玉米是货币，也是文明的血肉。建筑可升级至 Lv3，外观随等级变化" },
+    { img: "pic/battlefield-night.webp", step: "夜晚 · NIGHT", title: "防守", desc: "敌人从丛林入口涌入：亡灵、堕落豹骑、殖民者……点选士兵，迎击来犯者" },
+    { img: "pic/hero-bg.webp", step: "城邦 · CITY", title: "守护", desc: "守住金字塔城邦，就是守住金穗城。7 关之后，真正的敌人从来是「遗忘来处」" },
   ],
 
   /* ===== 分组美术图鉴 ===== */
@@ -1173,7 +1179,7 @@ const PROJECT = {
     {
       name: "英雄", en: "HERO",
       items: [
-        { src: "pic/人物/ref_mage_512.webp", caption: "大祭司 · 基础形象" },
+        { src: "pic/人物/ref_mage_512.webp", caption: "大祭司巴兰 · 基础形象" },
         { src: "pic/人物/21.webp", caption: "待机动画帧" },
         { src: "pic/人物/stand/41.webp", caption: "待机动画 Set2" },
         { src: "pic/人物/run/30.webp", caption: "奔跑动画" },
@@ -1187,13 +1193,13 @@ const PROJECT = {
     {
       name: "我方单位", en: "ALLY",
       items: [
-        { src: "pic/人物/ref_sword_512.webp", caption: "剑兵 · 近战 HP40" },
+        { src: "pic/人物/ref_sword_512.webp", caption: "剑兵 · 近战 ATK12" },
         { src: "pic/人物/ref_sword_attack1_512.webp", caption: "剑兵 · 进攻动画" },
-        { src: "pic/人物/ref_archer_512.webp", caption: "弓箭手 · 射程144" },
+        { src: "pic/人物/ref_archer_512.webp", caption: "弓箭手 · 射程180" },
         { src: "pic/人物/ref_archer_attack1_512.webp", caption: "弓箭手 · 进攻动画" },
         { src: "pic/人物/ref_guardian_512.webp", caption: "图腾战士 · 治疗光环" },
         { src: "pic/人物/ref_guardian_cast1_512.webp", caption: "图腾战士 · 施法" },
-        { src: "pic/人物/bear/抠图-1784701709051.webp", caption: "野熊 · 英雄召唤 HP80" },
+        { src: "pic/人物/bear/抠图-1784701709051.webp", caption: "野熊 · 英雄召唤" },
         { src: "pic/人物/bear/run/1.webp", caption: "野熊 · 奔跑动画" },
         { src: "pic/人物/bear/攻击/1.webp", caption: "野熊 · 攻击动画" },
       ],
@@ -1201,13 +1207,13 @@ const PROJECT = {
     {
       name: "敌方单位", en: "ENEMY",
       items: [
-        { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 基础近战" },
-        { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 高速穿透" },
-        { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 肉盾 HP1400" },
-        { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 精英 HP1200" },
-        { src: "pic/人物/ref_boss_512.webp", caption: "骷髅BOSS · HP1500" },
+        { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 迷途亡灵" },
+        { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 被腐蚀的守护兽" },
+        { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 堕落神之造物" },
+        { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 只识黄金" },
+        { src: "pic/人物/ref_boss_512.webp", caption: "枯骨王 卡班 · BOSS" },
         { src: "pic/人物/ref_boss_attack1_512.webp", caption: "BOSS · 攻击动画" },
-        { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 飞行单位" },
+        { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 丛林异变" },
       ],
     },
     {
@@ -1216,12 +1222,12 @@ const PROJECT = {
         { src: "pic/建筑/ref_barracks_512.webp", caption: "剑士营 · 送 3 剑兵" },
         { src: "pic/建筑/ref_barracks_lv2_512.webp", caption: "剑士营 Lv2" },
         { src: "pic/建筑/ref_archer_range_512.webp", caption: "射手营 · 送 2 弓手" },
-        { src: "pic/建筑/ref_altar_512.webp", caption: "祭坛 · 祭司" },
-        { src: "pic/建筑/ref_temple_512.webp", caption: "治疗之泉 · 图腾战士" },
+        { src: "pic/建筑/ref_temple_512.webp", caption: "神庙 · 图腾战士" },
         { src: "pic/建筑/ref_cornfield_lv1_512.webp", caption: "玉米田 · 产玉米" },
         { src: "pic/建筑/ref_fence_512.webp", caption: "栅栏 · 阻挡敌人" },
         { src: "pic/建筑/塔.webp", caption: "斧头投手塔 · 慢速高伤" },
         { src: "pic/建筑/抠图-1784812779922.webp", caption: "喷火塔 · 固定喷火" },
+        { src: "pic/建筑/ref_altar_512.webp", caption: "祭坛 · 建筑参考" },
       ],
     },
     {
@@ -1240,14 +1246,23 @@ const PROJECT = {
     },
   ],
 
-  process: [],
   gallery: [],
   details: [],
   views: [],
   structure: null,
   video: null,
   model: null,
-  specs: [],
+
+  specs: [
+    { label: "TYPE",     value: "轻度策略防守 + 兵种操控" },
+    { label: "PLATFORM", value: "浏览器（PC） · Canvas 2D" },
+    { label: "VIEW",     value: "等距视角（Isometric）" },
+    { label: "LEVELS",   value: "7 关 · 10-15 分钟/局" },
+    { label: "CURRENCY", value: "玉米 🌽（唯一货币）" },
+    { label: "CYCLE",    value: "昼夜循环 · 白天经营 / 夜晚防守" },
+    { label: "HERO",     value: "大祭司巴兰 · 主动技能" },
+    { label: "TOOLS",    value: "AI 绘画 · 逐帧动画" },
+  ],
 
   nextProject: { title: "近地轨道空间站", url: "../satellite/" },
 };
