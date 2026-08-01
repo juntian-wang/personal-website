@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>赛博少年 Jon · Jon's Lab</title>
+<title>近地轨道空间站 · Jon's Lab</title>
 
 <!-- Space Grotesk 西文字体（jsdelivr fontsource，中文自动回退系统字体） -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -670,67 +670,26 @@
   .hero.is-in .hero-meta { opacity: 1; transform: none; }
   .hero-bg img { transition: transform 2.6s cubic-bezier(0.22, 1, 0.36, 1); }
 
-  /* ===== 动画设定（堆叠卡片展开） ===== */
-  .deck {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    aspect-ratio: 16 / 10;
+  /* ===== 细节特写（四联排，统一 4:5 比例） ===== */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.4rem;
   }
-  .deck-card {
-    position: absolute;
-    inset: 0;
-    border-radius: 10px;
+  .detail-item .d-img {
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.45);
-    background: #111;
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease;
-    will-change: transform, opacity;
+    cursor: zoom-in;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    aspect-ratio: 4 / 5;
   }
-  .deck-card .d-img { width: 100%; height: 100%; }
-  .deck-card .d-img img {
+  .detail-item .d-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    transition: transform 0.5s ease;
   }
-  .deck-card .d-caption {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 3.2rem 1.4rem 1.1rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 55%, transparent 100%);
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  .deck-card .d-caption .fig-cap { margin-top: 0; }
-  .deck-card .d-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1.4;
-    color: #fff;
-  }
-  .deck-meta {
-    display: flex;
-    justify-content: center;
-    gap: 1.6rem;
-    align-items: baseline;
-    margin-top: 1.5rem;
-  }
-  .deck-counter {
-    font-size: 0.8rem;
-    letter-spacing: 0.22em;
-    color: rgba(255,255,255,0.4);
-  }
-  .deck-hint {
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    color: rgba(255,255,255,0.28);
-    cursor: pointer;
-  }
-  .deck-hint:hover { color: rgba(255,255,255,0.6); }
+  .detail-item .d-img:hover img { transform: scale(1.03); }
 
   /* ===== 多角度三联排 ===== */
   .views-row {
@@ -911,9 +870,7 @@
     .hero { padding: 6rem 1.3rem 3rem; }
     .bottom-nav { padding: 3.5rem 1.3rem 1.5rem; }
     .footer-inner { padding: 1.8rem 1.3rem 2.2rem; }
-    .deck { aspect-ratio: 16 / 11; }
-    .deck-card .d-caption { padding: 2.4rem 1rem 0.9rem; }
-    .deck-meta { gap: 1.2rem; margin-top: 1.2rem; }
+    .detail-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
     .views-row,
     .process-steps { grid-template-columns: 1fr; }
     .brief { grid-template-columns: 1fr; gap: 2.8rem; }
@@ -991,19 +948,11 @@
     <div class="gallery-masonry" id="gallery"></div>
   </section>
 
-  <!-- ===== 动画演示（PROJECT.details / PROJECT.video 任一存在才渲染） ===== -->
-  <section class="section reveal" data-block="video" id="videoSection" style="display:none">
-    <div class="sec-label">ANIMATION</div>
-    <h2 class="section-title grad-text">动画演示</h2>
-    <div class="deck" id="deck"></div>
-    <div class="deck-meta">
-      <div class="deck-counter" id="deckCounter"></div>
-      <div class="deck-hint" id="deckHint">点击卡片查看下一张</div>
-    </div>
-    <div class="video-wrap wide-media" style="margin-top: 3.2rem">
-      <video id="projectVideo" controls preload="metadata" playsinline></video>
-    </div>
-    <div class="fig-cap" id="videoCaption"></div>
+  <!-- ===== 细节特写（PROJECT.details 非空才渲染） ===== -->
+  <section class="section reveal" data-block="details" id="detailsSection" style="display:none">
+    <div class="sec-label">DETAILS</div>
+    <h2 class="section-title grad-text">细节特写</h2>
+    <div class="detail-grid" id="detailGrid"></div>
   </section>
 
   <!-- ===== 多角度视图（PROJECT.views 非空才渲染） ===== -->
@@ -1039,7 +988,15 @@
     </div>
   </section>
 
-  <!-- ===== 视频（并入动画演示区块） ===== -->
+  <!-- ===== 视频 ===== -->
+  <section class="section reveal" data-block="video">
+    <div class="sec-label">VIDEO</div>
+    <h2 class="section-title grad-text">动态演示</h2>
+    <div class="video-wrap wide-media">
+      <video id="projectVideo" controls preload="metadata" playsinline></video>
+    </div>
+    <div class="fig-cap" id="videoCaption"></div>
+  </section>
 
   <!-- ===== 3D 模型（PROJECT.model 存在时才渲染） ===== -->
   <section class="section reveal" data-block="model" id="modelSection" style="display:none">
@@ -1139,103 +1096,112 @@
 const PROJECT = {
   homeUrl: "https://jonlab.cn",
 
-  category: "人物设计",
-  title: "赛博少年 Jon",
-  titleEn: "CYBER BOY JON",
-  subtitle: "我的数字分身——一个住在个人网站里的赛博少年",
+  category: "3D 建模",
+  title: "近地轨道空间站",
+  titleEn: "LEO Ring Station",
+  subtitle: "一座静静运行在地球轨道上的环形空间站",
   meta: [
-    { label: "TYPE", value: "人物设计 / 动画" },
+    { label: "TYPE", value: "3D 建模 / 概念设计" },
     { label: "YEAR", value: "2026" },
-    { label: "ANIMATION", value: "361 帧手绘动画" },
+    { label: "MODULES", value: "20+ 功能模块" },
   ],
 
   intro: [
-    "这是**赛博少年 Jon**——我的数字分身。它住在个人网站的首页里：加载时做 361 帧跑酷动画，进入页面后站在赛博都市前跟你打招呼，滚动时还会读书、喝牛奶、讲讲 AI 编程和八年跑酷的故事。",
-    "这个角色从一张**人物设定图**开始：先用 AI 生成形象草案，再手工调整比例、配色和赛博元素，最后把 361 帧动画一帧帧跑起来，让它像真人一样活动在网页里。",
+    "这是我设计的一座**近地轨道空间站**。整座空间站采用「中央核心 + 环形生栖舱」的结构：一根核心模块纵贯全站，反应堆、生栖环、工程甲板、传感阵列从上到下依次排布。",
+    "设计的时候，我先把每个模块拆开单独建模——居住区、货舱、植物舱、天线、推进器……再把它们一件件组装回核心轴上。下面的爆炸图里，可以看到全部 20 多个功能模块是怎么拼在一起的。",
   ],
   facts: [
-    { label: "CLIENT",    value: "Jon's Lab" },
-    { label: "ROLE",      value: "角色设定 · 动画制作" },
-    { label: "YEAR",      value: "2026" },
-    { label: "ANIMATION", value: "361 帧手绘动画" },
-    { label: "STYLE",     value: "赛博朋克" },
-    { label: "STATUS",    value: "在个人网站首页运行中" },
+    { label: "CLIENT",   value: "Jon's Lab" },
+    { label: "ROLE",     value: "概念设计 · 3D 建模" },
+    { label: "YEAR",     value: "2026" },
+    { label: "MODULES",  value: "20+ 功能模块" },
+    { label: "ORBIT",    value: "近地轨道（LEO）" },
+    { label: "STATUS",   value: "概念方案 · 在轨运行中（想象）" },
   ],
+  /* 大引言：建议换成 Jon 自己说的一句话（为什么设计它 / 它最酷的地方） */
   quote: {
-    text: "我想让每个点进网站的人，都先认识一下真实的 Jon。",
+    text: "我想造一座真的能住人的空间站——先在这里把它造出来。",
     author: "JON · 设计师",
   },
-  heroMedia: null,
-  heroBg: "assets/other-01.webp",
+  heroMedia: {
+    src: "assets/hero-wide.webp",
+    alt: "空间站 45 度侧视全景，地球弧线与远方恒星",
+    caption: "空间站在近地轨道运行，地球弧线与远方恒星",
+  },
 
   process: [
-    { img: "assets/character-01.webp", step: "STEP 01", title: "角色构想",   desc: "从性格出发构思形象：爱喝牛奶、爱画画、练了八年跑酷的赛博少年" },
-    { img: "assets/character-02.webp", step: "STEP 02", title: "形象定稿",   desc: "AI 生成草案 + 手工调整，确定配色、比例与赛博元素" },
-    { img: "assets/character-03.webp", step: "STEP 03", title: "页面落地",   desc: "让角色真正住进网页：背景、动画与首页 HERO 场景融合" },
+    { img: "assets/schematic.webp",  step: "STEP 01", title: "设计图纸",   desc: "先在图纸上推演整体结构：核心轴、生栖环，以及每个模块的位置" },
+    { img: "assets/clay-model.webp", step: "STEP 02", title: "白模搭建",   desc: "把每个模块拆开来建模，组装回核心轴后确认比例与结构关系" },
+    { img: "assets/hero-orbit.webp", step: "STEP 03", title: "材质与渲染", desc: "加上金属材质、舷窗灯光和地球背景，输出最终效果图" },
   ],
 
   gallery: [
-    { src: "assets/hero-set-01.webp", caption: "HERO 页设定 · 场景一" },
-    { src: "assets/hero-set-02.webp", caption: "HERO 页设定 · 场景二" },
-    { src: "assets/hero-set-03.webp", caption: "HERO 页设定 · 场景三" },
-    { src: "assets/hero-set-04.webp", caption: "HERO 页设定 · 场景四" },
-    { src: "assets/hero-set-05.webp", caption: "HERO 页设定 · 场景五" },
-    { src: "assets/hero-set-06.webp", caption: "HERO 页设定 · 场景六" },
+    { src: "assets/orbit-view.webp", caption: "整体渲染 · 俯瞰地球" },
+    { src: "assets/hero-orbit.webp", caption: "整体渲染 · 轨道之上" },
+    { src: "assets/deep-space.webp", caption: "整体渲染 · 深空视角" },
+    { src: "assets/exploded.webp",   caption: "全站爆炸分解图" },
   ],
 
   details: [
-    { src: "assets/animation-01.webp", cap: "动画设定 · 01" },
-    { src: "assets/animation-02.webp", cap: "动画设定 · 02" },
-    { src: "assets/animation-03.webp", cap: "动画设定 · 03" },
-    { src: "assets/animation-04.webp", cap: "动画设定 · 04" },
-    { src: "assets/animation-05.webp", cap: "动画设定 · 05" },
-    { src: "assets/animation-06.webp", cap: "动画设定 · 06" },
+    { src: "assets/detail-ring.webp",     cap: "生栖环外壁 · 舷窗暖光" },
+    { src: "assets/detail-reactor.webp",  cap: "反应堆核心 · 能量舱" },
+    { src: "assets/detail-antenna.webp",  cap: "星形天线阵列" },
+    { src: "assets/detail-thruster.webp", cap: "主推进器 · 环形喷口" },
   ],
 
+  /* 多角度视图（图到位后填入，例如）：
   views: [
-    { src: "assets/other-01.webp", cap: "页面素材 · 其一" },
-    { src: "assets/other-02.webp", cap: "页面素材 · 其二" },
-    { src: "assets/other-03.webp", cap: "页面素材 · 其三" },
-    { src: "assets/other-04.webp", cap: "页面素材 · 其四" },
-    { src: "assets/other-05.webp", cap: "页面素材 · 其五" },
-  ],
+    { src: "assets/view-side.webp",   cap: "侧视图" },
+    { src: "assets/view-top.webp",    cap: "顶视图" },
+    { src: "assets/view-bottom.webp", cap: "仰视图" },
+  ], */
+  views: [],
 
+  /* 超大数字展示：页面重音，4 个以内 */
   stats: [
-    { num: "1",   label: "数字分身" },
-    { num: "361", label: "手绘动画帧" },
-    { num: "2K",  label: "渲染分辨率" },
-    { num: "5",   label: "场景设定" },
+    { num: "20+", label: "功能模块" },
+    { num: "4",   label: "生栖环模块" },
+    { num: "20s", label: "环绕影像" },
+    { num: "2142", label: "图纸设定年份" },
   ],
 
+  /* 宽幅氛围图：全幅沉浸展示（视差 + 叠字），line/sub 为空则不叠字 */
   atmosphere: {
-    src: "assets/hero-set-01.webp",
-    cap: "赛博少年 · 城市夜景",
-    line: "HELLO, I'M JON",
-    sub: "欢迎来到我的数字世界",
+    src: "assets/orbit-view.webp",
+    cap: "在轨巡航 · 掠过地球上空",
+    line: "IN SILENT ORBIT",
+    sub: "在轨运行 · 安静巡航",
   },
 
   structure: {
-    img: "assets/cover-01.webp",
-    cap: "赛博少年 Jon · 人物设定图",
-    note: "点击查看大图 · 人物设定图",
-    modules: [],
+    img: "assets/exploded-labeled.webp",
+    note: "点击查看大图 · 全部模块标注",
+    modules: [
+      "反应堆堆栈", "反应堆燃料棒", "生栖环模块 ×4", "核心螺块",
+      "工程进港核心", "货运舱", "TARGGO 植物模块", "主推进器",
+      "传感模块", "传感鳍板", "星形天线臂", "工程甲板",
+      "远程遥测高性能模块", "生栖舱盖",
+    ],
   },
 
   video: {
-    src: "assets/hero-video.mp4",
-    poster: "assets/hero-set-01.webp",
-    caption: "首页滚动动画：喝牛奶、AI 编程、画画、八年跑酷",
+    src: "assets/flyaround.mp4",
+    poster: "assets/video-poster.webp",
+    caption: "环绕运镜看全站：空间站静静运行，远处有地球划过",
   },
 
-  model: null,
+  /* 3D 模型：glb 文件（已 Draco 压缩），可交互旋转缩放 */
+  model: { src: "assets/station-draco.glb" },
 
   specs: [
-    { label: "CHARACTER", value: "赛博少年 Jon（数字分身）" },
-    { label: "ANIMATION", value: "361 帧手绘动画" },
-    { label: "RESOLUTION", value: "2K 渲染 · 1080p 交付" },
-    { label: "TOOLS",     value: "AI 绘画 + ffmpeg 逐帧动画" },
+    { label: "STRUCTURE", value: "中央核心轴 + 环形生栖舱" },
+    { label: "MODULES",   value: "20+ 个功能模块" },
+    { label: "ORBIT",     value: "近地轨道（LEO）" },
+    { label: "TOOLS",     value: "3D 建模 + AI 渲染" },
   ],
 
+  /* 下一个作品导航：null 则不渲染。需要时填入，例如：
+  nextProject: { title: "玉米·黄金·美洲豹", url: "../corn-jaguar/" }, */
   nextProject: null,
 };
 
@@ -1247,7 +1213,7 @@ document.getElementById('heroLabel').textContent = "WORK · " + PROJECT.category
 document.getElementById('heroTitle').textContent = PROJECT.title;
 document.getElementById('heroTitleEn').textContent = PROJECT.titleEn || '';
 document.getElementById('heroSubtitle').textContent = PROJECT.subtitle;
-document.getElementById('heroBgImg').src = PROJECT.heroBg || PROJECT.heroMedia.src;
+document.getElementById('heroBgImg').src = PROJECT.heroMedia.src;
 
 // 返回首页链接
 ['navHome', 'backHome'].forEach(function(id){
@@ -1312,17 +1278,11 @@ function renderFigCap(el, text) {
   figCounter++;
 }
 
-// 主视觉（PROJECT.heroMedia 为 null 则不渲染，也不占 FIG 编号）
-var heroMediaWrap = document.getElementById('heroMediaWrap');
-if (PROJECT.heroMedia && PROJECT.heroMedia.src) {
-  var heroMediaImg = document.getElementById('heroMediaImg');
-  heroMediaImg.src = PROJECT.heroMedia.src;
-  heroMediaImg.alt = PROJECT.heroMedia.alt || PROJECT.title;
-  renderFigCap(document.getElementById('heroMediaCaption'), PROJECT.heroMedia.caption);
-} else {
-  heroMediaWrap.style.display = 'none';
-  document.getElementById('heroMediaCaption').style.display = 'none';
-}
+// 主视觉
+var heroMediaImg = document.getElementById('heroMediaImg');
+heroMediaImg.src = PROJECT.heroMedia.src;
+heroMediaImg.alt = PROJECT.heroMedia.alt || PROJECT.title;
+renderFigCap(document.getElementById('heroMediaCaption'), PROJECT.heroMedia.caption);
 
 // 设计过程（空数组不渲染）
 if (PROJECT.process && PROJECT.process.length) {
@@ -1368,109 +1328,22 @@ var gallery = document.getElementById('gallery');
   gallery.appendChild(cols[1]);
 })();
 
-// 动画设定（堆叠卡片：点击顶卡飞出，下一张顶上；并入动画演示区块；空数组不渲染）
+// 细节特写（空数组不渲染）
 if (PROJECT.details && PROJECT.details.length) {
-  document.getElementById('videoSection').style.display = '';
-  var deck = document.getElementById('deck');
-  var deckCounter = document.getElementById('deckCounter');
-  var deckHint = document.getElementById('deckHint');
-  var cards = [];
-  PROJECT.details.forEach(function(item, i){
-    var c = document.createElement('div');
-    c.className = 'deck-card';
-    c.innerHTML =
-      '<div class="d-img"><img loading="lazy" alt=""></div>' +
-      '<div class="d-caption"><div class="fig-cap"></div><div class="d-title"></div></div>';
-    c.querySelector('img').src = item.src;
-    c.querySelector('img').alt = item.cap || '';
-    renderFigCap(c.querySelector('.fig-cap'), item.cap);
-    c.querySelector('.d-title').textContent = item.title || '';
-    deck.appendChild(c);
-    cards.push(c);
+  document.getElementById('detailsSection').style.display = '';
+  var dg = document.getElementById('detailGrid');
+  PROJECT.details.forEach(function(item){
+    var d = document.createElement('div');
+    d.className = 'detail-item';
+    d.innerHTML =
+      '<div class="d-img" data-zoom><img loading="lazy" alt=""></div>' +
+      '<div class="fig-cap"></div>';
+    d.querySelector('img').src = item.src;
+    d.querySelector('img').alt = item.cap || '';
+    renderFigCap(d.querySelector('.fig-cap'), item.cap);
+    dg.appendChild(d);
   });
-
-  var total = cards.length;
-  var idx = 0; // 当前顶卡索引（0 = 最上面）
-  function layout() {
-    cards.forEach(function(c, i){
-      // 已飞出的卡隐藏
-      if (i < idx) { c.style.visibility = 'hidden'; c.style.cursor = 'default'; c.style.pointerEvents = 'none'; return; }
-      var k = i - idx; // 相对顶卡的层数
-      c.style.visibility = 'visible';
-      c.style.zIndex = 100 - k;
-      c.style.transform = k === 0
-        ? 'translate(0,0) rotate(0deg)'
-        : 'translate(' + (k * 18) + 'px,' + (-k * 12) + 'px) rotate(' + (k * 1.6) + 'deg) scale(' + (1 - k * 0.02) + ')';
-      c.style.cursor = k === 0 ? 'pointer' : 'default';
-      c.style.pointerEvents = k === 0 ? 'auto' : 'none';
-    });
-    deckCounter.textContent =
-      String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
-    deckHint.textContent = '点击卡片查看下一张';
-  }
-  function flyOut() {
-    var c = cards[idx];
-    if (!c) return;
-    c.style.transform = 'translate(140%, -30%) rotate(12deg)';
-    c.style.opacity = 0;
-    idx++;
-    if (idx >= total) {
-      // 全部看完：点击重新开始
-      setTimeout(function(){
-        idx = 0;
-        cards.forEach(function(c){
-          c.style.opacity = 1;
-          c.style.transition = 'none';
-        });
-        layout();
-        requestAnimationFrame(function(){
-          requestAnimationFrame(function(){
-            cards.forEach(function(c){ c.style.transition = ''; });
-          });
-        });
-      }, 650);
-    } else {
-      setTimeout(layout, 300);
-    }
-  }
-  deck.addEventListener('click', function(e){
-    if (idx >= total) { flyOut(); return; } // 全部看完后点击重置
-    var c = cards[idx];
-    if (e.target === c || c.contains(e.target)) flyOut();
-  });
-  deckHint.addEventListener('click', function(){ flyOut(); });
-  layout();
 }
-
-// 视频（并入动画演示区块；details 存在时即使无 video 也保留区块）
-if (PROJECT.video) {
-  document.querySelector('[data-block="video"]').style.display = '';
-  var v = document.getElementById('projectVideo');
-  v.src = PROJECT.video.src;
-  if (PROJECT.video.poster) v.poster = PROJECT.video.poster;
-  v.muted = true;
-  v.loop = true;
-  v.setAttribute('muted', '');
-  renderFigCap(document.getElementById('videoCaption'), PROJECT.video.caption);
-
-  var userPaused = false, ioPause = false;
-  v.addEventListener('pause', function(){ if (!ioPause) userPaused = true; });
-  v.addEventListener('play',  function(){ userPaused = false; });
-  var vio = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if (en.isIntersecting) {
-        if (!userPaused) v.play().catch(function(){});
-      } else {
-        ioPause = true; v.pause(); ioPause = false;
-      }
-    });
-  }, { threshold: 0.35 });
-  vio.observe(v);
-} else if (!(PROJECT.details && PROJECT.details.length)) {
-  document.querySelector('[data-block="video"]').style.display = 'none';
-}
-
-
 
 // 多角度视图（空数组不渲染）
 if (PROJECT.views && PROJECT.views.length) {
@@ -1496,9 +1369,7 @@ if (st) {
   document.getElementById('structureNote').textContent = st.note || '';
   renderFigCap(document.getElementById('structureCap'), st.cap || '全站爆炸分解 · 模块标注图');
   var chips = document.getElementById('moduleChips');
-  var mods = st.modules || [];
-  if (!mods.length) chips.style.display = 'none';
-  mods.forEach(function(name){
+  (st.modules || []).forEach(function(name){
     var c = document.createElement('span');
     c.className = 'chip';
     c.textContent = name;
@@ -1529,6 +1400,33 @@ if (PROJECT.atmosphere && PROJECT.atmosphere.src) {
   renderFigCap(document.getElementById('atmosphereCap'), PROJECT.atmosphere.cap);
   if (PROJECT.atmosphere.line) document.getElementById('atmoLine').textContent = PROJECT.atmosphere.line;
   if (PROJECT.atmosphere.sub)  document.getElementById('atmoSub').textContent = PROJECT.atmosphere.sub;
+}
+
+// 视频（静音循环，滚动进入视口自动播放，离开暂停；用户手动暂停后不再自动播）
+if (PROJECT.video) {
+  var v = document.getElementById('projectVideo');
+  v.src = PROJECT.video.src;
+  if (PROJECT.video.poster) v.poster = PROJECT.video.poster;
+  v.muted = true;
+  v.loop = true;
+  v.setAttribute('muted', '');
+  renderFigCap(document.getElementById('videoCaption'), PROJECT.video.caption);
+
+  var userPaused = false, ioPause = false;
+  v.addEventListener('pause', function(){ if (!ioPause) userPaused = true; });
+  v.addEventListener('play',  function(){ userPaused = false; });
+  var vio = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting) {
+        if (!userPaused) v.play().catch(function(){});
+      } else {
+        ioPause = true; v.pause(); ioPause = false;
+      }
+    });
+  }, { threshold: 0.35 });
+  vio.observe(v);
+} else {
+  document.querySelector('[data-block="video"]').style.display = 'none';
 }
 
 // 3D 模型（懒加载：滚到区块附近才加载脚本 + 模型 + HDRI；失败/不支持时给提示）

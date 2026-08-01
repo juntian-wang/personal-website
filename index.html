@@ -729,13 +729,17 @@
       // skips the animation; frames still preload in the background.
       // Also skip on back/forward navigation directly (robust for
       // browsers where sessionStorage is unreliable on restore).
+      // Detail pages link home as ?from=detail#portfolio → skip loader
+      // and jump straight to the portfolio section.
       var isBackForward = false;
       try {
         var nav = performance.getEntriesByType('navigation')[0];
         isBackForward = nav && nav.type === 'back_forward';
       } catch (e) { /* old browser: rely on sessionStorage only */ }
 
-      var shouldSkip = isBackForward;
+      var fromDetail = /[?&]from=detail/.test(location.search);
+
+      var shouldSkip = isBackForward || fromDetail;
       try {
         if (sessionStorage.getItem('loaderShown')) {
           shouldSkip = true;
@@ -908,7 +912,7 @@
   </section>
 
   <!-- ===== Portfolio ===== -->
-  <section class="portfolio">
+  <section class="portfolio" id="portfolio">
     <div class="portfolio-top-img-wrap">
       <img class="portfolio-top-img" src="pic/背景图-偷看.webp" alt="" />
     </div>
