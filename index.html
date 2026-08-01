@@ -692,14 +692,28 @@
       // Session-only: show the loading screen once per tab session.
       // Returning from a work page (back navigation reloads the page)
       // skips the animation; frames still preload in the background.
+      // Also skip on back/forward navigation directly (robust for
+      // browsers where sessionStorage is unreliable on restore).
+      var isBackForward = false;
+      try {
+        var nav = performance.getEntriesByType('navigation')[0];
+        isBackForward = nav && nav.type === 'back_forward';
+      } catch (e) { /* old browser: rely on sessionStorage only */ }
+
+      var shouldSkip = isBackForward;
       try {
         if (sessionStorage.getItem('loaderShown')) {
-          wrapper.classList.add('is-hidden');
-          document.body.style.overflow = '';
-          return;
+          shouldSkip = true;
+        } else {
+          sessionStorage.setItem('loaderShown', '1');
         }
-        sessionStorage.setItem('loaderShown', '1');
-      } catch (e) { /* storage unavailable: always show */ }
+      } catch (e) { /* storage unavailable: fall back to nav type */ }
+
+      if (shouldSkip) {
+        wrapper.classList.add('is-hidden');
+        document.body.style.overflow = '';
+        return;
+      }
 
       // Lock scroll
       document.body.style.overflow = 'hidden';
