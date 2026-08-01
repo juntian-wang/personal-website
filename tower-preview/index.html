@@ -682,9 +682,11 @@
   .group-block .section-title { margin-bottom: 1.6rem; }
   .group-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
   }
+  @media (max-width: 1024px) { .group-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px)  { .group-grid { grid-template-columns: repeat(2, 1fr); } }
   .group-card .g-img {
     border-radius: 8px;
     overflow: hidden;
@@ -711,9 +713,7 @@
   }
   .group-card .g-img.anim-card img.active { display: block; }
   .group-card .fig-cap { margin-top: 0.6rem; }
-  @media (max-width: 640px) {
-    .group-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  }
+
 
   .detail-item .d-img {
     border-radius: 8px;
