@@ -689,6 +689,18 @@
       var pctEl   = document.getElementById('loader-percentage');
       var statusEl= document.getElementById('loader-status');
 
+      // Session-only: show the loading screen once per tab session.
+      // Returning from a work page (back navigation reloads the page)
+      // skips the animation; frames still preload in the background.
+      try {
+        if (sessionStorage.getItem('loaderShown')) {
+          wrapper.classList.add('is-hidden');
+          document.body.style.overflow = '';
+          return;
+        }
+        sessionStorage.setItem('loaderShown', '1');
+      } catch (e) { /* storage unavailable: always show */ }
+
       // Lock scroll
       document.body.style.overflow = 'hidden';
 
