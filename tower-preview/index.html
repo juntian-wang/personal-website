@@ -676,6 +676,11 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 1.4rem;
   }
+  /* ===== 分组图鉴（玛雅塔防专用）：每组 = sec-label + 标题 + 两列瀑布流 ===== */
+  .group-block { margin: 0 0 5rem; }
+  .group-block:last-child { margin-bottom: 0; }
+  .group-block .section-title { margin-bottom: 1.6rem; }
+
   .detail-item .d-img {
     border-radius: 8px;
     overflow: hidden;
@@ -944,7 +949,7 @@
   <!-- ===== 图片画廊（智能瀑布流，任意比例自动编排） ===== -->
   <section class="section reveal" data-block="gallery">
     <div class="sec-label">GALLERY</div>
-    <h2 class="section-title grad-text">单位图鉴</h2>
+    <h2 class="section-title grad-text">美术图鉴</h2>
     <div class="gallery-masonry" id="gallery"></div>
   </section>
 
@@ -1109,7 +1114,7 @@ const PROJECT = {
 
   intro: [
     "这是我正在做的**玛雅塔防**——一款以玛雅文明为背景的策略塔防游戏。在这片玉米丛生的丛林里，**玉米就是货币**：招募剑兵、建造祭坛、培育玉米田，抵御一波波来自丛林的敌人。",
-    "这一页是它的**美术图鉴**：大祭司英雄、我方与敌方单位、建筑和物品的设定图全部收录在这里，部分角色还配有逐帧动画。",
+    "这一页是它的**美术图鉴**：大祭司英雄、我方与敌方单位、建筑和物品的设定图，按类别分组收录。",
   ],
   facts: [
     { label: "CLIENT",   value: "Jon's Lab" },
@@ -1137,67 +1142,86 @@ const PROJECT = {
     { num: "🌽",  label: "玉米货币" },
   ],
 
-  process: [
-    { img: "pic/人物/ref_sword_512.webp", step: "STEP 01", title: "形象设计", desc: "每个单位先确定基础形象：剑兵、弓手、祭司、图腾战士……" },
-    { img: "pic/人物/run/30.webp", step: "STEP 02", title: "动画帧", desc: "为移动、攻击、施法补上逐帧动画：奔跑 / 待机 / 施法三套循环" },
-    { img: "pic/人物/bear/抠图-1784701709051.webp", step: "STEP 03", title: "游戏内集成", desc: "按缩放比例放进游戏——地图上奔跑的野熊、飞旋的斧头都来自这里" },
+  /* ===== 分组美术图鉴 ===== */
+  groups: [
+    {
+      name: "英雄", en: "HERO",
+      items: [
+        { src: "pic/人物/ref_mage_512.webp", caption: "大祭司 · 基础形象" },
+        { src: "pic/人物/21.webp", caption: "待机动画帧" },
+        { src: "pic/人物/stand/41.webp", caption: "待机动画 Set2" },
+        { src: "pic/人物/run/30.webp", caption: "奔跑动画" },
+        { src: "pic/人物/ref_mage_cast1_512.webp", caption: "施法动画" },
+        { src: "pic/人物/hero_avatar.webp", caption: "英雄头像 · 面板" },
+        { src: "pic/人物/hero_panel_bg.webp", caption: "面板底图（4 格）" },
+        { src: "pic/物品/抠图-1784641170884.webp", caption: "脚下光环 1" },
+        { src: "pic/物品/抠图-1784641174926.webp", caption: "脚下光环 2" },
+      ],
+    },
+    {
+      name: "我方单位", en: "ALLY",
+      items: [
+        { src: "pic/人物/ref_sword_512.webp", caption: "剑兵 · 近战 HP40" },
+        { src: "pic/人物/ref_sword_attack1_512.webp", caption: "剑兵 · 进攻动画" },
+        { src: "pic/人物/ref_archer_512.webp", caption: "弓箭手 · 射程144" },
+        { src: "pic/人物/ref_archer_attack1_512.webp", caption: "弓箭手 · 进攻动画" },
+        { src: "pic/人物/ref_guardian_512.webp", caption: "图腾战士 · 治疗光环" },
+        { src: "pic/人物/ref_guardian_cast1_512.webp", caption: "图腾战士 · 施法" },
+        { src: "pic/人物/bear/抠图-1784701709051.webp", caption: "野熊 · 英雄召唤 HP80" },
+        { src: "pic/人物/bear/run/1.webp", caption: "野熊 · 奔跑动画" },
+        { src: "pic/人物/bear/攻击/1.webp", caption: "野熊 · 攻击动画" },
+      ],
+    },
+    {
+      name: "敌方单位", en: "ENEMY",
+      items: [
+        { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 基础近战" },
+        { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 高速穿透" },
+        { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 肉盾 HP1400" },
+        { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 精英 HP1200" },
+        { src: "pic/人物/ref_boss_512.webp", caption: "骷髅BOSS · HP1500" },
+        { src: "pic/人物/ref_boss_attack1_512.webp", caption: "BOSS · 攻击动画" },
+        { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 飞行单位" },
+      ],
+    },
+    {
+      name: "建筑", en: "BUILDING",
+      items: [
+        { src: "pic/建筑/ref_barracks_512.webp", caption: "剑士营 · 送 3 剑兵" },
+        { src: "pic/建筑/ref_barracks_lv2_512.webp", caption: "剑士营 Lv2" },
+        { src: "pic/建筑/ref_archer_range_512.webp", caption: "射手营 · 送 2 弓手" },
+        { src: "pic/建筑/ref_altar_512.webp", caption: "祭坛 · 祭司" },
+        { src: "pic/建筑/ref_temple_512.webp", caption: "治疗之泉 · 图腾战士" },
+        { src: "pic/建筑/ref_cornfield_lv1_512.webp", caption: "玉米田 · 产玉米" },
+        { src: "pic/建筑/ref_fence_512.webp", caption: "栅栏 · 阻挡敌人" },
+        { src: "pic/建筑/塔.webp", caption: "斧头投手塔 · 慢速高伤" },
+        { src: "pic/建筑/抠图-1784812779922.webp", caption: "喷火塔 · 固定喷火" },
+      ],
+    },
+    {
+      name: "物品与技能", en: "ITEM",
+      items: [
+        { src: "pic/物品/ref_arrow_512.webp", caption: "箭矢 · 弓手投射物" },
+        { src: "pic/物品/斧子.webp", caption: "斧子 · 投手投射物" },
+        { src: "pic/物品/抠图-1784812899152.webp", caption: "火焰 · 喷火塔效果" },
+        { src: "pic/物品/沼泽.webp", caption: "沼泽 · 地形技能" },
+        { src: "pic/物品/荆棘.webp", caption: "荆棘 · 地形技能" },
+        { src: "pic/物品/抠图-1784640332919.webp", caption: "炸弹花 · 爆炸投射物" },
+        { src: "pic/物品/抠图-1784774768047.webp", caption: "爆炸特效" },
+        { src: "pic/人物/图片生成-1784701243035.webp", caption: "技能图标 · 召唤野熊" },
+        { src: "pic/人物/图片生成-1784775674904.webp", caption: "技能图标 · 爆炸" },
+      ],
+    },
   ],
 
-  gallery: [
-    { src: "pic/人物/ref_mage_512.webp", caption: "英雄 · 大祭司 静态" },
-    { src: "pic/人物/21.webp", caption: "英雄 · 待机动画帧" },
-    { src: "pic/人物/ref_mage_cast1_512.webp", caption: "英雄 · 施法姿态" },
-    { src: "pic/人物/ref_sword_512.webp", caption: "剑兵 · 近战输出 HP40" },
-    { src: "pic/人物/ref_archer_512.webp", caption: "弓箭手 · 远程 射程144" },
-    { src: "pic/人物/ref_guardian_512.webp", caption: "图腾战士 · 治疗光环" },
-    { src: "pic/人物/bear/抠图-1784701709051.webp", caption: "野熊 · 英雄召唤 HP80" },
-    { src: "pic/人物/ref_enemy_warrior_512.webp", caption: "骷髅兵 · 基础近战" },
-    { src: "pic/人物/ref_jaguar_512.webp", caption: "豹骑 · 高速穿透" },
-    { src: "pic/人物/ref_serpent_move1_512.webp", caption: "巨蟒 · 高血量肉盾 HP1400" },
-    { src: "pic/人物/ref_conquistador_512.webp", caption: "征服者 · 精英兵 HP1200" },
-    { src: "pic/人物/ref_boss_512.webp", caption: "骷髅BOSS · 巨型首领 HP1500" },
-    { src: "pic/人物/ref_bat_512.webp", caption: "蝙蝠 · 飞行单位" },
-  ],
-
-  details: [
-    { src: "pic/建筑/ref_barracks_512.webp", cap: "剑士营 · 送 3 剑兵" },
-    { src: "pic/建筑/ref_archer_range_512.webp", cap: "射手营 · 送 2 弓手" },
-    { src: "pic/建筑/ref_altar_512.webp", cap: "祭坛 · 祭司" },
-    { src: "pic/建筑/ref_temple_512.webp", cap: "治疗之泉 · 图腾战士" },
-    { src: "pic/建筑/ref_cornfield_lv1_512.webp", cap: "玉米田 · 产玉米" },
-    { src: "pic/建筑/ref_fence_512.webp", cap: "栅栏 · 阻挡敌人" },
-    { src: "pic/建筑/塔.webp", cap: "斧头投手塔 · 慢速高伤" },
-    { src: "pic/建筑/抠图-1784812779922.webp", cap: "喷火塔 · 固定喷火" },
-  ],
-
-  views: [
-    { src: "pic/物品/ref_arrow_512.webp", cap: "箭矢 · 弓手投射物" },
-    { src: "pic/物品/斧子.webp", cap: "斧子 · 斧头投手投射物" },
-    { src: "pic/物品/抠图-1784812899152.webp", cap: "火焰 · 喷火塔效果" },
-    { src: "pic/物品/沼泽.webp", cap: "沼泽 · 地形技能" },
-    { src: "pic/物品/荆棘.webp", cap: "荆棘 · 地形技能" },
-    { src: "pic/物品/抠图-1784640332919.webp", cap: "炸弹花 · 爆炸投射物" },
-    { src: "pic/物品/抠图-1784774768047.webp", cap: "爆炸特效" },
-    { src: "pic/人物/hero_avatar.webp", cap: "英雄头像 · 面板" },
-  ],
-
-  structure: {
-    img: "pic/建筑/塔.webp",
-    note: "建筑体系 · 点击查看大图",
-    modules: ["剑士营", "射手营", "祭坛", "治疗之泉", "玉米田", "栅栏", "斧头投手塔", "喷火塔"],
-  },
-
+  process: [],
+  gallery: [],
+  details: [],
+  views: [],
+  structure: null,
   video: null,
   model: null,
-
-  specs: [
-    { label: "GAMEPLAY",  value: "经典塔防 · 建造与防守" },
-    { label: "CURRENCY",  value: "玉米 🌽" },
-    { label: "UNITS",     value: "20+ 角色 · 英雄 1 位" },
-    { label: "BUILDINGS", value: "18 个 · 可升级 3 级" },
-    { label: "ENEMY",     value: "6 类敌人 + BOSS" },
-    { label: "TOOLS",     value: "AI 绘画 · 逐帧动画" },
-  ],
+  specs: [],
 
   nextProject: { title: "近地轨道空间站", url: "../satellite/" },
 };
@@ -1302,27 +1326,45 @@ if (PROJECT.process && PROJECT.process.length) {
   });
 }
 
-// 画廊（瀑布流：Z 字顺序分两列，图片保持原始比例，参与 FIG 编号）
+// 分组图鉴：遍历 PROJECT.groups，每组 = 组标题 + 两列瀑布流（参与 FIG 编号）
 var gallery = document.getElementById('gallery');
 (function(){
-  var items = PROJECT.gallery || [];
-  if (!items.length) { gallery.closest('section').style.display = 'none'; return; }
-  var cols = [document.createElement('div'), document.createElement('div')];
-  cols[0].className = 'g-col';
-  cols[1].className = 'g-col';
-  items.forEach(function(item, i){
-    var d = document.createElement('div');
-    d.className = 'g-item';
-    d.innerHTML =
-      '<div class="g-img" data-zoom><img loading="lazy" alt=""></div>' +
-      '<div class="fig-cap"></div>';
-    d.querySelector('img').src = item.src;
-    d.querySelector('img').alt = item.caption || '';
-    renderFigCap(d.querySelector('.fig-cap'), item.caption);
-    cols[i % 2].appendChild(d);
+  var groups = PROJECT.groups || [];
+  if (!groups.length) { gallery.closest('section').style.display = 'none'; return; }
+  groups.forEach(function(group, gi){
+    var block = document.createElement('div');
+    block.className = 'group-block';
+
+    var label = document.createElement('div');
+    label.className = 'sec-label';
+    var enTxt = group.en ? group.en + ' · ' : '';
+    label.innerHTML = '<span class="sec-num">' + (gi < 9 ? '0' + (gi + 1) : gi + 1) + '</span>' + enTxt + group.name;
+
+    var title = document.createElement('h2');
+    title.className = 'section-title grad-text';
+    title.textContent = group.name;
+
+    var cols = [document.createElement('div'), document.createElement('div')];
+    cols[0].className = 'g-col';
+    cols[1].className = 'g-col';
+    (group.items || []).forEach(function(item, i){
+      var d = document.createElement('div');
+      d.className = 'g-item';
+      d.innerHTML =
+        '<div class="g-img" data-zoom><img loading="lazy" alt=""></div>' +
+        '<div class="fig-cap"></div>';
+      d.querySelector('img').src = item.src;
+      d.querySelector('img').alt = item.caption || '';
+      renderFigCap(d.querySelector('.fig-cap'), item.caption);
+      cols[i % 2].appendChild(d);
+    });
+
+    block.appendChild(label);
+    block.appendChild(title);
+    block.appendChild(cols[0]);
+    block.appendChild(cols[1]);
+    gallery.appendChild(block);
   });
-  gallery.appendChild(cols[0]);
-  gallery.appendChild(cols[1]);
 })();
 
 // 建筑一览（空数组不渲染）
@@ -1361,6 +1403,10 @@ if (PROJECT.views && PROJECT.views.length) {
 
 // 建筑体系
 var st = PROJECT.structure;
+if (!st) {
+  var stSec = document.querySelector('[data-block="structure"]');
+  if (stSec) stSec.style.display = 'none';
+}
 if (st) {
   document.getElementById('structureImg').src = st.img;
   document.getElementById('structureNote').textContent = st.note || '';
@@ -1471,7 +1517,11 @@ if (PROJECT.model && PROJECT.model.src) {
   }
 }
 
-// Specs
+// Specs（空数组隐藏区块）
+var specsSec = document.querySelector('[data-block="specs"]');
+if (!PROJECT.specs || !PROJECT.specs.length) {
+  if (specsSec) specsSec.style.display = 'none';
+}
 var specs = document.getElementById('specs');
 (PROJECT.specs || []).forEach(function(s){
   var d = document.createElement('div');

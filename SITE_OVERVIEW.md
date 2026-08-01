@@ -114,6 +114,9 @@ CSS/SVG 赛博朋克风格加载页，`z-index: 1000`。图层（从底到顶）
 | 近地轨道军事卫星设计图 | `卫星.webp` | 3D 建模 | 近地轨道军事卫星设计图 | 暂无 |
 | 星际飞船设计图 | `飞船.webp` | 3D 建模 | 星际飞船设计图 | 暂无 |
 | AI CAN BB（原名 AI奇葩说） | `ai-can-bb.webp`（官网截图） | AI奇葩说 | AI CAN BB | [官网](https://ai-summer.jonlab.cn) ↗ |
+| 玛雅塔防 · 美术预览 | `玛雅塔防.webp`（预览页截图） | 策略塔防游戏 | 玛雅塔防 · 美术预览 | [图鉴页](https://jonlab.cn/tower-preview/) ↗ |
+
+> tower-preview 已用 satellite 模板重做：数据驱动美术图鉴页（Hero → 图鉴 → 制作过程 → 单位图鉴 gallery → 建筑一览 details → 物品图鉴 views → 建筑体系 structure → 参数 specs），图片为 98 张 WebP（原 109.9MB → 5.2MB）
 
 - 纯黑底 `#000` + Unicorn Studio 动态背景（Project: `lEMBUE0ODtdPgc7dwRWz`，opacity 0.3）
 - 7 卡 flex 横排换行居中（`.mistake-gallery`，`max-width:1180px`，`gap:64px 60px`）
