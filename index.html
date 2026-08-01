@@ -269,6 +269,34 @@
       padding: 50px 0 20px;
     }
 
+    .gallery-group { width: 100%; margin-bottom: 3.5rem; }
+    .gallery-group:last-child { margin-bottom: 0; }
+    .gallery-group-title {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 2rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    .gallery-group-title .gg-num { color: rgba(255,255,255,0.65); font-variant-numeric: tabular-nums; }
+    .gallery-group-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+    }
+    .gallery-group-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 64px 60px;
+    }
+
     .mc-card-link {
       text-decoration: none;
       color: inherit;
@@ -276,7 +304,7 @@
       position: relative;
       z-index: 1;
     }
-    .mistake-gallery .mc-card-link:hover {
+    .gallery-group .mc-card-link:hover {
       z-index: 100;
     }
     .mc-card {
@@ -317,14 +345,16 @@
         0 34px 60px rgba(0, 0, 0, 0.32);
       z-index: 100;
     }
-    .mistake-gallery .mc-card-link:nth-child(1) .mc-card { --base: -7deg; }
-    .mistake-gallery .mc-card-link:nth-child(2) .mc-card { --base: 5deg; }
-    .mistake-gallery .mc-card-link:nth-child(3) .mc-card { --base: -4deg; }
-    .mistake-gallery > .mc-card:nth-child(4) { --base: 6deg; }
-    .mistake-gallery > .mc-card:nth-child(5) { --base: -3deg; }
-    .mistake-gallery > .mc-card:nth-child(6) { --base: 4deg; }
-    .mistake-gallery > .mc-card:nth-child(7) { --base: -5deg; }
-    .mistake-gallery .mc-card-link:nth-child(8) .mc-card { --base: 3deg; }
+    /* 作品组 5 张 */
+    .gallery-works .mc-card-link:nth-child(1) .mc-card { --base: -7deg; }
+    .gallery-works .mc-card-link:nth-child(2) .mc-card { --base: 5deg; }
+    .gallery-works .mc-card-link:nth-child(3) .mc-card { --base: -4deg; }
+    .gallery-works > .mc-card:nth-child(4) { --base: 6deg; }
+    .gallery-works .mc-card-link:nth-child(5) .mc-card { --base: 3deg; }
+    /* 设定集组 3 张 */
+    .gallery-artbooks .mc-card-link:nth-child(1) .mc-card { --base: -5deg; }
+    .gallery-artbooks .mc-card-link:nth-child(2) .mc-card { --base: 4deg; }
+    .gallery-artbooks .mc-card-link:nth-child(3) .mc-card { --base: -3deg; }
 
     .mc-photo {
       position: relative;
@@ -406,14 +436,14 @@
       z-index: 6;
       white-space: nowrap;
     }
-    .mistake-gallery .mc-card-link:nth-child(1) .mc-label { transform: rotate(-14deg); }
-    .mistake-gallery .mc-card-link:nth-child(2) .mc-label { transform: rotate(-16deg); }
-    .mistake-gallery .mc-card-link:nth-child(3) .mc-label { transform: rotate(-9deg); }
-    .mistake-gallery > .mc-card:nth-child(4) .mc-label { transform: rotate(-12deg); }
-    .mistake-gallery > .mc-card:nth-child(5) .mc-label { transform: rotate(-15deg); }
-    .mistake-gallery > .mc-card:nth-child(6) .mc-label { transform: rotate(-13deg); }
-    .mistake-gallery > .mc-card:nth-child(7) .mc-label { transform: rotate(-11deg); }
-    .mistake-gallery .mc-card-link:nth-child(8) .mc-label { transform: rotate(-10deg); }
+    .gallery-works .mc-card-link:nth-child(1) .mc-label { transform: rotate(-14deg); }
+    .gallery-works .mc-card-link:nth-child(2) .mc-label { transform: rotate(-16deg); }
+    .gallery-works .mc-card-link:nth-child(3) .mc-label { transform: rotate(-9deg); }
+    .gallery-works > .mc-card:nth-child(4) .mc-label { transform: rotate(-12deg); }
+    .gallery-works .mc-card-link:nth-child(5) .mc-label { transform: rotate(-10deg); }
+    .gallery-artbooks .mc-card-link:nth-child(1) .mc-label { transform: rotate(-13deg); }
+    .gallery-artbooks .mc-card-link:nth-child(2) .mc-label { transform: rotate(-15deg); }
+    .gallery-artbooks .mc-card-link:nth-child(3) .mc-label { transform: rotate(-11deg); }
 
     .mc-batch {
       margin-top: 13px;
@@ -424,6 +454,7 @@
 
     @media (max-width: 560px) {
       .mistake-gallery { gap: 56px 28px; }
+      .gallery-group-grid { gap: 56px 28px; }
       .mc-card { width: 100%; max-width: 360px; }
     }
     /* ===== Thanks Section ===== */
@@ -879,7 +910,10 @@
     </div>
     <div class="portfolio-inner">
       <div class="mistake-gallery" id="mistakeGallery" role="region" aria-label="作品卡片画廊">
-        <a class="mc-card-link" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&amp;vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener noreferrer">
+              <div class="gallery-group gallery-works">
+        <div class="gallery-group-title"><span class="gg-num">01</span>WORKS · 作品</div>
+        <div class="gallery-group-grid">
+<a class="mc-card-link" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&amp;vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener noreferrer">
         <article class="mc-card">
           <div class="mc-tape"></div>
           <div class="mc-photo">
@@ -925,7 +959,24 @@
           <p class="mc-batch">玉米·黄金·美洲豹</p>
         </article>
 
-        <a class="mc-card-link" href="/tower-preview/" rel="noopener noreferrer">
+<a class="mc-card-link" href="https://ai-summer.jonlab.cn" target="_blank" rel="noopener noreferrer">
+        <article class="mc-card">
+          <div class="mc-tape"></div>
+          <div class="mc-photo">
+            <img src="pic/作品封面/ai-can-bb.webp" alt="AI CAN BB" loading="lazy" />
+          </div>
+          <span class="mc-label">AI奇葩说</span>
+
+          <p class="mc-batch">AI CAN BB</p>
+        </article>
+        </a>
+
+                </div>
+      </div>
+      <div class="gallery-group gallery-artbooks">
+        <div class="gallery-group-title"><span class="gg-num">02</span>ARTBOOKS · 设定集</div>
+        <div class="gallery-group-grid">
+<a class="mc-card-link" href="/tower-preview/" rel="noopener noreferrer">
         <article class="mc-card">
           <div class="mc-tape"></div>
           <div class="mc-photo">
@@ -961,17 +1012,9 @@
         </article>
         </a>
 
-        <a class="mc-card-link" href="https://ai-summer.jonlab.cn" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/ai-can-bb.webp" alt="AI CAN BB" loading="lazy" />
-          </div>
-          <span class="mc-label">AI奇葩说</span>
-
-          <p class="mc-batch">AI CAN BB</p>
-        </article>
-        </a>
+        
+        </div>
+      </div>
       </div>
 
     </div>
