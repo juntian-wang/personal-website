@@ -486,12 +486,13 @@
     ITEMS.push({ src: 'assets/doodle-' + n + '.webp', name: '涂鸦 · ' + n });
   }
 
-  // ===== 渲染图集（马赛克拼贴：第 5/13/21 张占 2×2 大图） =====
+  // ===== 渲染图集（马赛克拼贴：第 5/12/13 张占 2×2 大图） =====
+  var BIG = { 4: 1, 11: 1, 12: 1 };  // idx 对应第 5、12、13 张
   var masonry = document.getElementById('masonry');
   ITEMS.forEach(function (item, idx) {
     var d = document.createElement('div');
     d.className = 'g-item reveal';
-    if (idx % 8 === 4) d.className += ' big';
+    if (BIG[idx]) d.className += ' big';
     d.innerHTML =
       '<div class="g-img"><img loading="lazy" alt=""></div>' +
       '<div class="fig-cap"><span class="fig-num"></span><span class="fig-text"></span></div>';
