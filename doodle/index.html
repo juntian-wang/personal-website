@@ -185,10 +185,13 @@
     margin: 0 auto;
     padding: 0.5rem 2rem 5rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem 1.8rem;
     align-items: start;
   }
+  /* 瀑布错落：第 2、4 列整体下移，形成阶梯节奏 */
+  .g-item:nth-child(4n+2),
+  .g-item:nth-child(4n+4) { margin-top: 2.2rem; }
   .g-item { cursor: zoom-in; }
   .g-item .g-img {
     border-radius: 10px;
@@ -377,6 +380,12 @@
   .lb-next { right: 1.4rem; }
 
   /* ===== 响应式 ===== */
+  @media (max-width: 1024px) {
+    .gallery-masonry { grid-template-columns: repeat(3, 1fr); }
+    .g-item:nth-child(3n+2) { margin-top: 2.2rem; }
+    .g-item:nth-child(4n+2),
+    .g-item:nth-child(4n+4) { margin-top: 0; }
+  }
   @media (max-width: 640px) {
     .nav { padding: 0.9rem 1rem; }
     .gallery-head { padding: 4rem 1rem 2rem; }
@@ -384,6 +393,8 @@
     .about-brief { flex-direction: column; gap: 1.6rem; }
     .about-facts { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 1.2rem; }
     .gallery-masonry { grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1rem; padding: 0.5rem 1rem 4rem; }
+    .g-item:nth-child(2n) { margin-top: 1.6rem; }
+    .g-item:nth-child(3n+2) { margin-top: 0; }
     .lb-prev { left: 0.8rem; }
     .lb-next { right: 0.8rem; }
     .lightbox img { max-width: 92vw; }
