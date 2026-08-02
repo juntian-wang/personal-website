@@ -186,12 +186,12 @@
     padding: 0.5rem 2rem 5rem;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2rem 1.8rem;
+    gap: 1.4rem;
     align-items: start;
+    grid-auto-flow: dense;
   }
-  /* 瀑布错落：第 2、4 列整体下移，形成阶梯节奏 */
-  .g-item:nth-child(4n+2),
-  .g-item:nth-child(4n+4) { margin-top: 2.2rem; }
+  /* 马赛克拼贴：每 8 张 1 张大图占 2×2 格 */
+  .g-item.big { grid-column: span 2; grid-row: span 2; }
   .g-item { cursor: zoom-in; }
   .g-item .g-img {
     border-radius: 10px;
@@ -382,9 +382,6 @@
   /* ===== 响应式 ===== */
   @media (max-width: 1024px) {
     .gallery-masonry { grid-template-columns: repeat(3, 1fr); }
-    .g-item:nth-child(3n+2) { margin-top: 2.2rem; }
-    .g-item:nth-child(4n+2),
-    .g-item:nth-child(4n+4) { margin-top: 0; }
   }
   @media (max-width: 640px) {
     .nav { padding: 0.9rem 1rem; }
@@ -392,9 +389,7 @@
     .about { padding: 0.5rem 1rem 2.5rem; }
     .about-brief { flex-direction: column; gap: 1.6rem; }
     .about-facts { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 1.2rem; }
-    .gallery-masonry { grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1rem; padding: 0.5rem 1rem 4rem; }
-    .g-item:nth-child(2n) { margin-top: 1.6rem; }
-    .g-item:nth-child(3n+2) { margin-top: 0; }
+    .gallery-masonry { grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 0.5rem 1rem 4rem; }
     .lb-prev { left: 0.8rem; }
     .lb-next { right: 0.8rem; }
     .lightbox img { max-width: 92vw; }
@@ -491,11 +486,12 @@
     ITEMS.push({ src: 'assets/doodle-' + n + '.webp', name: '涂鸦 · ' + n });
   }
 
-  // ===== 渲染图集（全部小卡片网格，直接顺序排列） =====
+  // ===== 渲染图集（马赛克拼贴：第 5/13/21 张占 2×2 大图） =====
   var masonry = document.getElementById('masonry');
   ITEMS.forEach(function (item, idx) {
     var d = document.createElement('div');
     d.className = 'g-item reveal';
+    if (idx % 8 === 4) d.className += ' big';
     d.innerHTML =
       '<div class="g-img"><img loading="lazy" alt=""></div>' +
       '<div class="fig-cap"><span class="fig-num"></span><span class="fig-text"></span></div>';
