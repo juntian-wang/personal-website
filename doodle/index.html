@@ -12,6 +12,7 @@
 
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
     background: #000;
@@ -21,6 +22,26 @@
   }
   a { color: inherit; }
   img { display: block; max-width: 100%; }
+
+  /* ===== 巨型描边背景字（区块氛围） ===== */
+  .bg-word {
+    position: absolute;
+    top: 1.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    text-align: center;
+    font-size: clamp(4rem, 13vw, 10rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.09);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
 
   /* ===== 顶部栏 ===== */
   .nav {
@@ -61,11 +82,25 @@
 
   /* ===== 图集标题 ===== */
   .gallery-head {
-    padding: 3.5rem 2rem 2rem;
+    position: relative;
+    padding: 5.5rem 2rem 2.5rem;
     text-align: center;
+    overflow: hidden;
+  }
+  .gallery-head .sec-label {
+    position: relative;
+    z-index: 1;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 0.9rem;
   }
   .gallery-head h1 {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    position: relative;
+    z-index: 1;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.35) 100%);
@@ -74,7 +109,9 @@
     background-clip: text;
   }
   .gallery-head p {
-    margin-top: 0.6rem;
+    position: relative;
+    z-index: 1;
+    margin-top: 0.8rem;
     font-size: 0.85rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -85,7 +122,7 @@
   .about {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 1rem 2rem 2.5rem;
+    padding: 1rem 2rem 3.5rem;
   }
   .sec-label {
     font-size: 0.7rem;
@@ -141,38 +178,66 @@
     color: rgba(255,255,255,0.85);
     line-height: 1.5;
   }
-  @media (max-width: 640px) {
-    .about { padding: 0.5rem 1rem 2rem; }
-    .about-brief { flex-direction: column; gap: 1.6rem; }
-    .about-facts { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 1.2rem; }
-  }
 
-  /* ===== 图集网格 ===== */
-  .doodle-grid {
+  /* ===== 图集瀑布流 ===== */
+  .gallery-masonry {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 1rem 2rem 5rem;
+    padding: 0.5rem 2rem 5rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.2rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+    align-items: start;
   }
-  .doodle-grid figure {
-    cursor: zoom-in;
-    border-radius: 8px;
+  .g-col { display: flex; flex-direction: column; gap: 2.6rem; }
+  /* 第二列整体下移，形成错落节奏 */
+  .g-col:nth-child(2) { margin-top: 3.5rem; }
+  .g-item { cursor: zoom-in; }
+  .g-item .g-img {
+    border-radius: 10px;
     overflow: hidden;
     background: #0a0a0a;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
   }
-  .doodle-grid img {
+  .g-item .g-img img {
     width: 100%;
     height: auto;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .doodle-grid figure:hover img { transform: scale(1.03); }
+  .g-item:hover .g-img img { transform: scale(1.03); }
+  .g-item:hover .g-img { outline: 1px solid rgba(255,255,255,0.14); outline-offset: 3px; }
+  /* 第 1 张封面大图跨两列 */
+  .g-item.g-hero { grid-column: 1 / -1; }
+  /* FIG 编号图注 */
+  .fig-cap {
+    margin-top: 0.7rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.45);
+    transition: color 0.25s ease;
+  }
+  .g-item:hover .fig-cap { color: rgba(255,255,255,0.8); }
+  .fig-cap .fig-num {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.3);
+    font-variant-numeric: tabular-nums;
+  }
+  .g-item:hover .fig-num { color: rgba(255,255,255,0.65); }
 
-  @media (max-width: 640px) {
-    .doodle-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 0.5rem 1rem 3rem; }
-    .gallery-head { padding: 2.5rem 1rem 1.5rem; }
-    .nav { padding: 0.9rem 1rem; }
+  /* ===== 滚动渐入 ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
   }
 
   /* ===== 底部导航（与其它详情页一致） ===== */
@@ -204,9 +269,6 @@
   }
   .back-nav a:hover, .back-nav button:hover { color: #fff; border-color: rgba(255,255,255,0.45); }
   .back-nav svg { width: 15px; height: 15px; }
-  @media (max-width: 560px) {
-    .back-nav { padding: 3.5rem 1.3rem 1.5rem; }
-  }
 
   /* ===== 底部版权 + 社媒 ===== */
   .doodle-footer {
@@ -233,12 +295,8 @@
   }
   .df-links a:hover { color: #fff; }
   .df-links svg { width: 16px; height: 16px; }
-  @media (max-width: 560px) {
-    .doodle-footer { justify-content: center; text-align: center; }
-    .df-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
-  }
 
-  /* ===== Lightbox 点击放大 ===== */
+  /* ===== Lightbox ===== */
   .lightbox {
     position: fixed;
     inset: 0;
@@ -246,20 +304,37 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0,0,0,0.93);
     cursor: zoom-out;
   }
   .lightbox.is-open { display: flex; }
+  .lb-stage { position: relative; display: flex; align-items: center; justify-content: center; }
   .lightbox img {
-    max-width: 92vw;
-    max-height: 92vh;
+    max-width: 88vw;
+    max-height: 84vh;
     border-radius: 6px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.6);
   }
-  .lightbox-close {
+  .lb-top {
     position: absolute;
     top: 1.2rem;
-    right: 1.4rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.6rem;
+    pointer-events: none;
+  }
+  .lb-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.45);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-close {
+    pointer-events: auto;
     width: 40px;
     height: 40px;
     display: flex;
@@ -268,11 +343,64 @@
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.2);
     color: rgba(255,255,255,0.7);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  .lightbox-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .lb-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .lb-caption {
+    position: absolute;
+    bottom: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+  }
+  .lb-nav {
+    pointer-events: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(0,0,0,0.3);
+    color: rgba(255,255,255,0.75);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .lb-nav:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .lb-prev { left: 1.4rem; }
+  .lb-next { right: 1.4rem; }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 640px) {
+    .nav { padding: 0.9rem 1rem; }
+    .gallery-head { padding: 4rem 1rem 2rem; }
+    .about { padding: 0.5rem 1rem 2.5rem; }
+    .about-brief { flex-direction: column; gap: 1.6rem; }
+    .about-facts { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 1.2rem; }
+    .gallery-masonry { grid-template-columns: 1fr; gap: 0; padding: 0.5rem 1rem 4rem; }
+    .g-col { gap: 1.8rem; }
+    .g-col:nth-child(2) { margin-top: 0; }
+    .g-item.g-hero { grid-column: 1; }
+    .lb-prev { left: 0.8rem; }
+    .lb-next { right: 0.8rem; }
+    .lightbox img { max-width: 92vw; }
+  }
+  @media (max-width: 560px) {
+    .back-nav { padding: 3.5rem 1.3rem 1.5rem; }
+    .doodle-footer { justify-content: center; text-align: center; }
+    .df-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  }
 </style>
 </head>
 <body>
@@ -286,11 +414,13 @@
 </nav>
 
 <header class="gallery-head">
+  <div class="bg-word">DOODLES</div>
+  <div class="sec-label">ARTBOOK · 设定集</div>
   <h1>涂鸦</h1>
   <p>DOODLES · 随手画的小画</p>
 </header>
 
-<section class="about">
+<section class="about reveal">
   <div class="sec-label">OVERVIEW</div>
   <h2 class="about-title">关于这件作品</h2>
   <div class="about-brief">
@@ -306,9 +436,9 @@
   </div>
 </section>
 
-<main class="doodle-grid" id="grid"></main>
+<div class="gallery-masonry" id="masonry"></div>
 
-<nav class="back-nav">
+<nav class="back-nav reveal">
   <a href="https://jonlab.cn/?from=detail#portfolio">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     返回作品集
@@ -338,34 +468,95 @@
 </footer>
 
 <div class="lightbox" id="lightbox">
-  <div class="lightbox-close" id="lbClose">✕</div>
-  <img id="lbImg" src="" alt="" />
+  <div class="lb-top">
+    <span class="lb-count" id="lbCount">01 / 25</span>
+    <div class="lb-close" id="lbClose">✕</div>
+  </div>
+  <div class="lb-stage">
+    <div class="lb-nav lb-prev" id="lbPrev">‹</div>
+    <img id="lbImg" src="" alt="" />
+    <div class="lb-nav lb-next" id="lbNext">›</div>
+  </div>
+  <div class="lb-caption" id="lbCaption"></div>
 </div>
 
 <script>
   var TOTAL = 25;
-  var grid = document.getElementById('grid');
+  var ITEMS = [];
   for (var i = 1; i <= TOTAL; i++) {
-    var fig = document.createElement('figure');
-    var img = document.createElement('img');
     var n = i < 10 ? '0' + i : i;
-    img.src = 'assets/doodle-' + n + '.webp';
-    img.alt = '涂鸦 · ' + n;
-    img.loading = 'lazy';
-    img.addEventListener('click', function () {
-      document.getElementById('lbImg').src = this.src;
-      document.getElementById('lightbox').classList.add('is-open');
-    });
-    fig.appendChild(img);
-    grid.appendChild(fig);
+    ITEMS.push({ src: 'assets/doodle-' + n + '.webp', name: '涂鸦 · ' + n });
   }
 
-  // Lightbox 关闭
+  // ===== 渲染两列瀑布流（第 1 张跨列大图） =====
+  var masonry = document.getElementById('masonry');
+  var cols = [document.createElement('div'), document.createElement('div')];
+  cols[0].className = 'g-col';
+  cols[1].className = 'g-col';
+
+  ITEMS.forEach(function (item, idx) {
+    var d = document.createElement('div');
+    d.className = 'g-item reveal';
+    if (idx === 0) d.className += ' g-hero';
+    d.innerHTML =
+      '<div class="g-img"><img loading="lazy" alt=""></div>' +
+      '<div class="fig-cap"><span class="fig-num"></span><span class="fig-text"></span></div>';
+    d.querySelector('img').src = item.src;
+    d.querySelector('img').alt = item.name;
+    d.querySelector('.fig-num').textContent = 'FIG. ' + (idx < 9 ? '0' + (idx + 1) : idx + 1);
+    d.querySelector('.fig-text').textContent = item.name;
+    d.addEventListener('click', function () { openLb(idx); });
+    // 第 1 张跨两列：独占一行；其余交替分列
+    if (idx === 0) {
+      masonry.appendChild(d);
+    } else {
+      cols[(idx - 1) % 2].appendChild(d);
+    }
+  });
+  masonry.appendChild(cols[0]);
+  masonry.appendChild(cols[1]);
+
+  // ===== 滚动渐入 =====
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  // ===== 灯箱 =====
   var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  var lbCount = document.getElementById('lbCount');
+  var lbCaption = document.getElementById('lbCaption');
+  var cur = 0;
+
+  function openLb(idx) {
+    cur = idx;
+    updateLb();
+    lb.classList.add('is-open');
+  }
   function closeLb() { lb.classList.remove('is-open'); }
-  lb.addEventListener('click', closeLb);
+  function stepLb(dir) {
+    cur = (cur + dir + TOTAL) % TOTAL;
+    updateLb();
+  }
+  function updateLb() {
+    lbImg.src = ITEMS[cur].src;
+    lbCount.textContent = (cur < 9 ? '0' + (cur + 1) : cur + 1) + ' / ' + TOTAL;
+    lbCaption.textContent = ITEMS[cur].name;
+  }
+
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
   document.getElementById('lbClose').addEventListener('click', function (e) { e.stopPropagation(); closeLb(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
+  document.getElementById('lbPrev').addEventListener('click', function (e) { e.stopPropagation(); stepLb(-1); });
+  document.getElementById('lbNext').addEventListener('click', function (e) { e.stopPropagation(); stepLb(1); });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') stepLb(-1);
+    if (e.key === 'ArrowRight') stepLb(1);
+  });
 </script>
 
 </body>
