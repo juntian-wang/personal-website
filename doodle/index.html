@@ -185,13 +185,10 @@
     margin: 0 auto;
     padding: 0.5rem 2rem 5rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 2rem 1.8rem;
     align-items: start;
   }
-  .g-col { display: flex; flex-direction: column; gap: 2.6rem; }
-  /* 第二列整体下移，形成错落节奏 */
-  .g-col:nth-child(2) { margin-top: 3.5rem; }
   .g-item { cursor: zoom-in; }
   .g-item .g-img {
     border-radius: 10px;
@@ -206,8 +203,6 @@
   }
   .g-item:hover .g-img img { transform: scale(1.03); }
   .g-item:hover .g-img { outline: 1px solid rgba(255,255,255,0.14); outline-offset: 3px; }
-  /* 第 1 张封面大图跨两列 */
-  .g-item.g-hero { grid-column: 1 / -1; }
   /* FIG 编号图注 */
   .fig-cap {
     margin-top: 0.7rem;
@@ -388,10 +383,7 @@
     .about { padding: 0.5rem 1rem 2.5rem; }
     .about-brief { flex-direction: column; gap: 1.6rem; }
     .about-facts { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 1.2rem; }
-    .gallery-masonry { grid-template-columns: 1fr; gap: 0; padding: 0.5rem 1rem 4rem; }
-    .g-col { gap: 1.8rem; }
-    .g-col:nth-child(2) { margin-top: 0; }
-    .g-item.g-hero { grid-column: 1; }
+    .gallery-masonry { grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1rem; padding: 0.5rem 1rem 4rem; }
     .lb-prev { left: 0.8rem; }
     .lb-next { right: 0.8rem; }
     .lightbox img { max-width: 92vw; }
@@ -488,16 +480,11 @@
     ITEMS.push({ src: 'assets/doodle-' + n + '.webp', name: '涂鸦 · ' + n });
   }
 
-  // ===== 渲染两列瀑布流（第 1 张跨列大图） =====
+  // ===== 渲染图集（全部小卡片网格，直接顺序排列） =====
   var masonry = document.getElementById('masonry');
-  var cols = [document.createElement('div'), document.createElement('div')];
-  cols[0].className = 'g-col';
-  cols[1].className = 'g-col';
-
   ITEMS.forEach(function (item, idx) {
     var d = document.createElement('div');
     d.className = 'g-item reveal';
-    if (idx === 0) d.className += ' g-hero';
     d.innerHTML =
       '<div class="g-img"><img loading="lazy" alt=""></div>' +
       '<div class="fig-cap"><span class="fig-num"></span><span class="fig-text"></span></div>';
@@ -506,15 +493,8 @@
     d.querySelector('.fig-num').textContent = 'FIG. ' + (idx < 9 ? '0' + (idx + 1) : idx + 1);
     d.querySelector('.fig-text').textContent = item.name;
     d.addEventListener('click', function () { openLb(idx); });
-    // 第 1 张跨两列：独占一行；其余交替分列
-    if (idx === 0) {
-      masonry.appendChild(d);
-    } else {
-      cols[(idx - 1) % 2].appendChild(d);
-    }
+    masonry.appendChild(d);
   });
-  masonry.appendChild(cols[0]);
-  masonry.appendChild(cols[1]);
 
   // ===== 滚动渐入 =====
   var io = new IntersectionObserver(function (entries) {
