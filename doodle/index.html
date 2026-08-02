@@ -486,8 +486,8 @@
     ITEMS.push({ src: 'assets/doodle-' + n + '.webp', name: '涂鸦 · ' + n });
   }
 
-  // ===== 渲染图集（马赛克拼贴：第 5/12/13 张占 2×2 大图） =====
-  var BIG = { 4: 1, 11: 1, 12: 1 };  // idx 对应第 5、12、13 张
+  // ===== 渲染图集（马赛克拼贴：第 5/12/13/21 张占 2×2 大图） =====
+  var BIG = { 4: 1, 11: 1, 12: 1, 20: 1 };  // idx 对应第 5、12、13、21 张
   var masonry = document.getElementById('masonry');
   ITEMS.forEach(function (item, idx) {
     var d = document.createElement('div');
