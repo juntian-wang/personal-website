@@ -210,17 +210,219 @@
       }
     }
 
+    /* ===== Let's go. 过渡页 + 作品卡片堆叠（视频板块之后） ===== */
+    /* Bebas Neue 本地字体：展示大字号稳定渲染 */
+    @font-face {
+      font-family: "Bebas Neue";
+      src: url("fonts/BebasNeue-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+
+    /* ---- Transition page: black -> gray, "Let's go." ---- */
+    .transition-page {
+      height: 200vh;
+      background: #877d7d; /* 与视频最后一帧背景色一致（灰棕） */
+      position: relative;
+    }
+    .letsgo-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .letsgo-wrap h2 {
+      font-family: "Bebas Neue", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: clamp(8rem, 30vw, 27rem);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      line-height: 0.9;
+      color: #ffffff;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    /* ---- Card Stack (sticky) ---- */
+    .g_component_layout {
+      position: relative;
+      width: 100%;
+    }
+
+    .slide-wrapper {
+      position: sticky;
+      top: 0;
+      height: 75vh;
+      width: 100%;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      /* 2026-08-04: 移除 perspective —— 3D 上下文会把卡片区提升为 GPU 合成层，
+         无视 z-index 盖住设定集图片；收走动画改用纯 2D（rotationZ+scale） */
+    }
+    .slide-wrapper[data-index="0"] { background: #000000; } /* 过渡页结束色（黑） */
+    .slide-wrapper[data-index="1"] { background: #0a0a0a; }
+    .slide-wrapper[data-index="2"] { background: #e9e6df; }
+    .slide-wrapper[data-index="3"] { background: #877d7d; } /* 卡片2（诗词）背景 */
+    .slide-wrapper[data-index="4"] { background: #e9e6df; }
+    /* Spacer: 最后一张 sticky 卡片（城市植物）的停留窗口（2/3 屏 ≈ 收走区间长度）。
+       没有它，最后一个 wrapper 刚 sticky 就被父容器底部推出，收走时直接滚出视口 */
+    .stack-spacer {
+      height: 66.67vh;
+      width: 100%;
+    }
+    .card_stack_component {
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      /* 2026-08-04: 移除 preserve-3d（与 wrapper perspective 配套的 3D 上下文，同因移除） */
+    }
+    .card_stack_component.card-transparent { background: #0a0a0a; } /* p1 dark */
+    .card_stack_component.card-pink { background: #e9e6df; }        /* 疆域：白底（kraft） */
+    .card_stack_component.card-white { background: #877d7d; }       /* 诗词：与 Let's go 初始色一致（灰棕） */
+    .card_stack_component.card-4 { background: #e9e6df; }           /* p4 light */
+    .card_stack_component.card-5 { background: #0a0a0a; }           /* p5 dark */
+    /* 浅色卡（card-pink 疆域 / card-4 AI CAN BB）：深色文字规则 */
+    .card_stack_component.card-pink h2,
+    .card_stack_component.card-4 h2 { color: #0a0a0a; }
+    .card_stack_component.card-pink .card-desc p,
+    .card_stack_component.card-4 .card-desc p { color: #7c776f; }
+    .card_stack_component.card-pink .request-btn,
+    .card_stack_component.card-4 .request-btn { border-color: #0a0a0a; color: #0a0a0a; }
+    .card_stack_component.card-pink .request-btn:hover,
+    .card_stack_component.card-4 .request-btn:hover {
+      background: #c23a52;
+      border-color: #c23a52;
+      color: #ffffff;
+    }
+    .card_stack_layout {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 80px;
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 38px;
+    }
+    .card_stack_content {
+      flex: 0 0 488px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+      padding: 48px 0;
+    }
+    .g_heading h2 {
+      font-size: clamp(3rem, 5.85vw, 5.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .card-desc { margin-top: 1.6rem; }
+    .card-desc p {
+      font-size: clamp(1.05rem, 1.25vw, 1.3rem);
+      font-weight: 400;
+      line-height: 1.5;
+      max-width: 46ch;
+      color: rgba(255, 255, 255, 0.65);
+    }
+    .fade-line { overflow: hidden; }
+    .card_button-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .request-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.95rem 1.5rem;
+      border: 1.5px solid #ffffff;
+      border-radius: 100px;
+      background: transparent;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.35rem;
+      font-weight: 400;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .request-btn:hover {
+      background: #ffe86e;
+      border-color: #ffe86e;
+      color: #0a0a0a;
+    }
+    .request-btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .card_stack_img_wrap {
+      flex: 0 0 700px;
+      aspect-ratio: 3 / 2;
+      align-self: flex-start;
+      margin-top: 48px;
+      position: relative;
+      overflow: hidden;
+      will-change: transform;
+    }
+    /* 双铃坠卡片（卡片 0）：封面与视频均为 16:9（原始比例不裁切），容器适配 16:9 零裁切 */
+    .slide-wrapper[data-index="0"] .card_stack_img_wrap {
+      aspect-ratio: 16 / 9;
+    }
+    /* 诗词地图卡片（卡片 2）：封面与视频均为 16:9，容器适配 16:9 使两者完整显示零裁切 */
+    .slide-wrapper[data-index="2"] .card_stack_img_wrap {
+      aspect-ratio: 16 / 9;
+    }
+    /* 疆域地图卡片（卡片 1）：封面与视频均为 16:9，容器适配 16:9 零裁切 */
+    .slide-wrapper[data-index="1"] .card_stack_img_wrap {
+      aspect-ratio: 16 / 9;
+    }
+    .card_stack_img_wrap img,
+    .card_stack_img_wrap video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform-origin: 100% 0%; /* top-right corner */
+    }
+    /* 双铃坠卡片：封面放大后淡入并自动播放动画视频。
+       容器已适配 4:3，封面/视频均 cover 完整显示、零裁切、零留边 */
+    .card_stack_img_wrap video {
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    @media (max-width: 991px) {
+      .card_stack_layout { flex-direction: column-reverse; gap: 2rem; text-align: center; }
+      .card_stack_content { flex: none; width: 100%; min-height: auto; align-items: center; }
+      .card_stack_img_wrap { width: 100%; aspect-ratio: 16/10; }
+    }
+
     /* ===== Portfolio ===== */
     .portfolio {
       position: relative;
+      /* 2026-08-04: position: relative + overflow: clip 会创建层叠上下文（CSS2.1 规则），
+         整个 portfolio 被封装进 auto 层级，wrapper4（z5）反而压住顶部图片（z20）。
+         加 z-index: 10 使 portfolio 整体高于卡片堆叠（z1-5），图片推上来时才能盖住卡片 */
+      z-index: 10;
       width: 100%;
       padding: 0 2rem 6rem;
       background: #000;
-      overflow: clip;
-      transform: translateY(var(--sec-p, 0px));
-      will-change: transform;
+      /* 2026-08-04: 移除 overflow: clip —— 顶部图片推升 transform 超出 portfolio 上边界时会被裁剪（不显示）；
+         保留 z-index 10 使 portfolio 整体高于卡片堆叠 */
     }
     .portfolio-top-img-wrap {
+      position: relative;
+      z-index: 20; /* 盖住卡片堆叠（z-index 1-5）：城市植物卡收走时推上来覆盖 */
       margin-left: -2rem;
       width: calc(100% + 4rem);
       overflow: hidden;
@@ -275,19 +477,21 @@
       display: flex;
       align-items: center;
       gap: 0.9rem;
-      margin-bottom: 2rem;
+      margin-bottom: 3.5rem; /* 2026-08-04 与卡片间距加大，避免过近 */
       font-size: 0.78rem;
       font-weight: 600;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
+      color: rgba(255,255,255,0.88); /* 2026-08-04 更突出 */
+      position: relative;
+      z-index: 5; /* 标题在 hover 上浮的卡片之上 */
     }
     .gallery-group-title .gg-num { color: rgba(255,255,255,0.65); font-variant-numeric: tabular-nums; }
     .gallery-group-title::after {
       content: '';
       flex: 1;
       height: 1px;
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.3); /* 2026-08-04 更突出 */
     }
     .gallery-group-grid {
       display: flex;
@@ -386,7 +590,8 @@
       font-weight: 500;
       letter-spacing: 0.08em;
     }
-    .mc-photo img {
+    .mc-photo img,
+    .mc-photo video {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -693,7 +898,149 @@
     }
 
     /* (已移除 --sec-p 整屏位移：sticky 导致作品集看起来像独立滑窗) */
+
+    /* ================= 涂鸦墙（随手画）================= */
+    #dwSection {
+      position: relative;
+      height: 180vh;          /* 提供滚动停留空间 */
+      background: #000;       /* 与设定集板块（.portfolio）背景一致，纯黑 */
+    }
+    #dwViewport {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* 2026-08-04 顶部渐隐遮罩：tile 漂到标题区域时淡出，不与标题重叠 */
+    #dwViewport::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 130px;
+      z-index: 99; /* 标题 z-index 100 之上可见，tile 之下被遮挡 */
+      background: linear-gradient(to bottom, rgba(10,10,13,0.92) 0%, rgba(10,10,13,0.5) 45%, transparent 100%);
+      pointer-events: none;
+    }
+    #dwWall {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4.5vw;
+      will-change: transform;
+    }
+    .dw-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4.5vw;
+      flex-shrink: 0;
+    }
+    .dw-row {
+      display: flex;
+      gap: 4.5vw;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      align-items: flex-start; /* 防止瓦片被 flex 拉伸，保持正方形 */
+    }
+    .dw-tile {
+      position: relative;
+      flex-shrink: 0;
+      width: 12vw;
+      aspect-ratio: 1 / 1;
+      border: 5px solid rgba(255,255,255,0.6);
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      background: rgba(255,255,255,0.04);
+      transform: translateZ(0);
+      transition: transform 0.5s cubic-bezier(0.22, 0.6, 0.2, 1);
+    }
+    .dw-tile:hover { transform: scale(1.07); z-index: 5; }
+    body.dw-dragging .dw-tile,
+    body.dw-dragging .dw-tile:hover { transform: none; transition: none; z-index: auto; }
+    .dw-tile img,
+    .dw-tile video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;   /* 完整显示，绝不裁切 */
+      pointer-events: none;
+      -webkit-user-drag: none;
+      user-select: none;
+      filter: saturate(0.92) brightness(0.96);
+      transition: filter 0.5s;
+    }
+    .dw-tile:hover img,
+    .dw-tile:hover video { filter: saturate(1.1) brightness(1.06); }
+    #dwHeader {
+      position: absolute;
+      top: 34px; /* 2026-08-04 下移，避免与漂移的 tile 重叠 */
+      left: max(2rem, calc((100vw - 1100px) / 2)); /* 与设定集内容区(1100px 居中)左缘对齐 */
+      right: 26px;               /* 横线可延伸至右缘 */
+      z-index: 100;
+      pointer-events: none;
+      display: flex;             /* 与「设定集」标题同形式：文字 + 右侧横线 */
+      align-items: center;
+      gap: 0.9rem;
+      color: rgba(255,255,255,0.88); /* 2026-08-04 更突出 */
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    #dwHeader::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.3); /* 2026-08-04 更突出 */
+    }
+    #dwHint {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      pointer-events: none;
+      color: rgba(255,255,255,0.35);
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      transition: opacity 2s ease;
+    }
+    #dwLightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 8, 10, 0.88);
+      cursor: zoom-out;
+    }
+    #dwLightbox.open { display: flex; }
+    #dwLightbox img,
+    #dwLightbox video {
+      max-width: 82vw;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 24px 90px rgba(0,0,0,0.65);
+      animation: dwLbIn 0.25s cubic-bezier(0.22, 0.9, 0.3, 1);
+      background: #000;
+    }
+    @keyframes dwLbIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
   </style>
+
+  <!-- 本地化的动效库（GSAP + ScrollTrigger + SplitText + Lenis），不依赖外部 CDN -->
+  <script src="gsap.min.js"></script>
+  <script src="gsap.ScrollTrigger.min.js"></script>
+  <script src="gsap.SplitText.min.js"></script>
+  <script src="lenis.min.js"></script>
 </head>
 <body>
 
@@ -903,6 +1250,144 @@
     </div>
   </section>
 
+  <!-- ===== Let's go. 过渡页（视频板块之后的承转） ===== -->
+  <section class="transition-page"></section>
+
+  <!-- Fixed "Let's go." text — glued to viewport bottom while it grows -->
+  <div class="letsgo-wrap">
+    <h2><span data-squeeze>Let's</span> <span data-squeeze>go.</span></h2>
+  </div>
+
+  <!-- ===== 作品卡片堆叠（Let's go. 之后、作品集画廊之前） ===== -->
+  <section class="card-stack-section">
+    <div class="g_component_layout" id="cardStack">
+
+      <!-- Card 0: 双铃坠 -->
+      <div class="slide-wrapper" data-index="0">
+        <div class="card_stack_component card-transparent">
+          <div class="card_stack_layout">
+            <div class="card_stack_content">
+              <div data-animate-heading="line-fade-in" class="g_heading">
+                <h2>双铃坠</h2>
+              </div>
+              <div class="card_button-wrapper">
+                <a class="request-btn" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&amp;vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener noreferrer">
+                  来看动画
+                  <svg viewBox="0 0 16 17" fill="none"><path d="M12.175 9.5H0V7.5H12.175L6.575 1.9 8 0.5 16 8.5 8 16.5 6.575 15.1 12.175 9.5Z" fill="currentColor"/></svg>
+                </a>
+                <div class="card-desc"><p>漕运船工陈砚的父亲被贪官陷害冤死，只留下一对「忠」「勇」双铃。他蛰伏多年，夜探、越狱、上京，把冤屈一路告到金銮殿上——公道和性命，只能选一个。</p></div>
+              </div>
+            </div>
+            <div class="card_stack_img_wrap" data-gsap-image="scale">
+              <img src="pic/作品封面/双铃坠封面 16-9.webp" alt="双铃坠" loading="lazy">
+              <video data-src="pic/作品封面/双铃坠封面动画-v4.mp4" muted loop playsinline aria-label="双铃坠动画"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 1: 中国古代疆域地图 -->
+      <div class="slide-wrapper" data-index="1">
+        <div class="card_stack_component card-pink">
+          <div class="card_stack_layout">
+            <div class="card_stack_content">
+              <div data-animate-heading="line-fade-in" class="g_heading">
+                <h2>中国古代疆域地图</h2>
+              </div>
+              <div class="card_button-wrapper">
+                <a class="request-btn" href="https://history.jonlab.cn/" target="_blank" rel="noopener noreferrer">
+                  查看网页
+                  <svg viewBox="0 0 16 17" fill="none"><path d="M12.175 9.5H0V7.5H12.175L6.575 1.9 8 0.5 16 8.5 8 16.5 6.575 15.1 12.175 9.5Z" fill="currentColor"/></svg>
+                </a>
+                <div class="card-desc"><p>横跨 24 个朝代、约 2700 年的中国疆域 3D 地图。拖动时间轴，疆域怎么长、怎么缩，哪块地换了主人，一眼看明白。内置 108 个历史事件，像一座可以玩的历史沙盘。</p></div>
+              </div>
+            </div>
+            <div class="card_stack_img_wrap" data-gsap-image="scale">
+              <img src="pic/作品封面/中国古代疆域.webp" alt="中国古代疆域地图" loading="lazy">
+              <video data-src="pic/作品封面/中国古代疆域地图封面动画-v4.mp4" muted loop playsinline aria-label="中国古代疆域地图动画"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: 中国古代诗词地图 -->
+      <div class="slide-wrapper" data-index="2">
+        <div class="card_stack_component card-white">
+          <div class="card_stack_layout">
+            <div class="card_stack_content">
+              <div data-animate-heading="line-fade-in" class="g_heading">
+                <h2>中国古代诗词地图</h2>
+              </div>
+              <div class="card_button-wrapper">
+                <a class="request-btn" href="https://history.jonlab.cn/maplibre_3d_history.html?mode=poem" target="_blank" rel="noopener noreferrer">
+                  查看网页
+                  <svg viewBox="0 0 16 17" fill="none"><path d="M12.175 9.5H0V7.5H12.175L6.575 1.9 8 0.5 16 8.5 8 16.5 6.575 15.1 12.175 9.5Z" fill="currentColor"/></svg>
+                </a>
+                <div class="card-desc"><p>把 69 首必背古诗词放回它们诞生的地方。每个朝代只显示那个时代的诗，龙藏体书法、脉动金光、缓缓旋转的 3D 地图，把诗写进山水之间。搜索诗人的名字，就能看到他在哪儿写下这些诗。</p></div>
+              </div>
+            </div>
+            <div class="card_stack_img_wrap" data-gsap-image="scale">
+              <img src="pic/作品封面/中国古代诗词地图.webp" alt="中国古代诗词地图" loading="lazy">
+              <video data-src="pic/作品封面/中国古代诗词地图封面动画-v4.mp4" muted loop playsinline aria-label="中国古代诗词地图动画"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: AI CAN BB -->
+      <div class="slide-wrapper" data-index="3">
+        <div class="card_stack_component card-4">
+          <div class="card_stack_layout">
+            <div class="card_stack_content">
+              <div data-animate-heading="line-fade-in" class="g_heading">
+                <h2>AI CAN BB</h2>
+              </div>
+              <div class="card_button-wrapper">
+                <a class="request-btn" href="https://ai-summer.jonlab.cn" target="_blank" rel="noopener noreferrer">
+                  查看网页
+                  <svg viewBox="0 0 16 17" fill="none"><path d="M12.175 9.5H0V7.5H12.175L6.575 1.9 8 0.5 16 8.5 8 16.5 6.575 15.1 12.175 9.5Z" fill="currentColor"/></svg>
+                </a>
+                <div class="card-desc"><p>你出题，让 AI 辩手来一场辩论赛。规则还原《奇葩说》：选边、立论、开杠、结辩被奇袭。30 位观众各有小传，听你辩完再投票。底层接 DeepSeek，每句话都是真思考。</p></div>
+              </div>
+            </div>
+            <div class="card_stack_img_wrap" data-gsap-image="scale">
+              <img src="pic/作品封面/ai-can-bb.webp" alt="AI CAN BB" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: 城市中的植物 -->
+      <div class="slide-wrapper" data-index="4">
+        <div class="card_stack_component card-5">
+          <div class="card_stack_layout">
+            <div class="card_stack_content">
+              <div data-animate-heading="line-fade-in" class="g_heading">
+                <h2>城市中的植物</h2>
+              </div>
+              <div class="card_button-wrapper">
+                <a class="request-btn" href="https://plants.jonlab.cn/" target="_blank" rel="noopener noreferrer">
+                  查看网页
+                  <svg viewBox="0 0 16 17" fill="none"><path d="M12.175 9.5H0V7.5H12.175L6.575 1.9 8 0.5 16 8.5 8 16.5 6.575 15.1 12.175 9.5Z" fill="currentColor"/></svg>
+                </a>
+                <div class="card-desc"><p>让植物长满城市的每个角落，把钢筋水泥的城市种成一座可以逛的花园。</p></div>
+              </div>
+            </div>
+            <div class="card_stack_img_wrap" data-gsap-image="scale">
+              <img src="pic/作品封面/城市中的植物-2.webp" alt="城市中的植物" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Spacer: 给最后一张 sticky 卡片（城市植物）提供停留窗口，使其收走时固定在视口顶部
+           （2/3 屏 ≈ 收走区间长度；删掉它最后一张卡的 sticky 会失效、直接滚出视口） -->
+      <div class="stack-spacer"></div>
+
+
+
+    </div>
+  </section>
+
   <!-- ===== Portfolio ===== -->
   <section class="portfolio" id="portfolio">
     <div class="portfolio-top-img-wrap">
@@ -910,99 +1395,9 @@
     </div>
     <div class="portfolio-inner">
       <div class="mistake-gallery" id="mistakeGallery" role="region" aria-label="作品卡片画廊">
-              <div class="gallery-group gallery-works">
-        <div class="gallery-group-title"><span class="gg-num">01</span>WORKS · 作品</div>
-        <div class="gallery-group-grid">
-<a class="mc-card-link" href="https://www.bilibili.com/video/BV1JrQ9B1Ecp/?share_source=copy_web&amp;vd_source=91a204b4d912e659f8d54a6c6e3a9f22" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/双铃坠封面 2.webp" alt="双铃坠" loading="lazy" />
-          </div>
-          <span class="mc-label">动画短片</span>
-
-          <p class="mc-batch">双铃坠</p>
-        </article>
-        </a>
-
-        <a class="mc-card-link" href="https://history.jonlab.cn/" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/中国古代疆域.webp" alt="中国古代疆域地图" loading="lazy" />
-          </div>
-          <span class="mc-label">数据可视化</span>
-
-          <p class="mc-batch">中国古代疆域地图</p>
-        </article>
-        </a>
-
-        <a class="mc-card-link" href="https://history.jonlab.cn/maplibre_3d_history.html?mode=poem" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/中国古代诗词地图.webp" alt="中国古代诗词地图" loading="lazy" />
-          </div>
-          <span class="mc-label">数据可视化</span>
-
-          <p class="mc-batch">中国古代诗词地图</p>
-        </article>
-        </a>
-
-        <a class="mc-card-link" href="https://ai-summer.jonlab.cn" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/ai-can-bb.webp" alt="AI CAN BB" loading="lazy" />
-          </div>
-          <span class="mc-label">AI奇葩说</span>
-
-          <p class="mc-batch">AI CAN BB</p>
-        </article>
-        </a>
-
-<a class="mc-card-link" href="https://plants.jonlab.cn/" target="_blank" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/城市中的植物-2.webp" alt="城市中的植物" loading="lazy" />
-          </div>
-          <span class="mc-label">城市绿化模拟游戏</span>
-
-          <p class="mc-batch">城市中的植物</p>
-        </article>
-        </a>
-
-
-<article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <div class="mc-placeholder">敬请期待</div>
-          </div>
-          <span class="mc-label">策略塔防游戏</span>
-
-          <p class="mc-batch">玉米·黄金·美洲豹</p>
-        </article>
-
-        
-
-                </div>
-      </div>
       <div class="gallery-group gallery-artbooks">
-        <div class="gallery-group-title"><span class="gg-num">02</span>ARTBOOKS · 设定集</div>
+        <div class="gallery-group-title">ARTBOOKS · 设定集</div>
         <div class="gallery-group-grid">
-        <a class="mc-card-link" href="/doodle/" rel="noopener noreferrer">
-        <article class="mc-card">
-          <div class="mc-tape"></div>
-          <div class="mc-photo">
-            <img src="pic/作品封面/涂鸦.webp" alt="随手画" loading="lazy" />
-          </div>
-          <span class="mc-label">涂鸦</span>
-
-          <p class="mc-batch">随手画</p>
-        </article>
-        </a>
-
 <a class="mc-card-link" href="/satellite/" rel="noopener noreferrer">
         <article class="mc-card">
           <div class="mc-tape"></div>
@@ -1074,6 +1469,19 @@
     </div>
   </section>
 
+  <!-- ===== 涂鸦墙（随手画）：无限循环可拖拽图片墙 ===== -->
+  <section class="dw-section" id="dwSection">
+    <div id="dwViewport">
+      <div id="dwWall"></div>
+      <div id="dwHeader">SCRAPBOOK · 随手画</div>
+      <div id="dwHint">墙面无限漫游 · 按住拖动浏览 · 点击放大</div>
+    </div>
+    <div id="dwLightbox">
+      <img id="dwLightboxImg" alt="" style="display:block">
+      <video id="dwLightboxVideo" muted loop playsinline controls style="display:none"></video>
+    </div>
+  </section>
+
   <!-- ===== Thanks ===== -->
   <section class="thanks" id="thanksSection">
     <div class="thanks-scene">
@@ -1092,6 +1500,10 @@
       <div class="thanks-footer-inner">
         <div class="tf-copy">© 2026 Jon's Lab. All rights reserved.</div>
         <div class="tf-links">
+          <a href="https://jonlab.cn/" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2 12 4l9 7.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.8 10.6V19a1 1 0 0 0 1 1h10.4a1 1 0 0 0 1-1v-8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            个人主页
+          </a>
           <a href="https://space.bilibili.com/1551587375" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 7L5.5 4M17 7l1.5-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="8" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
             bilibili
@@ -1405,13 +1817,7 @@
           if (op < 0.6) op = 0.6;
           sv.style.setProperty('--sv-op', op.toFixed(2));
         }
-        // Portfolio section parallax: slight inter-screen displacement
-        if (pf) {
-          var rPS = pf.getBoundingClientRect();
-          var pPS = (rPS.top + rPS.height / 2 - vh / 2) / vh;
-          if (pPS > 1) pPS = 1; else if (pPS < -1) pPS = -1;
-          pf.style.setProperty('--sec-p', (pPS * 80).toFixed(1) + 'px');
-        }
+        // (已移除 --sec-p 整屏屏间视差：2026-08-04 用户要求只保留作品集内部视差)
         // Internal portfolio parallax: cards faster (1.6x) than the image
         var ci = document.querySelector('.portfolio-inner');
         if (pf && ci) {
@@ -1427,6 +1833,537 @@
       }, { passive: true });
       window.addEventListener('resize', update);
       update();
+    })();
+  </script>
+
+  <!-- ================= 涂鸦墙（随手画）：懒加载 + 无限循环可拖拽 ================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      var section = document.getElementById('dwSection');
+      var viewport = document.getElementById('dwViewport');
+      var wall = document.getElementById('dwWall');
+      if (!section || !viewport || !wall) return;
+
+      /* ---- 图片与尺寸 ---- */
+      var IMGS = [];
+      for (var i = 1; i <= 31; i++) {
+        IMGS.push('doodle/assets/thumbs/doodle-' + (i < 10 ? '0' + i : i) + '.webp');
+      }
+      var GAP_VW = 4.5;
+      var ROW_W = 400;
+      var ROWS_N = 6;
+      var SIZES = [8, 9.5, 10.5, 12, 13.5, 15];   // 整体更小，最小号 8 不变
+      var BIG_SIZES = [16, 18];                    // 放大图同步微缩，保持对比度
+      var BIG_IMGS = ['doodle/assets/thumbs/doodle-05.webp', 'doodle/assets/thumbs/doodle-12.webp', 'doodle/assets/thumbs/doodle-13.webp', 'doodle/assets/thumbs/doodle-18.webp', 'doodle/assets/thumbs/doodle-21.webp', 'doodle/assets/thumbs/doodle-25.webp', 'doodle/assets/thumbs/doodle-26.webp', 'doodle/assets/thumbs/doodle-30.webp'];
+      var VIDEOS = ['doodle/assets/video-01.mp4', 'doodle/assets/video-02.mp4', 'doodle/assets/video-03.mp4', 'doodle/assets/video-04.mp4', 'doodle/assets/video-05.mp4', 'doodle/assets/video-06.mp4'];
+      var videoAssign = 0; // 三个视频轮流分配，保证全部出现（不再随机）
+      var AR = { 'doodle-28.webp': 0.757, 'doodle-29.webp': 0.757, 'doodle-30.webp': 2.357, 'doodle-31.webp': 0.757 }; // 非 1:1 图的宽高比：tile 外边框跟随图片
+
+      var seed = 20260804;
+      function rnd() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      }
+
+      function buildRowSeq(prevLast, prevRow) {
+        var seq = [];
+        var prev = prevLast || null;
+        var guard = 0;
+        while (seq.length < 44 && guard++ < 800) {
+          var cands = [], cands2 = [], cands3 = [];
+          for (var k = 0; k < IMGS.length; k++) {
+            var name = IMGS[k];
+            if (name === prev) continue; // 行内相邻不重复（硬性）
+            var inRow = seq.indexOf(name) !== -1; // 行内是否已用
+            var nearPrev = false; // 与上一行同列/相邻列是否重复
+            if (prevRow && prevRow.length) {
+              for (var j = Math.max(0, seq.length - 1); j <= Math.min(prevRow.length - 1, seq.length + 1); j++) {
+                if (prevRow[j].img === name) { nearPrev = true; break; }
+              }
+            }
+            if (!inRow && !nearPrev) cands.push(name);   // 最佳：行内唯一 + 列不邻近
+            else if (!inRow) cands2.push(name);          // 降级1：仅行内唯一
+            else if (!nearPrev) cands3.push(name);       // 降级2：仅列不邻近
+          }
+          var pick = cands.length ? cands : (cands2.length ? cands2 : cands3);
+          if (!pick.length) break;
+          seq.push(pick[Math.floor(rnd() * pick.length)]);
+          prev = seq[seq.length - 1];
+        }
+        return seq;
+      }
+
+      function buildWall() {
+        var rowData = [];
+        var prevLast = null;
+        var prevRow = null;
+        for (var r = 0; r < ROWS_N; r++) {
+          var imgs = buildRowSeq(prevLast, prevRow);
+          var seq = [];
+          var used = 0;
+          var guard = 0;
+          while (used < ROW_W - 30 && guard++ < 26) {
+            var img = imgs[seq.length % imgs.length];
+            var pool = BIG_IMGS.indexOf(img) !== -1 ? BIG_SIZES : SIZES;
+            var w = pool[Math.floor(rnd() * pool.length)];
+            if (used + w + GAP_VW > ROW_W) {
+              w = Math.max(6, ROW_W - GAP_VW - used);
+            }
+            if (used + w + GAP_VW > ROW_W + 0.5) break;
+            seq.push({ w: w, img: img });
+            used += w + GAP_VW;
+          }
+          if (seq.length > 1 && seq[0].img === seq[seq.length - 1].img) {
+            for (var i2 = 0; i2 < IMGS.length; i2++) {
+              if (IMGS[i2] !== seq[0].img && IMGS[i2] !== seq[seq.length - 2].img) {
+                seq[seq.length - 1].img = IMGS[i2];
+                break;
+              }
+            }
+          }
+          prevLast = seq[seq.length - 1].img;
+          prevRow = seq;
+          rowData.push(seq);
+        }
+        if (rowData.length > 1 && rowData[0][0].img === rowData[rowData.length - 1][rowData[rowData.length - 1].length - 1].img) {
+          for (var i3 = 0; i3 < IMGS.length; i3++) {
+            if (IMGS[i3] !== rowData[0][0].img && IMGS[i3] !== rowData[0][1].img) {
+              rowData[0][0].img = IMGS[i3];
+              break;
+            }
+          }
+        }
+        for (var g = 0; g < 2; g++) {
+          var group = document.createElement('div');
+          group.className = 'dw-group';
+          for (var rr = 0; rr < rowData.length; rr++) {
+            var row = document.createElement('div');
+            row.className = 'dw-row';
+            row.style.width = (ROW_W * 2) + 'vw';
+            for (var k2 = 0; k2 < 2; k2++) {
+              for (var t = 0; t < rowData[rr].length; t++) {
+                var a = document.createElement('a');
+                a.className = 'dw-tile';
+                a.draggable = false;
+                a.style.width = rowData[rr][t].w + 'vw';
+                var ar = AR[rowData[rr][t].img.split('/').pop()] || 1;
+                if (ar !== 1) a.style.aspectRatio = String(ar); // 非 1:1 图：tile 边框跟随图片比例
+                // 视频 tile 每行均匀分配：每 7 个 tile 放 1 个（t=3,10,17,24，避开行首与行尾），
+                // 镜像两遍同一规则 → 每行固定 4 个、位置均布，视觉均衡不集中在某区域；
+                // 墙循环漂移时视口窗口内总能命中视频
+                var wantVideo = VIDEOS.length && (t + 4) % 7 === 0;
+                if (wantVideo) {
+                  var video = document.createElement('video');
+                  video.src = VIDEOS[videoAssign % VIDEOS.length]; // 三个视频轮流分配（创建时设 src；懒下载由 preload=none 控制）
+                  videoAssign++;
+                  video.poster = rowData[rr][t].img; // poster 用本应显示的涂鸦图：未加载时显示图片，不空白，且零额外请求
+                  video.muted = true; video.loop = true; video.playsInline = true;
+                  video.autoplay = true; video.preload = 'none'; video.draggable = false; // 懒加载：进视口 play() 才下载
+                  a.dataset.video = video.src;
+                  a.style.aspectRatio = '1'; // 视频 640x640 是 1:1，覆盖非 1:1 图片的 AR
+                  a.appendChild(video);
+                  // 进入视口才加载并播放（poster 兜底）；离开视口暂停省资源；拖动期间不暂停
+                  var vio = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (en) {
+                      if (en.isIntersecting) { video.play().catch(function () {}); }
+                      else if (!dragging) { video.pause(); }
+                    });
+                  }, { threshold: 0.05 });
+                  vio.observe(a);
+                } else {
+                  var img = document.createElement('img');
+                  img.src = rowData[rr][t].img;   // 墙内显示缩略图
+                  img.alt = '';
+                  img.draggable = false;
+                  a.dataset.full = rowData[rr][t].img.replace('/thumbs/', '/'); // 原图留给灯箱
+                  a.appendChild(img);
+                }
+                row.appendChild(a);
+              }
+            }
+            group.appendChild(row);
+          }
+          wall.appendChild(group);
+        }
+      }
+
+      /* ---- 循环周期 ---- */
+      var cycleX = 1, cycleY = 1;
+      function measureCycles() {
+        cycleX = ROW_W / 100 * window.innerWidth;
+        var firstGroup = wall.querySelector('.dw-group');
+        var gapPx = GAP_VW / 100 * window.innerWidth;
+        cycleY = firstGroup ? firstGroup.offsetHeight + gapPx : 1;
+      }
+
+      /* ---- 自动漂移 + 视差 + 拖拽 ---- */
+      var DRIFT_X = -10, DRIFT_Y = -10;
+      var HOVER_FACTOR = 0.05;
+      var DRAG_FACTOR = 2.0;
+      var LERP_IDLE = 0.07, LERP_DRAG = 0.3;
+      var driftX = 0, driftY = 0, offsetX = 0, offsetY = 0;
+      var targetX = 0, targetY = 0, curX = 0, curY = 0;
+      var dragging = false;
+      var startPX = 0, startPY = 0, startTX = 0, startTY = 0;
+      var lastT = performance.now();
+      var rafId = 0;
+
+      function apply() {
+        var modX = ((curX % cycleX) + cycleX) % cycleX;
+        var modY = ((curY % cycleY) + cycleY) % cycleY;
+        wall.style.transform = 'translate3d(' + (modX - cycleX) + 'px, ' + (modY - cycleY) + 'px, 0)';
+      }
+
+      function loop(now) {
+        var dt = Math.min((now - lastT) / 1000, 0.05);
+        lastT = now;
+        if (!dragging) {
+          driftX += DRIFT_X * dt;
+          driftY += DRIFT_Y * dt;
+          targetX = driftX + offsetX;
+          targetY = driftY + offsetY;
+        }
+        var lerp = dragging ? LERP_DRAG : LERP_IDLE;
+        curX += (targetX - curX) * lerp;
+        curY += (targetY - curY) * lerp;
+        apply();
+        rafId = requestAnimationFrame(loop);
+      }
+      function start() {
+        if (rafId) return;
+        lastT = performance.now();
+        rafId = requestAnimationFrame(loop);
+      }
+      function stop() {
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      }
+
+      function onPointerMove(e) {
+        if (dragging) {
+          targetX = startTX + (e.clientX - startPX) * DRAG_FACTOR;
+          targetY = startTY + (e.clientY - startPY) * DRAG_FACTOR;
+        } else {
+          offsetX = -(e.clientX - window.innerWidth / 2) * HOVER_FACTOR;
+          offsetY = -(e.clientY - window.innerHeight / 2) * HOVER_FACTOR;
+        }
+      }
+      function onPointerDown(e) {
+        dragging = true;
+        document.body.classList.add('dw-dragging');
+        startPX = e.clientX;
+        startPY = e.clientY;
+        startTX = targetX;
+        startTY = targetY;
+      }
+      function onPointerUp(e) {
+        if (!dragging) return;
+        dragging = false;
+        document.body.classList.remove('dw-dragging');
+        driftX = curX;
+        driftY = curY;
+        var dx = e.clientX - startPX, dy = e.clientY - startPY;
+        if (dx * dx + dy * dy < 36) {
+          // 取整坐标再命中检测，避免小数落在像素边界导致漏检
+          var el = document.elementFromPoint(Math.round(e.clientX), Math.round(e.clientY));
+          var tile = el && el.closest ? el.closest('.dw-tile') : null;
+          if (tile) openLightbox(tile);
+        }
+      }
+
+      /* ---- 点击放大灯箱 ---- */
+      var lightbox = document.getElementById('dwLightbox');
+      var lightboxImg = document.getElementById('dwLightboxImg');
+      var lightboxVideo = document.getElementById('dwLightboxVideo');
+      function openLightbox(el) {
+        if (el.dataset.video) {
+          lightboxImg.style.display = 'none';
+          lightboxVideo.style.display = 'block';
+          lightboxVideo.src = el.dataset.video;
+          lightboxVideo.play().catch(function () {});
+        } else {
+          lightboxVideo.pause();
+          lightboxVideo.style.display = 'none';
+          lightboxImg.style.display = 'block';
+          lightboxImg.src = el.dataset.full || el.querySelector('img').src;
+        }
+        lightbox.classList.add('open');
+        document.documentElement.style.overflow = 'hidden';
+      }
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        lightboxVideo.pause();
+        document.documentElement.style.overflow = '';
+      }
+      lightbox.addEventListener('click', closeLightbox);
+      lightboxVideo.addEventListener('click', function (e) { e.stopPropagation(); });
+      window.addEventListener('keydown', function (e) {
+        if ((e.key === 'Escape' || e.key === 'Esc') && lightbox.classList.contains('open')) closeLightbox();
+      });
+
+      /* ---- 事件绑定（仅限涂鸦墙区域，不干扰主页其他交互） ---- */
+      viewport.addEventListener('dragstart', function (e) { e.preventDefault(); });
+      viewport.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      viewport.addEventListener('pointermove', onPointerMove);
+      viewport.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+      window.addEventListener('resize', function () { measureCycles(); });
+
+      /* ---- 懒加载：进入视口才构建并启动，离开暂停 ---- */
+      var built = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            if (!built) {
+              buildWall(); measureCycles(); built = true;
+              var hint = document.getElementById('dwHint');
+              if (hint) setTimeout(function () { hint.style.opacity = '0'; }, 5000);
+            }
+            start();
+          } else {
+            stop();
+          }
+        });
+      }, { threshold: 0.05 });
+      io.observe(section);
+    })();
+  </script>
+
+  <script>
+    // ===== Let's go. 过渡页 + 作品卡片堆叠（Lenis 全站平滑 + GSAP ScrollTrigger） =====
+    (function () {
+      gsap.registerPlugin(ScrollTrigger, SplitText);
+
+      // ---- Lenis 全站平滑滚动（与现有原生 scroll 监听兼容：仍会派发 scroll 事件） ----
+      var lenis = new Lenis({
+        duration: 1.2,
+        easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+        smoothWheel: true,
+      });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+
+      // ---- 卡片标题逐行淡入 ----
+      document.querySelectorAll('[data-animate-heading="line-fade-in"]').forEach(function (wrapper) {
+        var h2 = wrapper.querySelector('h2');
+        if (!h2) return;
+        var split = new SplitText(h2, {
+          type: 'lines, words',
+          linesClass: 'fade-line',
+          autoSplit: true,
+          onSplit: function (self) {
+            return gsap.fromTo(self.lines,
+              { opacity: 0, yPercent: 100 },
+              {
+                opacity: 1, yPercent: 0,
+                duration: 0.8, stagger: 0.2, ease: 'power2.out',
+                scrollTrigger: { trigger: wrapper, start: 'top 70%', once: true },
+                onComplete: function () { split.revert(); },
+              }
+            );
+          },
+        });
+      });
+
+      // ---- 卡片视频懒加载：滚动接近对应卡片时才加载（避免页面打开即下载全部视频） ----
+      document.querySelectorAll('.card_stack_img_wrap video').forEach(function (v) {
+        if (!v.dataset.src) return;
+        var src = v.dataset.src;
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              v.src = src;
+              v.load();
+              io.disconnect();
+            }
+          });
+        }, { rootMargin: '100% 0px' });
+        io.observe(v.parentElement);
+      });
+
+      // ---- 3D 卡片堆叠 ----
+      var wrappers = gsap.utils.toArray('.slide-wrapper');
+      var cards = gsap.utils.toArray('.card_stack_component');
+
+      // z-index: 后面的卡片盖住前面的（像叠纸）
+      wrappers.forEach(function (w, i) { w.style.zIndex = String(i + 1); });
+
+      var stack = document.querySelector('.g_component_layout');
+      var vh = function () { return window.innerHeight; };
+      // 卡片高 75vh，触发位置以卡片高度为基准，保证各卡节奏一致
+      var cardH = function () {
+        var el = document.querySelector('.card_stack_component');
+        return (el && el.offsetHeight) || vh() * 0.75;
+      };
+      var stackTopAbs = function () { return stack.getBoundingClientRect().top + window.scrollY; };
+
+      // ---- 过渡页：背景 灰棕(视频末帧) -> 黑，"Let's go." 从底部生长后随滚动上升 ----
+      var transition = document.querySelector('.transition-page');
+      if (transition) {
+        gsap.to(transition, {
+          backgroundColor: '#000000', // 渐变到黑（下一作品区背景）
+          ease: 'none',
+          scrollTrigger: {
+            trigger: transition,
+            start: 'top bottom',
+            end: 'top top', // 过渡页滚过一屏即完成变黑（原 bottom top 要滚两屏，太慢）
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        var squeezeWords = Array.from(document.querySelectorAll('[data-squeeze]'));
+        var wrap = document.querySelector('.letsgo-wrap');
+        if (squeezeWords.length && wrap) {
+          var transTopAbs = function () { return transition.getBoundingClientRect().top + window.scrollY; };
+          gsap.set(squeezeWords, { display: 'inline-block', scaleY: 0, transformOrigin: '0 100%' });
+          squeezeWords.forEach(function (word) {
+            gsap.to(word, {
+              scaleY: 1,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: transition,
+                start: function () { return transTopAbs() - window.innerHeight; },
+                end: function () { return transTopAbs(); },
+                scrub: 1,
+                invalidateOnRefresh: true,
+              },
+            });
+          });
+          // 生长完成后文字随滚动 1:1 上升，从视口顶部滚出
+          gsap.to(wrap, {
+            y: function () { return -window.innerHeight; },
+            ease: 'none',
+            scrollTrigger: {
+              trigger: transition,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+      }
+
+      // ---- 卡片收走：下一张上升时，当前这张倾斜缩小（不淡出）。
+      // 最后一张卡（城市植物）由设定集页面覆盖，同样收走（与其他卡一致） ----
+      wrappers.forEach(function (wrapper, i) {
+        var card = cards[i];
+        var rotZ = (Math.random() - 0.5) * 20; // 倾斜 -10..10 度
+        gsap.to(card, {
+          rotationZ: rotZ,
+          scale: 0.5, // 2026-08-04: 移除 rotationX 35°（3D 变换触发 GPU 合成层，盖住设定集图片）；纯 2D 收走
+          transformOrigin: 'center center',
+          ease: 'power1.in',
+          scrollTrigger: {
+            trigger: stack,
+            start: function () { return stackTopAbs() + (i + 1) * cardH() - vh() * (2 / 3); },
+            end: function () { return stackTopAbs() + (i + 1) * cardH(); },
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+
+      // ---- 图片缩放 0.3 -> 1（卡片进入视口时完成） ----
+      wrappers.forEach(function (wrapper, i) {
+        var img = wrapper.querySelector('[data-gsap-image]');
+        if (!img) return;
+        gsap.set(img, { scale: 0.3, transformOrigin: '100% 0%' });
+        var anim = {
+          scale: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: stack,
+            start: function () { return stackTopAbs() + i * cardH() - vh(); },
+            end: function () { return stackTopAbs() + i * cardH() - vh() * 0.5; },
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        };
+        // 双铃坠卡片（i===0）：封面 + 视频均为 16:9，容器已适配。
+        // 播放时机：下一张卡片（i===1）开始划入视口时才播放视频（封面停留更久）；
+        // 回滚离开该区域则恢复封面并暂停。视频未就绪时保持封面等待 canplay。
+        if (i === 0) {
+          var cover = img.querySelector('img');
+          var video = img.querySelector('video');
+          if (cover && video) {
+            var triggerY = function () { return stackTopAbs() + cardH() - vh(); };
+            var doSwitch0 = function () {
+              cover.style.opacity = 0;
+              video.style.opacity = 1;
+              if (video.paused) video.play().catch(function () {});
+            };
+            function playV0() {
+              if (video.readyState >= 3) { doSwitch0(); video.removeEventListener('canplay', doSwitch0); }
+              else if (!video.dataset.wait0) {
+                video.dataset.wait0 = '1';
+                video.addEventListener('canplay', doSwitch0, { once: true });
+              }
+            }
+            function stopV0() {
+              cover.style.opacity = 1;
+              video.style.opacity = 0;
+              if (!video.paused) video.pause();
+              video.removeEventListener('canplay', doSwitch0);
+              delete video.dataset.wait0;
+            }
+            ScrollTrigger.create({
+              trigger: stack,
+              start: function () { return triggerY(); },
+              end: function () { return triggerY() + vh() * 0.5; },
+              onEnter: playV0,
+              onLeaveBack: stopV0,
+            });
+          }
+        }
+        // 疆域地图（i===1）与诗词地图（i===2）：封面放大到正常尺寸后播放动画视频（回滚恢复封面）；
+        // 视频未就绪时保持封面，canplay 后再切换（避免封面淡出后黑屏等待）
+        if (i === 1 || i === 2) {
+          var cover = img.querySelector('img');
+          var video = img.querySelector('video');
+          var playNow = function () {
+            if (cover) cover.style.opacity = 0;
+            video.style.opacity = 1;
+            if (video.paused) video.play().catch(function () {});
+          };
+          anim.onUpdate = function () {
+            if (!video) return;
+            var rect = wrapper.getBoundingClientRect();
+            var inView = rect.bottom > 0 && rect.top < vh();
+            var done = this.progress() >= 1 && inView;
+            if (done) {
+              if (video.readyState >= 3) { playNow(); video.removeEventListener('canplay', playNow); }
+              else if (!video.dataset.playWaiting) {
+                video.dataset.playWaiting = '1';
+                video.addEventListener('canplay', playNow, { once: true });
+              }
+            } else {
+              if (cover) cover.style.opacity = 1;
+              video.style.opacity = 0;
+              if (!video.paused) video.pause();
+              video.removeEventListener('canplay', playNow);
+              delete video.dataset.playWaiting;
+            }
+          };
+        }
+        gsap.to(img, anim);
+      });
+
+      // ---- 设定集顶部图片：城市植物卡收走时盖住它（与前面几张卡被覆盖的节奏一致） ----
+      // 原理：spacer（2/3 屏）使最后一张卡能钉在视口顶部收走；图片位于 spacer 之后，
+      // 恒定提前 2/3 屏（y = -2/3vh = spacer 高度）→ 图片在卡片收走开始时已在视口底部等待，
+      // 随滚动自然升起（1:1）盖住卡片——与上面"下一张 sticky 卡从底部升起盖住"的节奏完全一致
+      var pfImgWrap = document.querySelector('.portfolio-top-img-wrap');
+      if (pfImgWrap) {
+        gsap.set(pfImgWrap, { y: function () { return -vh() * 2 / 3; } });
+      }
+
+      // 字体/图片加载完成后重算触发位置
+      window.addEventListener('load', function () { ScrollTrigger.refresh(); });
     })();
   </script>
 
