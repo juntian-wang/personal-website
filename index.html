@@ -438,7 +438,9 @@
     .portfolio-inner {
       position: relative;
       max-width: 1100px;
-      margin: 0 auto;
+      /* 2026-08-05: 顶部负边距 -2/3vh = 顶部图片上移量（transform 不改变文档流占位，
+         图片上移盖住卡片区后原位置留下空洞，内容上移同样距离消除空洞） */
+      margin: -66.67vh auto 0;
       z-index: 1;
       transform: translateY(var(--card-p, 0px));
       will-change: transform;
@@ -1857,7 +1859,7 @@
       var SIZES = [8, 9.5, 10.5, 12, 13.5, 15];   // 整体更小，最小号 8 不变
       var BIG_SIZES = [16, 18];                    // 放大图同步微缩，保持对比度
       var BIG_IMGS = ['doodle/assets/thumbs/doodle-05.webp', 'doodle/assets/thumbs/doodle-12.webp', 'doodle/assets/thumbs/doodle-13.webp', 'doodle/assets/thumbs/doodle-18.webp', 'doodle/assets/thumbs/doodle-21.webp', 'doodle/assets/thumbs/doodle-25.webp', 'doodle/assets/thumbs/doodle-26.webp', 'doodle/assets/thumbs/doodle-30.webp'];
-      var VIDEOS = ['doodle/assets/video-01.mp4', 'doodle/assets/video-02.mp4', 'doodle/assets/video-03.mp4', 'doodle/assets/video-04.mp4', 'doodle/assets/video-05.mp4', 'doodle/assets/video-06.mp4'];
+      var VIDEOS = ['doodle/assets/video-01-v2.mp4', 'doodle/assets/video-02-v2.mp4', 'doodle/assets/video-03-v2.mp4', 'doodle/assets/video-04-v2.mp4', 'doodle/assets/video-05-v2.mp4', 'doodle/assets/video-06-v2.mp4'];
       var videoAssign = 0; // 三个视频轮流分配，保证全部出现（不再随机）
       var AR = { 'doodle-28.webp': 0.757, 'doodle-29.webp': 0.757, 'doodle-30.webp': 2.357, 'doodle-31.webp': 0.757 }; // 非 1:1 图的宽高比：tile 外边框跟随图片
 
