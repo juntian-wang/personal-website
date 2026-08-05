@@ -960,18 +960,18 @@
       left: 0;
       display: flex;
       flex-direction: column;
-      gap: 5vw; /* 2026-08-05 16:47: 行间距 7→5vw（用户要求减小） */
+      gap: 4vw; /* 2026-08-05 17:43: 行间距 5→4vw（用户要求再减小） */
       will-change: transform;
     }
     .dw-group {
       display: flex;
       flex-direction: column;
-      gap: 5vw; /* 2026-08-05 16:47: 行间距同步减小 */
+      gap: 4vw; /* 2026-08-05 17:43: 行间距同步减小 */
       flex-shrink: 0;
     }
     .dw-row {
       display: flex;
-      gap: 6vw; /* 2026-08-05 16:47: 列间距 4.5→6vw（用户要求加大） */
+      gap: 7vw; /* 2026-08-05 17:43: 列间距 6→7vw（用户要求再加大） */
       flex-wrap: nowrap;
       flex-shrink: 0;
       align-items: center; /* 2026-08-05 15:35: 行内垂直居中（参考站 Miller 风格），小图大图居中浮动 */
@@ -1889,7 +1889,7 @@
         if (i === 30) continue; // doodle-30 是 hero 背景图，非随手画，从涂鸦墙排除
         IMGS.push('doodle/assets/thumbs/doodle-' + (i < 10 ? '0' + i : i) + '.webp');
       }
-      var GAP_VW = 6; // 列间距 vw（与 .dw-row gap 同步，2026-08-05 16:47: 4.5→6）
+      var GAP_VW = 7; // 列间距 vw（与 .dw-row gap 同步，2026-08-05 17:43: 6→7）
       var ROW_W = 400;
       var ROWS_N = 6;
       var SIZES = [7.5, 8.5, 9.5, 10.5, 11.5, 12];   // 2026-08-05 15:35: 收窄差异（跨度 1.6 倍，对齐参考站温和感）
