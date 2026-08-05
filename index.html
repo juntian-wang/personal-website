@@ -1896,7 +1896,7 @@
         return seed / 233280;
       }
 
-      function buildRowSeq(prevLast, prevRow) {
+      function buildRowSeq(prevLast, prevRow, usedCount) {
         var seq = [];
         var lastIdx = {};  // 图名 → 行内最后一次出现的索引，保证最小间距
         var prev = prevLast || null;
@@ -1910,9 +1910,9 @@
             var gapOk = lastIdx[name] === undefined || (seq.length - lastIdx[name] >= MIN_GAP);
             if (!gapOk) continue;        // 行内最小间距（硬性，杜绝同一图频繁重复）
             var inRow = seq.indexOf(name) !== -1; // 行内是否已用
-            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±2 列）
+            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±3 列，2026-08-05 16:38 从 ±2 扩到 ±3 分散更均匀）
             if (prevRow && prevRow.length) {
-              for (var j = Math.max(0, seq.length - 2); j <= Math.min(prevRow.length - 1, seq.length + 2); j++) {
+              for (var j = Math.max(0, seq.length - 3); j <= Math.min(prevRow.length - 1, seq.length + 3); j++) {
                 if (prevRow[j].img === name) { nearPrev = true; break; }
               }
             }
@@ -1923,7 +1923,14 @@
           }
           var pick = cands.length ? cands : (cands2.length ? cands2 : (cands3.length ? cands3 : cands4));
           if (!pick.length) break;
-          seq.push(pick[Math.floor(rnd() * pick.length)]);
+          // 2026-08-05 16:38: 全局频率均衡——优先选使用次数最少的图，避免某些图密集重复
+          pick.sort(function (a, b) {
+            var da = usedCount[a] || 0, db = usedCount[b] || 0;
+            if (da !== db) return da - db;
+            return rnd() - 0.5; // 同频随机
+          });
+          seq.push(pick[0]);
+          usedCount[pick[0]] = (usedCount[pick[0]] || 0) + 1;
           lastIdx[seq[seq.length - 1]] = seq.length - 1;
           prev = seq[seq.length - 1];
         }
@@ -1934,8 +1941,9 @@
         var rowData = [];
         var prevLast = null;
         var prevRow = null;
+        var usedCount = {}; // 全局图使用次数统计（2026-08-05 16:38：全墙频率均衡）
         for (var r = 0; r < ROWS_N; r++) {
-          var imgs = buildRowSeq(prevLast, prevRow);
+          var imgs = buildRowSeq(prevLast, prevRow, usedCount);
           var seq = [];
           var used = 0;
           var guard = 0;
