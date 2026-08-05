@@ -953,13 +953,13 @@
       left: 0;
       display: flex;
       flex-direction: column;
-      gap: 4.5vw;
+      gap: 7vw; /* 2026-08-05 16:44: 行间距 4.5→7vw，更透气 */
       will-change: transform;
     }
     .dw-group {
       display: flex;
       flex-direction: column;
-      gap: 4.5vw;
+      gap: 7vw; /* 2026-08-05 16:44: 行间距同步加大 */
       flex-shrink: 0;
     }
     .dw-row {
@@ -2065,7 +2065,8 @@
       function measureCycles() {
         cycleX = ROW_W / 100 * window.innerWidth;
         var firstGroup = wall.querySelector('.dw-group');
-        var gapPx = GAP_VW / 100 * window.innerWidth;
+        // 行间距读取 CSS 实际 gap（7vw），不再用行内 GAP_VW（4.5vw），防止循环测量错位
+        var gapPx = parseFloat(getComputedStyle(wall).gap) || (GAP_VW / 100 * window.innerWidth);
         cycleY = firstGroup ? firstGroup.offsetHeight + gapPx : 1;
       }
 
