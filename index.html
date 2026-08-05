@@ -974,7 +974,10 @@
       flex-shrink: 0;
       width: 12vw;
       aspect-ratio: 1 / 1;
-      border: 5px solid rgba(255,255,255,0.6);
+      /* 2026-08-05 16:40: border → box-shadow（border 占用布局空间会使 aspect-ratio
+         与 object-fit:contain 的 content 区比例错位，非 1:1 图边框/图片不对齐；
+         box-shadow 不占布局，画框与图片精确贴合） */
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.6);
       border-radius: 4px;
       overflow: hidden;
       cursor: pointer;
