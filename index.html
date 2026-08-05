@@ -683,6 +683,17 @@
       background: #000;
       overflow: hidden;
     }
+    /* 2026-08-05 14:52: 上缘对称渐隐——与涂鸦墙底部渐隐重叠衔接，
+       tile 进入 Thanks 区域前完全淡出，消除硬边界 */
+    .thanks::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 180px;
+      z-index: 10;
+      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.9) 100%);
+      pointer-events: none;
+    }
     .thanks-scene {
       position: absolute;
       top: 0;
@@ -929,7 +940,7 @@
       top: 0; left: 0; right: 0;
       height: 130px;
       z-index: 99; /* 标题 z-index 100 之上可见，tile 之下被遮挡 */
-      background: linear-gradient(to bottom, rgba(10,10,13,0.92) 0%, rgba(10,10,13,0.5) 45%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
       pointer-events: none;
     }
     /* 2026-08-05 底部渐隐遮罩（对称顶部）：tile 漂到板块下边缘时淡出，
@@ -938,9 +949,9 @@
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      height: 130px;
+      height: 200px; /* 2026-08-05 14:52: 130→200，纯黑对齐 #000，淡出更缓 */
       z-index: 99;
-      background: linear-gradient(to top, rgba(10,10,13,0.92) 0%, rgba(10,10,13,0.5) 45%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.55) 45%, transparent 100%);
       pointer-events: none;
     }
     #dwWall {
