@@ -683,17 +683,6 @@
       background: #000;
       overflow: hidden;
     }
-    /* 2026-08-05 14:52: 上缘对称渐隐——与涂鸦墙底部渐隐重叠衔接，
-       tile 进入 Thanks 区域前完全淡出，消除硬边界 */
-    .thanks::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 180px;
-      z-index: 10;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.9) 100%);
-      pointer-events: none;
-    }
     .thanks-scene {
       position: absolute;
       top: 0;
