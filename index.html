@@ -914,7 +914,11 @@
     #dwSection {
       position: relative;
       height: 180vh;          /* 提供滚动停留空间 */
-      background: #000;       /* 与设定集板块（.portfolio）背景一致，纯黑 */
+      background-color: #000; /* 与设定集板块（.portfolio）背景一致，纯黑 */
+      /* 2026-08-05 16:37: 点阵背景回归（floating-wall 原型效果，低调版 0.08）
+         每 30px 一个 1.3px 半透明白点，稿纸质感，不抢图片视觉 */
+      background-image: radial-gradient(rgba(255,255,255,0.08) 1.3px, transparent 1.3px);
+      background-size: 30px 30px;
     }
     #dwViewport {
       position: sticky;
