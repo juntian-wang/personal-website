@@ -901,6 +901,15 @@
 
     /* (已移除 --sec-p 整屏位移：sticky 导致作品集看起来像独立滑窗) */
 
+    /* 2026-08-05: 涂鸦墙期间隐藏页面滚动条——sticky 视口画面不动、滚动条滑动无意义 */
+    html.no-scrollbar {
+      scrollbar-width: none;
+    }
+    html.no-scrollbar::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
     /* ================= 涂鸦墙（随手画）================= */
     #dwSection {
       position: relative;
@@ -921,6 +930,17 @@
       height: 130px;
       z-index: 99; /* 标题 z-index 100 之上可见，tile 之下被遮挡 */
       background: linear-gradient(to bottom, rgba(10,10,13,0.92) 0%, rgba(10,10,13,0.5) 45%, transparent 100%);
+      pointer-events: none;
+    }
+    /* 2026-08-05 底部渐隐遮罩（对称顶部）：tile 漂到板块下边缘时淡出，
+       与结尾板块（Thanks 黑底）衔接柔和，不再硬切 */
+    #dwViewport::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 130px;
+      z-index: 99;
+      background: linear-gradient(to top, rgba(10,10,13,0.92) 0%, rgba(10,10,13,0.5) 45%, transparent 100%);
       pointer-events: none;
     }
     #dwWall {
@@ -1937,6 +1957,31 @@
             }
           }
         }
+        // 2026-08-05: 每行视频位置真随机生成（非固定偏移），且与上一行视频位置错开 ≥3 tile，
+        // 同时行内视频也保持 ≥3 间距 → 行/列双向分散，不会同列对齐或相近堆叠。
+        // 两个 group（横向无缝循环副本）共用同一份视频位置，滚动循环时不跳变。
+        var videoPositions = [];
+        var prevVideoT = [];
+        for (var pr = 0; pr < rowData.length; pr++) {
+          var videoT = [];
+          var wantCount = Math.max(2, Math.floor(rowData[pr].length / 7));
+          var guardV = 0;
+          while (videoT.length < wantCount && guardV++ < 300) {
+            var candV = 1 + Math.floor(rnd() * (rowData[pr].length - 2));
+            var okV = true;
+            for (var vi = 0; vi < videoT.length; vi++) {
+              if (Math.abs(videoT[vi] - candV) < 3) { okV = false; break; }
+            }
+            if (okV) {
+              for (var vj = 0; vj < prevVideoT.length; vj++) {
+                if (Math.abs(prevVideoT[vj] - candV) < 3) { okV = false; break; }
+              }
+            }
+            if (okV) videoT.push(candV);
+          }
+          videoPositions.push(videoT);
+          prevVideoT = videoT;
+        }
         for (var g = 0; g < 2; g++) {
           var group = document.createElement('div');
           group.className = 'dw-group';
@@ -1944,6 +1989,7 @@
             var row = document.createElement('div');
             row.className = 'dw-row';
             row.style.width = (ROW_W * 2) + 'vw';
+            var videoT = videoPositions[rr];
             for (var k2 = 0; k2 < 2; k2++) {
               for (var t = 0; t < rowData[rr].length; t++) {
                 var a = document.createElement('a');
@@ -1952,10 +1998,8 @@
                 a.style.width = rowData[rr][t].w + 'vw';
                 var ar = AR[rowData[rr][t].img.split('/').pop()] || 1;
                 if (ar !== 1) a.style.aspectRatio = String(ar); // 非 1:1 图：tile 边框跟随图片比例
-                // 视频 tile 每行均匀分配：每 7 个 tile 放 1 个（t=3,10,17,24，避开行首与行尾），
-                // 镜像两遍同一规则 → 每行固定 4 个、位置均布，视觉均衡不集中在某区域；
-                // 墙循环漂移时视口窗口内总能命中视频
-                var wantVideo = VIDEOS.length && (t + 4) % 7 === 0;
+                // 视频 tile：行内位置随机且跨行错开（videoT 集合），避免同列对齐/相近堆叠
+                var wantVideo = VIDEOS.length && videoT.indexOf(t) !== -1;
                 if (wantVideo) {
                   var video = document.createElement('video');
                   video.src = VIDEOS[videoAssign % VIDEOS.length]; // 三个视频轮流分配（创建时设 src；懒下载由 preload=none 控制）
@@ -2363,6 +2407,38 @@
       if (pfImgWrap) {
         gsap.set(pfImgWrap, { y: function () { return -vh() * 2 / 3; } });
       }
+
+      // ---- 城市植物卡收走后，卡片区渐渐隐去（opacity 1→0）----
+      // 图片顶部有 mask 渐隐（透明→不透明），若卡片区收走后仍残留，会从图片渐隐区露出来（难看）。
+      // 2026-08-05: 渐隐提前到收走 80% 开始（区间 0.5vh），收走完成时已明显变淡——用户反馈原区间
+      // （收走完成后 0.2vh）太晚太短，停在"图片盖住卡片"的位置看不到渐隐过程
+      wrappers.forEach(function (w) {
+        gsap.to(w, {
+          opacity: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: stack,
+            start: function () { return stackTopAbs() + 5 * cardH() - vh() * 0.2; },
+            end: function () { return stackTopAbs() + 5 * cardH() + vh() * 0.3; },
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+
+      // ---- 涂鸦墙期间隐藏页面滚动条：sticky 视口内滚动条滑动但画面不动（墙用 transform 平移），
+      // 无意义且干扰，滚动到 #dwSection 范围时隐藏，离开恢复 ----
+      function updateDwScrollbar() {
+        var dwEl = document.getElementById('dwSection');
+        if (!dwEl) return;
+        var top = dwEl.getBoundingClientRect().top + window.scrollY;
+        var y = window.scrollY;
+        var active = y >= top && y < top + dwEl.offsetHeight;
+        document.documentElement.classList.toggle('no-scrollbar', active);
+      }
+      window.addEventListener('scroll', updateDwScrollbar, { passive: true });
+      window.addEventListener('resize', updateDwScrollbar);
+      updateDwScrollbar();
 
       // 字体/图片加载完成后重算触发位置
       window.addEventListener('load', function () { ScrollTrigger.refresh(); });
