@@ -915,10 +915,17 @@
       position: relative;
       height: 180vh;          /* 提供滚动停留空间 */
       background-color: #000; /* 与设定集板块（.portfolio）背景一致，纯黑 */
-      /* 2026-08-05 16:37: 点阵背景回归（floating-wall 原型效果）
-         每 30px 一个 1.5px 半透明白点，稿纸质感；0.18 与原型一致（0.08 太淡看不见） */
+    }
+    /* 2026-08-05 16:45: 点阵独立层（可随鼠标视差移动，比作品慢——时差感）
+       原静态点阵从 #dwSection 移到此处，避免两层错位 */
+    #dwDots {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
       background-image: radial-gradient(rgba(255,255,255,0.18) 1.5px, transparent 1.5px);
       background-size: 30px 30px;
+      pointer-events: none;
+      will-change: transform;
     }
     #dwViewport {
       position: sticky;
@@ -1501,6 +1508,7 @@
   <!-- ===== 涂鸦墙（随手画）：无限循环可拖拽图片墙 ===== -->
   <section class="dw-section" id="dwSection">
     <div id="dwViewport">
+      <div id="dwDots"></div>
       <div id="dwWall"></div>
       <div id="dwHeader">SCRAPBOOK · 随手画</div>
       <div id="dwHint">墙面无限漫游 · 按住拖动浏览 · 点击放大</div>
@@ -2075,12 +2083,16 @@
       var HOVER_FACTOR = 0.05;
       var DRAG_FACTOR = 2.0;
       var LERP_IDLE = 0.07, LERP_DRAG = 0.3;
+      // 点阵视差参数：0.15 幅度 + 0.035 慢 lerp → 与作品有时差（2026-08-05 16:45）
+      var DOT_PARALLAX = 0.15, DOT_LERP = 0.035;
+      var dotX = 0, dotY = 0, dotTX = 0, dotTY = 0;
       var driftX = 0, driftY = 0, offsetX = 0, offsetY = 0;
       var targetX = 0, targetY = 0, curX = 0, curY = 0;
       var dragging = false;
       var startPX = 0, startPY = 0, startTX = 0, startTY = 0;
       var lastT = performance.now();
       var rafId = 0;
+      var dots = document.getElementById('dwDots');
 
       function apply() {
         var modX = ((curX % cycleX) + cycleX) % cycleX;
@@ -2100,6 +2112,10 @@
         var lerp = dragging ? LERP_DRAG : LERP_IDLE;
         curX += (targetX - curX) * lerp;
         curY += (targetY - curY) * lerp;
+        // 点阵视差：慢速跟随（0.035 lerp，比墙的 0.07/0.3 慢）→ 时差感
+        dotX += (dotTX - dotX) * DOT_LERP;
+        dotY += (dotTY - dotY) * DOT_LERP;
+        dots.style.transform = 'translate3d(' + dotX + 'px, ' + dotY + 'px, 0)';
         apply();
         rafId = requestAnimationFrame(loop);
       }
@@ -2113,6 +2129,9 @@
       }
 
       function onPointerMove(e) {
+        // 点阵视差目标：跟随鼠标但幅度小（0.15×），lerp 更慢 → 与作品有时差
+        dotTX = -(e.clientX - window.innerWidth / 2) * DOT_PARALLAX;
+        dotTY = -(e.clientY - window.innerHeight / 2) * DOT_PARALLAX;
         if (dragging) {
           targetX = startTX + (e.clientX - startPX) * DRAG_FACTOR;
           targetY = startTY + (e.clientY - startPY) * DRAG_FACTOR;
