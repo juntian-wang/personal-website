@@ -1870,7 +1870,7 @@
 
       /* ---- 图片与尺寸 ---- */
       var IMGS = [];
-      for (var i = 1; i <= 32; i++) {
+      for (var i = 1; i <= 45; i++) {
         if (i === 30) continue; // doodle-30 是 hero 背景图，非随手画，从涂鸦墙排除
         IMGS.push('doodle/assets/thumbs/doodle-' + (i < 10 ? '0' + i : i) + '.webp');
       }
@@ -1880,11 +1880,11 @@
       var SIZES = [7.5, 8.5, 9.5, 10.5, 11.5, 12];   // 2026-08-05 15:35: 收窄差异（跨度 1.6 倍，对齐参考站温和感）
       var BIG_SIZES = [12.5, 13.5];                   // 放大图同步收窄，保持轻微对比
       var BIG_IMGS = ['doodle/assets/thumbs/doodle-05.webp', 'doodle/assets/thumbs/doodle-12.webp', 'doodle/assets/thumbs/doodle-13.webp', 'doodle/assets/thumbs/doodle-18.webp', 'doodle/assets/thumbs/doodle-21.webp', 'doodle/assets/thumbs/doodle-25.webp', 'doodle/assets/thumbs/doodle-26.webp'];
-      var VIDEOS = ['doodle/assets/video-01-v2.mp4', 'doodle/assets/video-02-v2.mp4', 'doodle/assets/video-03-v2.mp4', 'doodle/assets/video-04-v2.mp4', 'doodle/assets/video-05-v2.mp4', 'doodle/assets/video-06-v2.mp4', 'doodle/assets/video-07-v2.mp4', 'doodle/assets/video-08-v2.mp4', 'doodle/assets/video-09-v2.mp4'];
+      var VIDEOS = ['doodle/assets/video-01-v2.mp4', 'doodle/assets/video-02-v2.mp4', 'doodle/assets/video-03-v2.mp4', 'doodle/assets/video-04-v2.mp4', 'doodle/assets/video-05-v2.mp4', 'doodle/assets/video-06-v2.mp4', 'doodle/assets/video-07-v2.mp4', 'doodle/assets/video-08-v2.mp4', 'doodle/assets/video-09-v2.mp4', 'doodle/assets/video-10-v2.mp4', 'doodle/assets/video-11-v2.mp4', 'doodle/assets/video-12-v2.mp4'];
       // 视频宽高比（与 VIDEOS 一一对应）：07 方形 1:1；08/09 竖版 560x752 ≈ 0.745
-      var VIDEO_RATIO = [1, 1, 1, 1, 1, 1, 1, 0.745, 0.745];
+      var VIDEO_RATIO = [1, 1, 1, 1, 1, 1, 1, 0.745, 0.745, 1, 1, 1];
       var videoAssign = 0; // 视频轮流分配，保证全部出现（不再随机）
-      var AR = { 'doodle-28.webp': 0.757, 'doodle-29.webp': 0.757, 'doodle-31.webp': 0.757, 'doodle-32.webp': 0.747 }; // 非 1:1 图的宽高比：tile 外边框跟随图片
+      var AR = { 'doodle-28.webp': 0.757, 'doodle-29.webp': 0.757, 'doodle-31.webp': 0.757, 'doodle-32.webp': 0.747, 'doodle-35.webp': 0.747, 'doodle-37.webp': 0.747, 'doodle-44.webp': 0.747, 'doodle-45.webp': 0.747 }; // 非 1:1 图的宽高比：tile 外边框跟随图片
 
       var seed = 20260804;
       function rnd() {
