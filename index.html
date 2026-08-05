@@ -963,7 +963,7 @@
       gap: 4.5vw;
       flex-wrap: nowrap;
       flex-shrink: 0;
-      align-items: flex-start; /* 防止瓦片被 flex 拉伸，保持正方形 */
+      align-items: center; /* 2026-08-05 15:35: 行内垂直居中（参考站 Miller 风格），小图大图居中浮动 */
     }
     .dw-tile {
       position: relative;
@@ -1877,8 +1877,8 @@
       var GAP_VW = 4.5;
       var ROW_W = 400;
       var ROWS_N = 6;
-      var SIZES = [6.5, 8, 9, 10.5, 11.5, 13];   // 2026-08-05 15:21: 整体再缩 15%（原 8~15）
-      var BIG_SIZES = [13.5, 15.5];               // 放大图同步微缩，保持对比度
+      var SIZES = [7.5, 8.5, 9.5, 10.5, 11.5, 12];   // 2026-08-05 15:35: 收窄差异（跨度 1.6 倍，对齐参考站温和感）
+      var BIG_SIZES = [12.5, 13.5];                   // 放大图同步收窄，保持轻微对比
       var BIG_IMGS = ['doodle/assets/thumbs/doodle-05.webp', 'doodle/assets/thumbs/doodle-12.webp', 'doodle/assets/thumbs/doodle-13.webp', 'doodle/assets/thumbs/doodle-18.webp', 'doodle/assets/thumbs/doodle-21.webp', 'doodle/assets/thumbs/doodle-25.webp', 'doodle/assets/thumbs/doodle-26.webp'];
       var VIDEOS = ['doodle/assets/video-01-v2.mp4', 'doodle/assets/video-02-v2.mp4', 'doodle/assets/video-03-v2.mp4', 'doodle/assets/video-04-v2.mp4', 'doodle/assets/video-05-v2.mp4', 'doodle/assets/video-06-v2.mp4', 'doodle/assets/video-07-v2.mp4', 'doodle/assets/video-08-v2.mp4', 'doodle/assets/video-09-v2.mp4'];
       // 视频宽高比（与 VIDEOS 一一对应）：07 方形 1:1；08/09 竖版 560x752 ≈ 0.745
