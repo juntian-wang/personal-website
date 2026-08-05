@@ -1894,27 +1894,33 @@
 
       function buildRowSeq(prevLast, prevRow) {
         var seq = [];
+        var lastIdx = {};  // 图名 → 行内最后一次出现的索引，保证最小间距
         var prev = prevLast || null;
         var guard = 0;
+        var MIN_GAP = 10;  // 2026-08-05 15:23: 同一张图在行内至少隔 10 个 tile 再出现（防临近重复）
         while (seq.length < 44 && guard++ < 800) {
-          var cands = [], cands2 = [], cands3 = [];
+          var cands = [], cands2 = [], cands3 = [], cands4 = [];
           for (var k = 0; k < IMGS.length; k++) {
             var name = IMGS[k];
             if (name === prev) continue; // 行内相邻不重复（硬性）
+            var gapOk = lastIdx[name] === undefined || (seq.length - lastIdx[name] >= MIN_GAP);
+            if (!gapOk) continue;        // 行内最小间距（硬性，杜绝同一图频繁重复）
             var inRow = seq.indexOf(name) !== -1; // 行内是否已用
-            var nearPrev = false; // 与上一行同列/相邻列是否重复
+            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±2 列）
             if (prevRow && prevRow.length) {
-              for (var j = Math.max(0, seq.length - 1); j <= Math.min(prevRow.length - 1, seq.length + 1); j++) {
+              for (var j = Math.max(0, seq.length - 2); j <= Math.min(prevRow.length - 1, seq.length + 2); j++) {
                 if (prevRow[j].img === name) { nearPrev = true; break; }
               }
             }
             if (!inRow && !nearPrev) cands.push(name);   // 最佳：行内唯一 + 列不邻近
             else if (!inRow) cands2.push(name);          // 降级1：仅行内唯一
             else if (!nearPrev) cands3.push(name);       // 降级2：仅列不邻近
+            else cands4.push(name);                      // 兜底：全占位
           }
-          var pick = cands.length ? cands : (cands2.length ? cands2 : cands3);
+          var pick = cands.length ? cands : (cands2.length ? cands2 : (cands3.length ? cands3 : cands4));
           if (!pick.length) break;
           seq.push(pick[Math.floor(rnd() * pick.length)]);
+          lastIdx[seq[seq.length - 1]] = seq.length - 1;
           prev = seq[seq.length - 1];
         }
         return seq;
