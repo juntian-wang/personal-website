@@ -1996,7 +1996,7 @@
         var prevVideoT = [];
         for (var pr = 0; pr < rowData.length; pr++) {
           var videoT = [];
-          var wantCount = Math.max(2, Math.floor(rowData[pr].length / 7));
+          var wantCount = Math.max(3, Math.floor(rowData[pr].length / 6)); // 2026-08-05 17:13: 视频频率 /7→/6，每行略增
           var guardV = 0;
           while (videoT.length < wantCount && guardV++ < 300) {
             var candV = 1 + Math.floor(rnd() * (rowData[pr].length - 2));
