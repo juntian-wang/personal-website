@@ -1953,14 +1953,17 @@
           var seq = [];
           var used = 0;
           var guard = 0;
-          while (used < ROW_W - 30 && guard++ < 26) {
+          // 2026-08-07 15:59: 行填满 800vw（ROW_W×2 = 两个周期）——
+          // buildRowSeq 的 44 候选 = POOL(22) 循环 2 轮（顺序相同），
+          // 行内 0~400vw 与 400~800vw 内容一致 → cycleX(400vw) 平移无缝循环
+          while (used < ROW_W * 2 - 30 && guard++ < 52) {
             var img = imgs[seq.length % imgs.length];
             var pool = BIG_IMGS.indexOf(img) !== -1 ? BIG_SIZES : SIZES;
             var w = pool[Math.floor(rnd() * pool.length)];
-            if (used + w + GAP_VW > ROW_W) {
-              w = Math.max(6, ROW_W - GAP_VW - used);
+            if (used + w + GAP_VW > ROW_W * 2) {
+              w = Math.max(6, ROW_W * 2 - GAP_VW - used);
             }
-            if (used + w + GAP_VW > ROW_W + 0.5) break;
+            if (used + w + GAP_VW > ROW_W * 2 + 0.5) break;
             seq.push({ w: w, img: img });
             // 实际显示才算频次（2026-08-07：修正统计口径）
             usedCount[img] = (usedCount[img] || 0) + 1;
