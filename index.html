@@ -1907,48 +1907,19 @@
         return seed / 233280;
       }
 
-      function buildRowSeq(prevLast, prevRow, usedCount, rowIdx, imgLastPos) {
+      function buildRowSeq(prevLast, prevRow, usedCount, rowIdx, imgRecentCols, prev2Row, rowPool, rowIndex) {
+        // 2026-08-07: 确定性错列方案——
+        // 偶数行用 A 组、奇数行用 B 组（相邻行图集零交集）；
+        // 同组 3 行（0/2/4 或 1/3/5）的每张图列位置固定错开 7 列（offset = 行序×7），
+        // 一屏（3 行 × 6 列）内同图列距 ≥7 → 永不重复。
+        // 生成 44 个候选（POOL 22 张循环 2 轮），buildWall 按序取 ≤26 个。
+        var POOL = rowPool || IMGS;
+        var n = POOL.length;
         var seq = [];
-        var lastIdx = {};  // 图名 → 行内最后一次出现的索引，保证最小间距
-        var prev = prevLast || null;
-        var guard = 0;
-        var MIN_GAP = 10;  // 同一张图在行内至少隔 10 个 tile 再出现（防临近重复）
-        while (seq.length < 44 && guard++ < 800) {
-          var cands = [], cands2 = [], cands3 = [], cands4 = [];
-          for (var k = 0; k < IMGS.length; k++) {
-            var name = IMGS[k];
-            if (name === prev) continue; // 行内相邻不重复（硬性）
-            var gapOk = lastIdx[name] === undefined || (seq.length - lastIdx[name] >= MIN_GAP);
-            if (!gapOk) continue;        // 行内最小间距（硬性，杜绝同一图频繁重复）
-            var inRow = seq.indexOf(name) !== -1; // 行内是否已用
-            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±3 列）
-            if (prevRow && prevRow.length) {
-              for (var j = Math.max(0, seq.length - 3); j <= Math.min(prevRow.length - 1, seq.length + 3); j++) {
-                if (prevRow[j].img === name) { nearPrev = true; break; }
-              }
-            }
-            // 2026-08-07: 跨行列重复——同一图在最近 2 行内出现在相近列（±3）也降级
-            if (!nearPrev && imgLastPos && imgLastPos[name] &&
-                rowIdx - imgLastPos[name].row <= 2 &&
-                Math.abs(seq.length - imgLastPos[name].col) <= 3) {
-              nearPrev = true;
-            }
-            if (!inRow && !nearPrev) cands.push(name);   // 最佳：行内唯一 + 列不邻近
-            else if (!inRow) cands2.push(name);          // 降级1：仅行内唯一
-            else if (!nearPrev) cands3.push(name);       // 降级2：仅列不邻近
-            else cands4.push(name);                      // 兜底：全占位
-          }
-          var pick = cands.length ? cands : (cands2.length ? cands2 : (cands3.length ? cands3 : cands4));
-          if (!pick.length) break;
-          // 全局频率均衡——优先选使用次数最少的图（注意：只读，实际计数在 buildWall 显示时累加）
-          pick.sort(function (a, b) {
-            var da = usedCount[a] || 0, db = usedCount[b] || 0;
-            if (da !== db) return da - db;
-            return rnd() - 0.5; // 同频随机
-          });
-          seq.push(pick[0]);
-          lastIdx[seq[seq.length - 1]] = seq.length - 1;
-          prev = seq[seq.length - 1];
+        var orderInGroup = Math.floor(rowIndex / 2); // 组内第几行（0/1/2）
+        var offset = (orderInGroup * 7) % n;
+        for (var i = 0; i < 44; i++) {
+          seq.push(POOL[(i + offset) % n]);
         }
         return seq;
       }
@@ -1956,11 +1927,29 @@
       function buildWall() {
         var rowData = [];
         var prevLast = null;
-        var prevRow = null;
-        var usedCount = {}; // 全局图使用次数统计（实际显示的 tile 上累加，2026-08-07 修正口径）
-        var imgLastPos = {}; // 图名 → {row, col} 最近实际显示位置（跨行列去重，2026-08-07）
+        var prevRow = null;   // 上一行
+        var prev2Row = null;  // 上上行
+        var usedCount = {};   // 全局图使用次数统计（实际显示的 tile 上累加）
+        // 2026-08-07: 奇偶行分组——偶数行用 A 组、奇数行用 B 组（各 22 张），
+        // 相邻行图池无交集 → 一屏（3行）内图片永不重复；隔行（同组）再按列错开。
+        // 组内打乱一次（消除编号规律），同组 3 行共享同一打乱顺序 + 列偏移 7。
+        var IMGS_A = [], IMGS_B = [];
+        for (var ga = 0; ga < IMGS.length; ga++) {
+          if (ga % 2 === 0) IMGS_A.push(IMGS[ga]);
+          else IMGS_B.push(IMGS[ga]);
+        }
+        function shuffleArr(arr) {
+          for (var si = arr.length - 1; si > 0; si--) {
+            var sj = Math.floor(rnd() * (si + 1));
+            var st = arr[si]; arr[si] = arr[sj]; arr[sj] = st;
+          }
+          return arr;
+        }
+        IMGS_A = shuffleArr(IMGS_A);
+        IMGS_B = shuffleArr(IMGS_B);
         for (var r = 0; r < ROWS_N; r++) {
-          var imgs = buildRowSeq(prevLast, prevRow, usedCount, r, imgLastPos);
+          var rowPool = (r % 2 === 0) ? IMGS_A : IMGS_B; // 奇偶行不同池
+          var imgs = buildRowSeq(prevLast, prevRow, usedCount, r, null, prev2Row, rowPool, r);
           var seq = [];
           var used = 0;
           var guard = 0;
@@ -1973,9 +1962,8 @@
             }
             if (used + w + GAP_VW > ROW_W + 0.5) break;
             seq.push({ w: w, img: img });
-            // 实际显示才算频次与位置（2026-08-07：修正统计口径 + 跨行列去重记录）
+            // 实际显示才算频次（2026-08-07：修正统计口径）
             usedCount[img] = (usedCount[img] || 0) + 1;
-            imgLastPos[img] = { row: r, col: seq.length - 1 };
             used += w + GAP_VW;
           }
           if (seq.length > 1 && seq[0].img === seq[seq.length - 1].img) {
@@ -1986,8 +1974,9 @@
               }
             }
           }
+          prev2Row = prevRow;   // 上一行变上上行
           prevLast = seq[seq.length - 1].img;
-          prevRow = seq;
+          prevRow = seq;        // 当前行变上一行
           rowData.push(seq);
         }
         if (rowData.length > 1 && rowData[0][0].img === rowData[rowData.length - 1][rowData[rowData.length - 1].length - 1].img) {
@@ -2023,34 +2012,58 @@
           videoPositions.push(videoT);
           prevVideoT = videoT;
         }
-        // 2026-08-07: 视频分配改为「每人 1 次 + 剩余位补最低频」——
-        // 12 个视频先各出现 1 次（顺序打散），多余位置补「当前出现次数最少」的视频，
-        // 保证频次均衡（最多差 1 次），不会某些视频天然多吃
-        var totalVideoPos = 0;
-        for (var vpc = 0; vpc < videoPositions.length; vpc++) totalVideoPos += videoPositions[vpc].length;
-        var videoSeq = [];
-        var baseOrder = [];
-        for (var vi2 = 0; vi2 < VIDEOS.length; vi2++) baseOrder.push(vi2);
-        // 打散第一轮顺序（Fisher-Yates）
-        for (var sh = baseOrder.length - 1; sh > 0; sh--) {
-          var sw = Math.floor(rnd() * (sh + 1));
-          var tmp2 = baseOrder[sh]; baseOrder[sh] = baseOrder[sw]; baseOrder[sw] = tmp2;
-        }
-        videoSeq = videoSeq.concat(baseOrder);
-        // 剩余位置：补「出现次数最少」的视频（同最低频时随机）
-        function videoCount(idx) {
-          var c = 0;
-          for (var cc = 0; cc < videoSeq.length; cc++) if (videoSeq[cc] === idx) c++;
-          return c;
-        }
-        while (videoSeq.length < totalVideoPos) {
-          var minCnt = 1e9, minCands = [];
-          for (var ci = 0; ci < VIDEOS.length; ci++) {
-            var cvi = videoCount(ci);
-            if (cvi < minCnt) { minCnt = cvi; minCands = [ci]; }
-            else if (cvi === minCnt) minCands.push(ci);
+        // 2026-08-07: 视频分配改为「逐位置贪心」——每个视频位选一个视频：
+        // 1) 排除最近 2 行 ±6 列内已出现的视频（一屏 3×6 内不重复，窗口超过屏宽）
+        // 2) 剩余候选中选「全局出现次数最少」的（频次均衡，最多差 1）
+        // 3) 全部视频都在附近（池子不足）时，退化为频次最少
+        var videoSpots = []; // [{row, col}] 展平视频位
+        for (var vpr = 0; vpr < videoPositions.length; vpr++) {
+          for (var vpc2 = 0; vpc2 < videoPositions[vpr].length; vpc2++) {
+            videoSpots.push({ row: vpr, col: videoPositions[vpr][vpc2] });
           }
-          videoSeq.push(minCands[Math.floor(rnd() * minCands.length)]);
+        }
+        var videoUsedCnt = {};  // 视频 → 全局使用次数
+        var videoLastPos = {};  // 视频 → {row, col} 最近位置
+        var videoPrevPos = {};  // 视频 → 上一个位置（保留最近 2 行，防止覆盖丢失）
+        var spotVideo = {};     // "row:col" → video idx（记录每个位置的分配）
+        for (var vsi = 0; vsi < videoSpots.length; vsi++) {
+          var spot = videoSpots[vsi];
+          var nearVideos = {}; // 附近已用视频集合（最近2行±6列）
+          for (var vk in videoLastPos) {
+            var lp = videoLastPos[vk];
+            if (spot.row - lp.row <= 2 && Math.abs(spot.col - lp.col) <= 6) nearVideos[vk] = true;
+            // 检查更早一次的位置（上上行），防止被覆盖丢失
+            var pp = videoPrevPos[vk];
+            if (pp && spot.row - pp.row <= 2 && Math.abs(spot.col - pp.col) <= 6) nearVideos[vk] = true;
+          }
+          var minCnt = 1e9, minCands = [];
+          for (var vci = 0; vci < VIDEOS.length; vci++) {
+            if (nearVideos[vci]) continue; // 一屏内已出现，跳过
+            var cvi = videoUsedCnt[vci] || 0;
+            if (cvi < minCnt) { minCnt = cvi; minCands = [vci]; }
+            else if (cvi === minCnt) minCands.push(vci);
+          }
+          if (!minCands.length) { // 池子不足：全部在附近，退化选频次最少的
+            minCnt = 1e9; minCands = [];
+            for (var vci2 = 0; vci2 < VIDEOS.length; vci2++) {
+              var cvi2 = videoUsedCnt[vci2] || 0;
+              if (cvi2 < minCnt) { minCnt = cvi2; minCands = [vci2]; }
+              else if (cvi2 === minCnt) minCands.push(vci2);
+            }
+          }
+          var picked = minCands[Math.floor(rnd() * minCands.length)];
+          videoUsedCnt[picked] = (videoUsedCnt[picked] || 0) + 1;
+          // 滚动保留最近 2 个位置：旧位置挪到 prev，新位置覆盖 last
+          if (videoLastPos[picked]) videoPrevPos[picked] = videoLastPos[picked];
+          videoLastPos[picked] = { row: spot.row, col: spot.col };
+          spotVideo[spot.row + ':' + spot.col] = picked;
+        }
+        // 按行遍历重建 videoSeq（与创建循环的顺序一致）
+        var videoSeq = [];
+        for (var vsr = 0; vsr < videoPositions.length; vsr++) {
+          for (var vsc = 0; vsc < videoPositions[vsr].length; vsc++) {
+            videoSeq.push(spotVideo[vsr + ':' + videoPositions[vsr][vsc]]);
+          }
         }
         var videoAssign = 0; // 指向 videoSeq
         for (var g = 0; g < 2; g++) {
