@@ -1898,7 +1898,7 @@
       var VIDEOS = ['doodle/assets/video-01-v2.mp4', 'doodle/assets/video-02-v2.mp4', 'doodle/assets/video-03-v2.mp4', 'doodle/assets/video-04-v2.mp4', 'doodle/assets/video-05-v2.mp4', 'doodle/assets/video-06-v2.mp4', 'doodle/assets/video-07-v2.mp4', 'doodle/assets/video-08-v2.mp4', 'doodle/assets/video-09-v2.mp4', 'doodle/assets/video-10-v2.mp4', 'doodle/assets/video-11-v2.mp4', 'doodle/assets/video-12-v2.mp4'];
       // 视频宽高比（与 VIDEOS 一一对应）：07 方形 1:1；08/09 竖版 560x752 ≈ 0.745
       var VIDEO_RATIO = [1, 1, 1, 1, 1, 1, 1, 0.745, 0.745, 1, 1, 1];
-      var videoAssign = 0; // 视频轮流分配，保证全部出现（不再随机）
+      // 视频分配已移到 buildWall 内（videoSeq 均衡序列，2026-08-07）
       var AR = { 'doodle-28.webp': 0.757, 'doodle-29.webp': 0.757, 'doodle-31.webp': 0.757, 'doodle-32.webp': 0.747, 'doodle-35.webp': 0.747, 'doodle-37.webp': 0.747, 'doodle-44.webp': 0.747, 'doodle-45.webp': 0.747 }; // 非 1:1 图的宽高比：tile 外边框跟随图片
 
       var seed = 20260804;
@@ -1907,12 +1907,12 @@
         return seed / 233280;
       }
 
-      function buildRowSeq(prevLast, prevRow, usedCount) {
+      function buildRowSeq(prevLast, prevRow, usedCount, rowIdx, imgLastPos) {
         var seq = [];
         var lastIdx = {};  // 图名 → 行内最后一次出现的索引，保证最小间距
         var prev = prevLast || null;
         var guard = 0;
-        var MIN_GAP = 10;  // 2026-08-05 15:23: 同一张图在行内至少隔 10 个 tile 再出现（防临近重复）
+        var MIN_GAP = 10;  // 同一张图在行内至少隔 10 个 tile 再出现（防临近重复）
         while (seq.length < 44 && guard++ < 800) {
           var cands = [], cands2 = [], cands3 = [], cands4 = [];
           for (var k = 0; k < IMGS.length; k++) {
@@ -1921,11 +1921,17 @@
             var gapOk = lastIdx[name] === undefined || (seq.length - lastIdx[name] >= MIN_GAP);
             if (!gapOk) continue;        // 行内最小间距（硬性，杜绝同一图频繁重复）
             var inRow = seq.indexOf(name) !== -1; // 行内是否已用
-            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±3 列，2026-08-05 16:38 从 ±2 扩到 ±3 分散更均匀）
+            var nearPrev = false; // 与上一行同列/相邻列是否重复（窗口 ±3 列）
             if (prevRow && prevRow.length) {
               for (var j = Math.max(0, seq.length - 3); j <= Math.min(prevRow.length - 1, seq.length + 3); j++) {
                 if (prevRow[j].img === name) { nearPrev = true; break; }
               }
+            }
+            // 2026-08-07: 跨行列重复——同一图在最近 2 行内出现在相近列（±3）也降级
+            if (!nearPrev && imgLastPos && imgLastPos[name] &&
+                rowIdx - imgLastPos[name].row <= 2 &&
+                Math.abs(seq.length - imgLastPos[name].col) <= 3) {
+              nearPrev = true;
             }
             if (!inRow && !nearPrev) cands.push(name);   // 最佳：行内唯一 + 列不邻近
             else if (!inRow) cands2.push(name);          // 降级1：仅行内唯一
@@ -1934,14 +1940,13 @@
           }
           var pick = cands.length ? cands : (cands2.length ? cands2 : (cands3.length ? cands3 : cands4));
           if (!pick.length) break;
-          // 2026-08-05 16:38: 全局频率均衡——优先选使用次数最少的图，避免某些图密集重复
+          // 全局频率均衡——优先选使用次数最少的图（注意：只读，实际计数在 buildWall 显示时累加）
           pick.sort(function (a, b) {
             var da = usedCount[a] || 0, db = usedCount[b] || 0;
             if (da !== db) return da - db;
             return rnd() - 0.5; // 同频随机
           });
           seq.push(pick[0]);
-          usedCount[pick[0]] = (usedCount[pick[0]] || 0) + 1;
           lastIdx[seq[seq.length - 1]] = seq.length - 1;
           prev = seq[seq.length - 1];
         }
@@ -1952,9 +1957,10 @@
         var rowData = [];
         var prevLast = null;
         var prevRow = null;
-        var usedCount = {}; // 全局图使用次数统计（2026-08-05 16:38：全墙频率均衡）
+        var usedCount = {}; // 全局图使用次数统计（实际显示的 tile 上累加，2026-08-07 修正口径）
+        var imgLastPos = {}; // 图名 → {row, col} 最近实际显示位置（跨行列去重，2026-08-07）
         for (var r = 0; r < ROWS_N; r++) {
-          var imgs = buildRowSeq(prevLast, prevRow, usedCount);
+          var imgs = buildRowSeq(prevLast, prevRow, usedCount, r, imgLastPos);
           var seq = [];
           var used = 0;
           var guard = 0;
@@ -1967,6 +1973,9 @@
             }
             if (used + w + GAP_VW > ROW_W + 0.5) break;
             seq.push({ w: w, img: img });
+            // 实际显示才算频次与位置（2026-08-07：修正统计口径 + 跨行列去重记录）
+            usedCount[img] = (usedCount[img] || 0) + 1;
+            imgLastPos[img] = { row: r, col: seq.length - 1 };
             used += w + GAP_VW;
           }
           if (seq.length > 1 && seq[0].img === seq[seq.length - 1].img) {
@@ -2014,6 +2023,36 @@
           videoPositions.push(videoT);
           prevVideoT = videoT;
         }
+        // 2026-08-07: 视频分配改为「每人 1 次 + 剩余位补最低频」——
+        // 12 个视频先各出现 1 次（顺序打散），多余位置补「当前出现次数最少」的视频，
+        // 保证频次均衡（最多差 1 次），不会某些视频天然多吃
+        var totalVideoPos = 0;
+        for (var vpc = 0; vpc < videoPositions.length; vpc++) totalVideoPos += videoPositions[vpc].length;
+        var videoSeq = [];
+        var baseOrder = [];
+        for (var vi2 = 0; vi2 < VIDEOS.length; vi2++) baseOrder.push(vi2);
+        // 打散第一轮顺序（Fisher-Yates）
+        for (var sh = baseOrder.length - 1; sh > 0; sh--) {
+          var sw = Math.floor(rnd() * (sh + 1));
+          var tmp2 = baseOrder[sh]; baseOrder[sh] = baseOrder[sw]; baseOrder[sw] = tmp2;
+        }
+        videoSeq = videoSeq.concat(baseOrder);
+        // 剩余位置：补「出现次数最少」的视频（同最低频时随机）
+        function videoCount(idx) {
+          var c = 0;
+          for (var cc = 0; cc < videoSeq.length; cc++) if (videoSeq[cc] === idx) c++;
+          return c;
+        }
+        while (videoSeq.length < totalVideoPos) {
+          var minCnt = 1e9, minCands = [];
+          for (var ci = 0; ci < VIDEOS.length; ci++) {
+            var cvi = videoCount(ci);
+            if (cvi < minCnt) { minCnt = cvi; minCands = [ci]; }
+            else if (cvi === minCnt) minCands.push(ci);
+          }
+          videoSeq.push(minCands[Math.floor(rnd() * minCands.length)]);
+        }
+        var videoAssign = 0; // 指向 videoSeq
         for (var g = 0; g < 2; g++) {
           var group = document.createElement('div');
           group.className = 'dw-group';
@@ -2033,9 +2072,9 @@
                 // 视频 tile：行内位置随机且跨行错开（videoT 集合），避免同列对齐/相近堆叠
                 var wantVideo = VIDEOS.length && videoT.indexOf(t) !== -1;
                 if (wantVideo) {
-                  var vIdx = videoAssign % VIDEOS.length;
+                  var vIdx = videoSeq[videoAssign % videoSeq.length]; // 均衡分配序列（每人≥1次）
                   var video = document.createElement('video');
-                  video.src = VIDEOS[vIdx]; // 视频轮流分配（创建时设 src；懒下载由 preload=none 控制）
+                  video.src = VIDEOS[vIdx]; // 视频分配（创建时设 src；懒下载由 preload=none 控制）
                   videoAssign++;
                   video.poster = rowData[rr][t].img; // poster 用本应显示的涂鸦图：未加载时显示图片，不空白，且零额外请求
                   video.muted = true; video.loop = true; video.playsInline = true;
